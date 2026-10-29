@@ -27,6 +27,12 @@
 
 The patch fixes indentation, adds a real gameplay-scene four-match regression test, makes Star Beam's icon/forging message more obvious, configures the missing provisional `assets/icon.svg` for Android export, and strengthens CI to fail on engine errors. Automated checks are required; **Android phone confirmation is still outstanding**. See [M2 guide](M2_SPECIALS_NOVA.md) and [QA plan](QA_TEST_PLAN.md). M2 remains open.
 
+## M2 special-combination audit (2026-10-29)
+
+The previous GDScript scene-load defect was shared across all power mechanics. A follow-up [combination audit (#19)](https://github.com/FoxyLight/Cosmic-Crystals/issues/19) now covers all 16 ordered special-pair types over six swap positions/orientations, plus an independently checked Nova chain. The new real-scene integration test also covers row/column Beam, Bomb and Supernova formation, Beam+Bomb swap, and Nova targeting/cancellation.
+
+**Confirmed separate UI bug:** An unaffected special crystal temporarily lost its overlay while another group cleared. The rendering path now retains the correct power marker. Android visual verification is still needed. See [M2 mechanics](M2_SPECIALS_NOVA.md) and [QA plan](QA_TEST_PLAN.md). M2 is not closed.
+
 ## Milestone rollup
 
 | Workstream | Tracking issue | Status |

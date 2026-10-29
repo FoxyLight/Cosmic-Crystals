@@ -11,6 +11,8 @@
 - `scripts/prototype.gd`: procedural starfield/crystals, readable power icons, HUD with Nova meter and cancelable targeting, touch/swipe input, animated gem+power events with phase locking, collection goal and synthetic draw/FPS stress test.
 - `tests/test_board.gd`: original 125-seed M1 rules and animation event invariants.
 - `tests/test_powers.gd`: seeded M2 special formation/activation, combos, Nova zero-cost/charge, event replay and overlap deduplication.
+- `tests/test_power_matrix.gd`: 96 ordered two-power combinations across center/edge and horizontal/vertical positions, independently expected blast union and exact gem/power/gravity/score invariants.
+- `tests/test_power_scene.gd`: real scene-controller creation of both Beam orientations, Bomb and Supernova, a Beam+Bomb swap and NOVA target/cancel controls.
 - `.github/workflows/godot-checks.yml`: downloads Godot 4.7.2, parses/imports and smoke-tests the scene, runs headless seeded tests, and exports a debug Android APK plus HTML5 artifacts.
 
 **Verified automatically:** Android debug APK and Web artifacts generated, parsing/tests/scenes pass. **Not yet verified:** actual APK install, browser runtime, touch/UX, measured graphics performance, AAB or iOS export.
@@ -81,6 +83,8 @@ CI runs:
 godot --headless --path . --editor --quit
 godot --headless --path . --script res://tests/test_board.gd
 godot --headless --path . --script res://tests/test_powers.gd
+godot --headless --path . --script res://tests/test_power_matrix.gd
+godot --headless --path . --script res://tests/test_power_scene.gd
 godot --headless --path . --quit-after 120
 ```
 

@@ -80,6 +80,16 @@ The M2 tests cover reward creation (four horizontal, four vertical, five straigh
 
 **CI success proves code execution and APK/web artifact creation, not that complex special animations are readable or responsive on an actual Android phone.** The next field test should check target selection and cancellation and validate charge rate.
 
+## Special-combination compatibility audit (2026-10-29)
+
+After the Star Beam scene-loader repair, we audited **every ordered pair** of Star Beam (row), Star Beam (column), Cosmic Bomb and Supernova across middle, top-left and bottom-right placements, in both horizontal and vertical swap orientations. The additional [power matrix](../tests/test_power_matrix.gd) exercises **96 cases** (16 ordered pairings × six arrangements), compares the precise first-blast cleared indices against an independently calculated footprint, and checks triggered counts, no double-counted cells, scoring, complete event continuity, gem/power gravity preservation, and stable board resolution. It additionally checks a Nova Pulse that chain-activates three different powers.
+
+The [playable-scene integration test](../tests/test_power_scene.gd) checks that actual Godot game controller swaps produce a horizontal Star Beam, vertical Star Beam, Supernova and Cosmic Bomb, that swapping Beam+Bomb starts resolution, and that the NOVA HUD supports targeting, cancel-without-consuming-charge and activation. Existing [M2 tests](../tests/test_powers.gd) remain active. All these checks run under the strict Godot error-log guard and the project still exports debug Android APK and Web builds.
+
+**Confirmed visual issue and fix:** When an unrelated group cleared, surviving special crystals were drawn without their power overlays during the clear animation because `_draw_animated_event()` omitted `specials_before[index]` for unaffected cells. The overlay now persists during clearing, as it already did during swaps, falling and idle rendering.
+
+**Remaining qualification:** An automated gameplay/renderer logic check does not prove the on-phone clarity of all blast animations; Android player verification remains open. This audit does **not** implement bespoke combined-special visual effects, blockers, or 5-level progression. Follow [issue #19](https://github.com/FoxyLight/Cosmic-Crystals/issues/19) and [M2 #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6).
+
 ## Next unresolved work
 
 - **Asteroid blockers** and their adjacent-match, special-area and Nova damage. A blocker cannot safely be added as just a gem kind; model blocker durability/occupancy separately and test gravity and deadlock behavior.
