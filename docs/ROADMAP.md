@@ -47,6 +47,8 @@
 
 ## Priority 1: Distinctive cosmic gameplay and a complete player journey
 
+**M2 reliability fix:** After the first special-piece phone playtest, the player reported missing Star Beam creation. [Bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17) identified a gameplay-scene parse error suppressed by green CI. [PR #18](https://github.com/FoxyLight/Cosmic-Crystals/pull/18) corrects the scene and adds a real-scene four-match smoke test with fail-on-Godot-errors CI. Retesting on a phone is pending; M2 stays open.
+
 ### M2: Cosmic mechanics | [Issue #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6)
 
 **Partial playable implementation:** Godot PR #16 adds tested specials, combo unions and targetable Nova. See [M2 Gameplay Guide](M2_SPECIALS_NOVA.md). Android feel/balance and blockers remain open.
