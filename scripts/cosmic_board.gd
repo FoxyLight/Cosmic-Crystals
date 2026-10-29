@@ -69,7 +69,16 @@ func play_swap(a: int, b: int) -> Dictionary:
 		return result
 
 	result["valid"] = true
-	var target_kind: int = original_b_kind if original_a_special == SUPERNOVA else original_a_kind
+	# A directly swapped Supernova targets the other piece's color.
+	# A Supernova hit later by a beam/bomb targets its OWN color.
+	var target_kind: int = -1
+	var focus_index: int = -1
+	if original_a_special == SUPERNOVA:
+		target_kind = original_b_kind
+		focus_index = b
+	elif original_b_special == SUPERNOVA:
+		target_kind = original_a_kind
+		focus_index = a
 	var full_board: bool = original_a_special == SUPERNOVA and original_b_special == SUPERNOVA
 	var seeds: Array[int] = matched.duplicate()
 	if activating:
@@ -88,7 +97,7 @@ func play_swap(a: int, b: int) -> Dictionary:
 	if not reward.is_empty():
 		seeds.erase(int(reward["index"]))
 		# No accidental activation of a power created by this same turn.
-	_resolve(seeds, result, reward, target_kind, false)
+	_resolve(seeds, result, reward, target_kind, false, focus_index)
 	return result
 
 
@@ -205,7 +214,7 @@ func _find_reward(matched: Array[int], a: int, b: int) -> Dictionary:
 
 
 func _expand_seeds(initial: Array[int], result: Dictionary,
-		target_kind: int) -> Array[int]:
+		target_kind: int, focus_index: int) -> Array[int]:
 	# All effect areas are unioned BEFORE clearing. Chains are evaluated once.
 	var marked: Dictionary = {}
 	var pending: Array[int] = initial.duplicate()
@@ -236,7 +245,7 @@ func _expand_seeds(initial: Array[int], result: Dictionary,
 					for c in range(maxi(0, col - 1), mini(WIDTH, col + 2)):
 						pending.append(r * WIDTH + c)
 			SUPERNOVA:
-				var wanted: int = target_kind if target_kind >= 0 else cells[index]
+				var wanted: int = target_kind if index == focus_index and target_kind >= 0 else cells[index]
 				for i in range(cells.size()):
 					if cells[i] == wanted:
 						pending.append(i)
@@ -248,12 +257,12 @@ func _expand_seeds(initial: Array[int], result: Dictionary,
 
 
 func _resolve(initial: Array[int], result: Dictionary, reward: Dictionary,
-		target_kind: int, is_nova: bool) -> void:
+		target_kind: int, is_nova: bool, focus_index: int = -1) -> void:
 	var pending: Array[int] = initial.duplicate()
 	for chain in range(1, MAX_CASCADES + 1):
 		if pending.is_empty():
 			break
-		var cleared: Array[int] = _expand_seeds(pending, result, target_kind)
+		var cleared: Array[int] = _expand_seeds(pending, result, target_kind, focus_index)
 		if cleared.is_empty():
 			break
 		var before: Array[int] = cells.duplicate()
