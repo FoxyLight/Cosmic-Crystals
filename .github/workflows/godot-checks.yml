@@ -71,11 +71,13 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install Android command line SDK
-        uses: android-actions/setup-android@v3
-      - name: Install Android SDK packages
+      - name: Install Android SDK packages on the GitHub Linux runner
         run: |
-          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort | tail -1)"
+          test -n "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
           test -x "$ANDROID_HOME/platform-tools/adb"
       - name: Download Godot 4.7.2 editor
         run: |
