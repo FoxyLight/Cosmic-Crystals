@@ -25,7 +25,7 @@ A milestone is **Done** only if all its exit criteria have demonstrable evidence
 | Foundation | Godot spike, seeded rules and headless CI | **Done** | None | [Merged PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5), [CI pass](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782) | [#1](https://github.com/FoxyLight/Cosmic-Crystals/issues/1), [#2](https://github.com/FoxyLight/Cosmic-Crystals/issues/2) |
 | **M0** | Android/web engine viability | **In progress** | Foundation | Debug APK on physical Android, signed AAB pipeline, tested web export, recorded performance and explicit engine go/no-go | [#4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4) |
 | **M1** | Stable animated match-3 loop | **In progress** | Foundation | Ordered event-driven swaps/rollback/cascades, correct game-state transitions, deterministic edge-case tests and touch-playthrough | [#3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) |
-| **M2** | Cosmic powers and blockers | **Not started** | M1 | Star Beam, Bomb, Supernova, combinations, asteroids and Nova Pulse all working/tested | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) |
+| **M2** | Cosmic powers and blockers | **In progress** | M1 | Star Beam, Bomb, Supernova, combinations, asteroids and Nova Pulse all working/tested | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) |
 | **M3** | Five-level Lyra vertical slice | **Not started** | M1 + M2 | Five tunable/winnable levels, galaxy map, tutorials, star rankings and versioned local saves | [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) |
 | **M4** | Art, sound, accessibility and mobile UX | **Not started** | M1; integrates with M3 | Readable cosmic art, effects, audio settings, reduced motion and phone-safe UI | [#8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) |
 | **M5** | Android and web release candidate | **Not started** | M0–M4 | Device/browser matrix green, no critical/high bugs, signed release candidate and recorded QA evidence | [#9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
@@ -37,6 +37,9 @@ A milestone is **Done** only if all its exit criteria have demonstrable evidence
 **After first release:** M7 is not required for a five-level MVP.
 
 ## What is in the current game
+
+**M2 progress (PR #16):** Star Beam, Cosmic Bomb, Supernova and targeted Nova Pulse now extend the M1 rules in [CosmicBoard](../scripts/cosmic_board.gd). The [M2 guide](M2_SPECIALS_NOVA.md) specifies first-pass combos and remaining blocker/device tests. M2 stays open until asteroids, balance and phone acceptance pass.
+
 
 The repository's one-scene prototype provides an 8×8 board with six crystal kinds, touch/mouse selection, match scanning, seeded legal board generation, gravity/refill/cascades, a total collection target, moves and a basic win/loss. The rules compute a turn synchronously but now return an ordered event sequence for animated swap/clear/drop/refill playback (PR #13); the production special-piece/level state model is still missing. It is **not** a five-level game and does **not** yet include specials, Nova, asteroid blockers, persistent progression, platform binaries or commercial SDKs.
 
