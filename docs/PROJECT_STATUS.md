@@ -16,7 +16,8 @@
 - **Unverified:** device/browser runtime compatibility and measurements, AAB Gradle/release signing, Play distribution, physical-device input and thermal behavior.
 - **M1 in progress:** ordered turn events and basic swap/clear/drop animations are coded; manual device playtesting, last-move/interruption tests and production UI are pending.
 - **M4 visual accessibility patch (PR #14):** player feedback identified Solar Amber/white Lunar Opal confusion on Android. New warm/icy fills, dark per-kind outlines and unique geometric silhouettes are implemented with a separate headless visual regression test. The player subsequently tested the updated Android build and confirmed it **looks a lot better** (positive qualitative follow-up, 2026-10-29). Controlled brightness/grayscale checks, broader readability tests and M4 production visual/art/audio acceptance remain open; M4 is not complete. See [Visual Identity](VISUAL_PALETTE.md).
-- **Missing product systems:** special pieces, asteroids, Nova Pulse, five complete levels, star map, local saving, tutorials, production audio and release flows.
+- **M2 first playable slice (PR #16):** Star Beams (row/column), Cosmic Bomb, Supernova, first-pass special combinations, chargeable Nova meter, zero-move targeted Nova Pulse and cancel targeting are coded and headlessly tested. Android gameplay feel/energy balance remain unverified. See [M2 gameplay guide](M2_SPECIALS_NOVA.md).
+- **Missing product systems:** asteroid blockers, five complete levels, star map, local saving, tutorials, production audio and release flows.
 
 ## Milestone rollup
 
@@ -24,7 +25,7 @@
 | --- | --- | --- |
 | Engine export/device validation (M0) | [#4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4) | In progress, blocking production sign-off |
 | Animated core and resolution (M1) | [#3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) | In progress |
-| Special pieces, blockers and Nova (M2) | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) | Not started |
+| Special pieces, blockers and Nova (M2) | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) | In progress: core powers/Nova implemented; asteroid blockers and phone QA pending |
 | Five levels, map and saves (M3) | [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) | Not started |
 | Mobile UX, art and audio (M4) | [#8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) | Contrast improvement in progress; full M4 still open |
 | End-to-end QA and release candidate (M5) | [#9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) | Not started |
@@ -35,7 +36,7 @@
 
 1. **M0:** Use the now repeatable CI APK/Web exports for actual device/browser playtests. Establish an AAB Gradle signing pipeline and record the Godot go/no-go.
 2. **M1:** Event stream and basic animations are implemented in PR #13; test interaction timing on devices and add last-move/interruption regression coverage.
-3. **M2:** Implement the Star Beam/Bomb/Supernova/Nova progression on that stable event pipeline.
+3. **M2:** The core special pieces and targeted Nova are coded with deterministic tests; next verify phone play and implement asteroid blockers, power balance and stronger chain regression.
 4. **M3–M4:** Build and polish the complete five-level Lyra journey.
 5. **M5–M6:** Test, sign and distribute once exit gates are met.
 
