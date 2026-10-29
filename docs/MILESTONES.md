@@ -18,6 +18,8 @@ Each milestone is represented by a **dedicated GitHub tracking issue** with chec
 
 A milestone is **Done** only if all its exit criteria have demonstrable evidence (test run, tagged build, device/browser test notes or approved sign-off). An unchecked item is not complete merely because a plan describes it.
 
+**Latest Android test evidence (2026-10-29):** The player reports the latest gameplay smoke test **passed**. See [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md). This partially satisfies M0's physical APK playability and M1/M2's human feedback, **not** comprehensive hardware QA, browser, AAB or asteroid-blocker acceptance.
+
 ## Milestone register
 
 | ID | Milestone | Status at baseline | Depends on | Exit / acceptance evidence | GitHub |
@@ -41,7 +43,7 @@ A milestone is **Done** only if all its exit criteria have demonstrable evidence
 **M2 progress:** PR #16 implemented Star Beam, Cosmic Bomb, Supernova and Nova Pulse; PR #18 repaired the shared gameplay-script loading bug. [Compatibility audit #19](https://github.com/FoxyLight/Cosmic-Crystals/issues/19) now tests all 96 ordered special-pair/position scenarios plus real scene creation/targeting. A separate overlay regression for surviving special pieces has been fixed. See the [M2 guide](M2_SPECIALS_NOVA.md) for confirmed automated coverage. **M2 remains open** for asteroid blockers, balance, device acceptance and broader gameplay QA.
 
 
-The repository's one-scene prototype provides an 8×8 board with six crystal kinds, touch/mouse selection, match scanning, seeded legal board generation, gravity/refill/cascades, a total collection target, moves and a basic win/loss. The rules compute a turn synchronously but now return an ordered event sequence for animated swap/clear/drop/refill playback (PR #13); the production special-piece/level state model is still missing. It is **not** a five-level game and does **not** yet include specials, Nova, asteroid blockers, persistent progression, platform binaries or commercial SDKs.
+The repository's current one-scene prototype provides an animated 8×8 board, six crystal kinds, mobile tap/swipe input, cascades, M2 Star Beams, Cosmic Bombs, Supernovas and targeted Nova Pulse, a short 30-crystal goal, and a deliberate PLAY AGAIN result control. Versioned Android debug APK and Web exports are produced in CI, and the player reports an Android gameplay smoke PASS. The game is **not** a five-level campaign; asteroid blockers, persistent progression, production art/audio, signed release AAB, real browser acceptance and commercial SDKs remain missing.
 
 The separately published concept advertises 20 levels and four constellations. Treat that as a **vision**, not a repository acceptance claim.
 

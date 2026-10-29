@@ -2,6 +2,8 @@
 
 **Status (2026-10-29):** GitHub Actions generates a **versioned Android debug APK** with verified manifest versionCode/versionName and SHA-256 metadata, plus a Godot HTML5/Web artifact. Players have tested earlier debug APKs on Android, but systematic device/browser QA, a signed AAB and store acceptance remain open. See [Android APK Versioning](ANDROID_VERSIONING.md).
 
+**Human Android evidence:** The player reported **“Human playtest passes”** on 2026-10-29. This is a successful general gameplay smoke test, not a complete device or release validation. The [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md) identifies the recommended versioned build and the missing hardware/environment measurements.
+
 ## 1. Open and run the prototype
 
 Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/) (not the .NET edition). Clone this repository and import `project.godot` in the Godot Project Manager.

@@ -5,6 +5,14 @@
 **Primary milestone register:** [MILESTONES.md](MILESTONES.md)  
 **Status rule:** evidence before checkmarks; dates below are snapshot dates rather than delivery commitments.
 
+## Android playtest sign-off: player-reported PASS (2026-10-29)
+
+The player confirms **“Human playtest passes”** after the Star Beam/combo/Nova fixes, accidental restart correction, and versioned APK rollout. This is evidence of a successful **practical Android gameplay smoke test**. It does **not** establish that every combo/performance/interruption case was individually tested or independently measure the device. The immediately recommended artifact was [v0.2.0-dev.82.1](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40958771036), but its installation was not verified over ADB.
+
+The [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md) records the pass, the exact evidence boundary, and the remaining M0/M1/M2 requirements. The reported gameplay reset issue and power audit may be accepted at smoke-test level; full milestone gates remain open.
+
+**Next gameplay priority:** Asteroid blockers and interactions with adjacent matches, special beams/bombs, Nova and blocker-safe gravity/reshuffles. Debug signing persistence and full device/web QA remain parallel infrastructure tasks.
+
 ## Executive summary
 
 **Status: Godot M0/M1 implementation underway; headless rules tests and automated web/debug-APK exports pass, but device/browser QA and Android release distribution remain unproven.**
@@ -14,7 +22,7 @@
 - **CI evidence:** [main branch passing workflow](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782) imported Godot, ran `tests/test_board.gd`, and completed a 120-frame headless scene smoke test.
 - **Verified in PR #13 CI:** Web and Android debug APK artifacts generated, expanded event replay tests and 120-frame scene smoke test passed ([workflow](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)).
 - **Unverified:** device/browser runtime compatibility and measurements, AAB Gradle/release signing, Play distribution, physical-device input and thermal behavior.
-- **M1 in progress:** ordered turn events and basic swap/clear/drop animations are coded; manual device playtesting, last-move/interruption tests and production UI are pending.
+- **M1 in progress:** ordered turn events and swap/clear/drop animations are implemented and an Android human gameplay smoke passes; last-move/interruption tests, prolonged device sessions and production UI are still pending.
 - **M4 visual accessibility patch (PR #14):** player feedback identified Solar Amber/white Lunar Opal confusion on Android. New warm/icy fills, dark per-kind outlines and unique geometric silhouettes are implemented with a separate headless visual regression test. The player subsequently tested the updated Android build and confirmed it **looks a lot better** (positive qualitative follow-up, 2026-10-29). Controlled brightness/grayscale checks, broader readability tests and M4 production visual/art/audio acceptance remain open; M4 is not complete. See [Visual Identity](VISUAL_PALETTE.md).
 - **M2 first playable slice (PR #16):** Star Beams (row/column), Cosmic Bomb, Supernova, first-pass special combinations, chargeable Nova meter, zero-move targeted Nova Pulse and cancel targeting are coded and headlessly tested. Android gameplay feel/energy balance remain unverified. See [M2 gameplay guide](M2_SPECIALS_NOVA.md).
 - **Missing product systems:** asteroid blockers, five complete levels, star map, local saving, tutorials, production audio and release flows.

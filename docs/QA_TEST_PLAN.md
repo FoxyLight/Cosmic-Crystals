@@ -3,6 +3,14 @@
 **Status:** Test strategy and acceptance gates, not a report of tests already run.  
 **Snapshot:** 2026-10-29
 
+## Latest physical Android gameplay smoke: PASS (player-reported)
+
+**2026-10-29:** The player confirmed **“Human playtest passes”** after receiving the newest versioned debug APK instructions. This establishes a **positive overall physical Android gameplay smoke test**, not a separate verified pass for each rare power combination, every deadlock scenario, or hardware performance requirement.
+
+The immediately preceding requested scope covered four/five-match special creation, combos, Nova Pulse, unexpected board resets, PLAY AGAIN and reshuffle behavior. Actual installed build/version was not read back through ADB; the **recommended** version was `0.2.0-dev.82.1+gb5e1737d`, from [main workflow #40958771036](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40958771036). Full evidence boundaries and outstanding fields: [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md).
+
+**Still outstanding:** device/Android version, FPS/RAM/thermals/touch latency, interruption/resume, safe areas, exhaustive manual combo coverage, web browser testing, signed AAB and final M0 engine sign-off. Do not conflate this limited smoke-test pass with release acceptance.
+
 ## 1. Current automated coverage
 
 The repository runs Godot headless import, `tests/test_board.gd`, the new `tests/test_visuals.gd` style assertions and a 120-frame scene smoke test in GitHub Actions, plus Android debug APK and Web export jobs.
