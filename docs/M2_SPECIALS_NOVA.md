@@ -56,6 +56,18 @@ Events are `swap`, `swap_back`, `clear`, `special_create`, `fall`, and `reshuffl
 
 Each falling event also carries the special type with the moving gem, preventing special rewards from becoming detached from their underlying crystal during gravity. Basic overlay icons distinguish horizontal and vertical beams, bombs and Supernovas, and the prior six-color/six-shape accessibility improvements remain in use.
 
+## Android regression: four-match Star Beam (2026-10-29)
+
+**Reported:** A player who tested the first M2 Android APK observed that matching four crystals did not create a Star Beam.
+
+**Confirmed engineering cause:** The initial M2 `scripts/prototype.gd` contained two literal backslash-`t` tokens in the Nova HUD instead of indentation. Godot logged `SCRIPT ERROR: Parse Error` and `Failed to load script` when importing/launching the gameplay scene, yet returned process exit code 0. Our original CI incorrectly called this a passing gameplay build. A downloadable APK alone did not prove the playable scene loaded. See [bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17).
+
+**Fix:** Correct the GDScript indentation, strengthen Star Beam's persistent cyan ring and line icon, and show the exact power name (`STAR BEAM FORGED!`) in result feedback.
+
+**Preventing recurrence:** CI now wraps every Godot parsing, test, scene launch and export command in a log-error guard that fails if Godot reports script/parser/runtime errors, even with a zero exit code. The guard has self-tests. `tests/test_game_scene.gd` loads the real `Prototype.tscn`, verifies the gameplay script is attached and initialized, performs a four-gem swap through its `_take_turn()` entry point, and asserts that a row Star Beam is forged.
+
+**Phone acceptance pending:** Install the new debug APK, make an intentional four-gem straight match (not just a cascade), and confirm that a bright cyan-ringed stripe gem survives the fall, that the `STAR BEAM FORGED!` message appears, and that swapping the new Beam later clears a row. Document device result in [#17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17). **Do not assume this is fixed on the user's device until retested.**
+
 ## Validation
 
 The existing CI workflow still runs the M1 seeded tests, M4 gem-contrast tests, and a 120-frame headless scene smoke, with Godot 4.7.2 Web/Android-debug exports. It additionally runs:
