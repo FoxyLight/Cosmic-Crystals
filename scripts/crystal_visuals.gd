@@ -9,21 +9,21 @@ const NAMES = [
 	"Plasma Ruby", "Aurora Emerald", "Lunar Opal"
 ]
 
-# Warm deep-orange amber versus a COOL blue-white opal, not two pale yellows.
+# Golden amber versus cool blue-white opal; royal-blue sapphire versus vibrant green.
 const FILL_HEX = [
-	"#824CF1", "#ED9B18", "#13B5EB",
-	"#F849A9", "#24CF87", "#D0EDFF"
+	"#B566FF", "#FFC442", "#3D65F5",
+	"#FF4F88", "#24EE78", "#CAF7FF"
 ]
 const OUTLINE_HEX = [
-	"#371570", "#733907", "#075176",
+	"#371570", "#733907", "#172861",
 	"#792354", "#075B3C", "#2F5C88"
 ]
 const FACET_HEX = [
-	"#C09BFF", "#FFD26A", "#70E6FF",
+	"#DFC1FF", "#FFE19B", "#8BACFF",
 	"#FFA0D4", "#93FFD1", "#83C9F6"
 ]
 const GLINT_HEX = [
-	"#E0D0FF", "#FFE19B", "#C1F5FF",
+	"#E0D0FF", "#FFE19B", "#C2D4FF",
 	"#FFD0E8", "#C9FFE9", "#EDF9FF"
 ]
 
@@ -68,7 +68,7 @@ static func shape_points(kind: int, center: Vector2, radius: float) -> PackedVec
 				var r: float = radius * (1.04 if i % 2 == 0 else 0.78)
 				points.append(center + Vector2(cos(theta), sin(theta)) * r)
 		2:
-			# A wider, cyan sapphire hexagon.
+			# A wider royal-blue sapphire hexagon.
 			for i in range(6):
 				var theta: float = TAU * float(i) / 6.0
 				points.append(center + Vector2(cos(theta), sin(theta) * 0.88) * radius)

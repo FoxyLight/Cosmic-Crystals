@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Original vector goal icon matching the procedural board's rock. -->
+  <path d="M30 4 47 10 59 25 54 45 40 59 19 55 5 41 8 20Z" fill="#897360" stroke="#C7A67D" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M30 4 36 31 8 20Z" fill="#A58B72"/>
+  <circle cx="23" cy="24" r="8" fill="#403B47"/>
+  <circle cx="43" cy="38" r="5" fill="#4F454D"/>
+  <circle cx="25" cy="47" r="3" fill="#FFDE9E"/>
+  <circle cx="35" cy="47" r="3" fill="#FFDE9E"/>
+</svg>
