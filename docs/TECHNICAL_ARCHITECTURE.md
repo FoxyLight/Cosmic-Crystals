@@ -6,9 +6,11 @@
 
 - `project.godot`: Compatibility renderer and portrait-oriented baseline.
 - `scenes/Prototype.tscn`: one-screen test scene.
-- `scripts/board.gd`: seedable 8×8 board generation, match scanning, legal swaps, gravity/refill/cascades, deadlock fallback, and immutable ordered `swap`, `swap_back`, `clear`, `fall` and `reshuffle` event snapshots.
-- `scripts/prototype.gd`: procedural starfield/crystals, HUD, touch and swipe/tap input, animated event playback with `phase` locking, score/move/collection goal, win/loss, and a synthetic draw/FPS stress test.
-- `tests/test_board.gd`: 125-seed rules tests, rejected adjacent swaps, intersection deduplication, stable-board checks, complete event replay and scoring invariants.
+- `scripts/board.gd`: stable seeded 8×8 generation/matching and M1 turn/event behavior.
+- `scripts/cosmic_board.gd`: M2 subclass with a parallel 64-entry special array, deterministic Star Beam/Bomb/Supernova creation/trigger chains, capped Nova energy, zero-move row/column target action and dual gem/special event snapshots.
+- `scripts/prototype.gd`: procedural starfield/crystals, readable power icons, HUD with Nova meter and cancelable targeting, touch/swipe input, animated gem+power events with phase locking, collection goal and synthetic draw/FPS stress test.
+- `tests/test_board.gd`: original 125-seed M1 rules and animation event invariants.
+- `tests/test_powers.gd`: seeded M2 special formation/activation, combos, Nova zero-cost/charge, event replay and overlap deduplication.
 - `.github/workflows/godot-checks.yml`: downloads Godot 4.7.2, parses/imports and smoke-tests the scene, runs headless seeded tests, and exports a debug Android APK plus HTML5 artifacts.
 
 **Verified automatically:** Android debug APK and Web artifacts generated, parsing/tests/scenes pass. **Not yet verified:** actual APK install, browser runtime, touch/UX, measured graphics performance, AAB or iOS export.
@@ -61,7 +63,7 @@ A tile must be collected/damaged only once per match resolution step; intersecti
 
 ### Domain data
 
-The **event log** is implemented for current blocker-free swaps, clearing and gravity. Next, move from the integer-only crystal representation to explicit crystal/special kind, cell occupancy, blocker durability, objective/goal deltas, level move budget and Nova energy. Prefer typed GDScript classes and Resources/validated JSON for level data.
+The **event log** now includes separate gem and special snapshots, including falling power locations. M2 implemented a separate special-type array and Nova charge. Next introduce blocker durability, multi-goal objectives, level move budgets and versioned progression. Prefer typed GDScript classes and Resources/validated JSON for level data.
 
 Keep progress storage under Godot `user://`, version save schemas, and persist only completed, stable progress. Do not save a half-resolved turn.
 
@@ -71,7 +73,7 @@ The prototype supports drag/swipe and tap-two-adjacent input through `_input`, s
 
 ### Tests and quality gates
 
-Headless tests now cover generation over 125 seeds, legal/invalid neighboring swaps, match intersections, gravity/cascades, event continuity, collection/score consistency and stable output boards. New tests are still required for specials, Nova, blockers, last-move victory, pause/restart during animations and save migrations.
+Headless tests cover M1 generation, invalid swaps, intersections/cascades/event continuity, plus M2 power formation, swap activation, combinations, Nova Pulse and gem/special event replay. Still required: blockers, last-move victory, long trigger-chain stress, pause/restart and save migrations.
 
 CI runs:
 
@@ -91,4 +93,4 @@ CI parser/tests and **successful debug APK/Web exports** do **not** substitute f
 - Prefer real-device measurements before introducing ads, in-app billing and analytics plugins.
 - Package iOS only after Android/web gameplay is stable.
 
-See [M0/M1 Implementation](M0_M1_IMPLEMENTATION.md) for the event protocol and successful CI artifact run, [Android/Web Export Guide](ANDROID_EXPORT.md), [Engine Evaluation](ENGINE_EVALUATION.md) and [Roadmap](ROADMAP.md).
+See [M2 Gameplay Guide](M2_SPECIALS_NOVA.md), [M0/M1 Implementation](M0_M1_IMPLEMENTATION.md) for the event protocol and successful CI artifact run, [Android/Web Export Guide](ANDROID_EXPORT.md), [Engine Evaluation](ENGINE_EVALUATION.md) and [Roadmap](ROADMAP.md).
