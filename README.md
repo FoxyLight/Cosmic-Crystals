@@ -42,6 +42,12 @@ A physical Android playtest revealed that matching four gems did not visibly pro
 
 The single-round prototype has a short **30-crystal target and 18-move budget**. Star Beams, Bombs and Nova can reach that target quickly. Previously any touch after the win/loss state immediately restarted the game. [PR #22](https://github.com/FoxyLight/Cosmic-Crystals/pull/22) adds a visible result overlay requiring an intentional **PLAY AGAIN** tap; ordinary taps are ignored. A separate deadlock recovery that previously regenerated the grid now reshuffles the **same gem inventory**, retaining moves, score and Nova charge. See [issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21) and [QA](docs/QA_TEST_PLAN.md). Android retest of these fixes is outstanding.
 
+## Versioned Android preview APKs
+
+**From PR #24 onward**, each CI Android APK has a unique `versionCode`, a readable `versionName` containing the product version/build number/commit, and a matching versioned APK filename. The artifact includes `build-info.json` (exact SHA/version/run/signing mode) and a SHA-256 checksum. CI verifies the **version embedded in the APK manifest**; renaming a file cannot make it pass.
+
+The source [VERSION](VERSION) is `0.2.0`. See [Android APK Versioning](docs/ANDROID_VERSIONING.md) for the full policy, downloads, wireless ADB installation and optional private persistent debug keystore. **Version numbers alone do not fix a changed signing certificate**, and future signed Google Play AABs remain a separate release process.
+
 ## Run the prototype
 
 1. Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/).
