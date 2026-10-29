@@ -18,16 +18,29 @@ jobs:
           unzip -q godot.zip
           chmod +x Godot_v4.7.2-stable_linux.x86_64
           mv Godot_v4.7.2-stable_linux.x86_64 godot
+      - name: Validate Godot error-log guard
+        run: |
+          bash scripts/ci/check_godot_log.sh bash -c 'echo "clean Godot log"'
+          if bash scripts/ci/check_godot_log.sh bash -c 'echo "SCRIPT ERROR: Parse Error: deliberate CI-guard test"; exit 0'; then
+            echo "::error::CI guard accepted a simulated Godot parser error"
+            exit 1
+          fi
+          if bash scripts/ci/check_godot_log.sh bash -c 'echo "ERROR: Failed to load script"; exit 0'; then
+            echo "::error::CI guard accepted a simulated failed scene-script load"
+            exit 1
+          fi
+      - name: Instantiate gameplay scene and verify a real four-match Star Beam
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_game_scene.gd
       - name: Import and parse Godot project headlessly
-        run: ./godot --headless --path . --editor --quit
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --editor --quit
       - name: Test deterministic match-3 board engine
-        run: ./godot --headless --path . --script res://tests/test_board.gd
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_board.gd
       - name: Verify gem contrast and distinct silhouettes
-        run: ./godot --headless --path . --script res://tests/test_visuals.gd
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_visuals.gd
       - name: Test Star Beams, Cosmic Bombs, Supernova and Nova Pulse
-        run: ./godot --headless --path . --script res://tests/test_powers.gd
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_powers.gd
       - name: Run the prototype scene headlessly for 120 frames
-        run: ./godot --headless --path . --quit-after 120
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --quit-after 120
 
   web-export:
     runs-on: ubuntu-latest
@@ -52,8 +65,8 @@ jobs:
       - name: Export HTML5 site
         run: |
           mkdir -p build/web
-          ./godot --headless --path . --editor --quit
-          ./godot --headless --path . --export-release Web build/web/index.html
+          bash scripts/ci/check_godot_log.sh ./godot --headless --path . --editor --quit
+          bash scripts/ci/check_godot_log.sh ./godot --headless --path . --export-release Web build/web/index.html
           test -s build/web/index.html
           test -s build/web/index.wasm
           test -s build/web/index.pck
@@ -108,8 +121,8 @@ jobs:
           export GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$HOME/.android/debug.keystore"
           export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
           export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
-          ./godot --headless --path . --editor --quit
-          ./godot --headless --path . --export-debug Android build/android/cosmic-crystals-debug.apk
+          bash scripts/ci/check_godot_log.sh ./godot --headless --path . --editor --quit
+          bash scripts/ci/check_godot_log.sh ./godot --headless --path . --export-debug Android build/android/cosmic-crystals-debug.apk
           test -s build/android/cosmic-crystals-debug.apk
           du -h build/android/cosmic-crystals-debug.apk
       - name: Upload debug APK for device testing
