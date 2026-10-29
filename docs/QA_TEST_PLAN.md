@@ -40,6 +40,16 @@ One confirmed on-screen behavior was corrected: **unaffected power icons disappe
 
 **Manual test still required:** On Android, create and activate each power and at least Beam+Beam, Beam+Bomb, Bomb+Bomb and Supernova+another-special. Verify the colored power icon remains visible even while nearby gems clear, Nova cancel retains charge, all blasts visibly reach the right tiles, and no double-collection or stuck animations occurs. Record the device and build in #19 / #6.
 
+## Accidental reset and deadlock recovery regression (2026-10-29)
+
+**Player report:** “Why does the board keep resetting?” [Issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21) identifies two deterministic causes.
+
+- **Unintended replay:** The short prototype target is **30 crystals within 18 moves**. Special combinations may clear 30 in only a few turns. Previously `phase == "finished"` restarted the entire game on *any screen touch release*. A visible modal now shows **CONSTELLATION RESTORED!** or **OUT OF MOVES**, the final crystal/score counters, and a dedicated **PLAY AGAIN** control. The player must press and release inside its large target.
+- **Deadlock reshuffle:** When a settled board had no available swap, the M2 resolver previously called `super.generate()`, replacing all gem kinds with a new random inventory. Recovery now reshuffles **existing** crystals in a seeded Fisher-Yates pass, accepting only match-free boards with a legal move. No score, moves or Nova energy are touched. A labeled `reshuffle` event allows visible feedback.
+- **Automated:** `tests/test_replay_and_shuffle.gd` reproduces a true no-match/no-legal-swap 8×8 fixture, verifies exact gem-color counts, deterministic reshuffle and special preservation, and checks that real scene taps outside PLAY AGAIN do not reset. A deliberate button press/release does.
+- **Manual Android:** Reach the goal using a special. Confirm a completion overlay remains visible after taps/swipes anywhere except PLAY AGAIN. Tap PLAY AGAIN intentionally to reset. Separately, verify a “Stars realigned” deadlock recovery changes gem positions but **not** their counts, move counter, score or Nova charge.
+- **Pass/fail:** Full board restart must never occur as a side effect of a random touch. Controlled display and input QA remain pending; CI cannot prove a user's device behaves correctly.
+
 ## Star Beam gameplay regression and CI parser gate
 
 The first M2 APK had a **hidden scene-script parse error** despite green GitHub Actions. [Bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17) tracks the defect and Android retest.
