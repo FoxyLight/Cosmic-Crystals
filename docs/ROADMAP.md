@@ -1,117 +1,106 @@
 # Development Roadmap
 
-**Baseline:** repository initialized with design documents on 2026-10-29. The Godot spike merged in PR #5 now passes headless CI, but device and browser exports are not yet verified. Published concept page: https://cosmic-crystals-starweaver-jneal.fxylght.chatgpt.site.
+**Status snapshot:** 2026-10-29  
+**Goal:** Android-first Godot game, one polished five-level Lyra constellation, then verified Google Play distribution.  
+**Source of truth for acceptance:** [Milestone register](MILESTONES.md) and the linked GitHub issues. This roadmap summarizes execution order, not a promise of release dates.
 
-## Guiding priority
+## Verified foundation (complete)
 
-**Make the puzzle reliable and satisfying before expanding content.** The first delivery is a functional Android-first Godot vertical slice with a web build, not a mockup and not an immediate app-store release.
+- [x] Godot 4.7.2 GDScript + Compatibility renderer project committed to `main`.
+- [x] Procedural 8×8 board with six crystal kinds and mouse/touch swap input.
+- [x] Seeded starting boards with legal moves and no pre-existing matches.
+- [x] 3+ match scanning, intersection deduplication, valid/invalid swaps, gravity, refill and cascades.
+- [x] Basic total-crystal objective, move counter, score and win/loss flow.
+- [x] Headless import/test and 120-frame smoke-check workflow passed.
 
-## P0 — Phase 0: Android-first engine validation (in progress)
+**Evidence:** [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5), [GitHub Actions success](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782).
 
-- [x] Approve Godot 4.7.2/GDScript for a technology spike.
-- [x] Commit native-capable Godot project, basic touch board and seeded rules tests.
-- [x] Parse/import the project and run tests in GitHub Actions.
-- [ ] Animate swaps, invalid rollback, gravity, refill and cascades through visual events.
-- [ ] Build and install a debug Android APK; record low/midrange device responsiveness.
-- [ ] Verify a release AAB export/signing path without committing credentials.
-- [ ] Export/test Web (desktop Chrome/Firefox, Android Chrome, iOS Safari where available).
-- [ ] Run a 30-second particle stress test, gather FPS and memory measurements.
-- [ ] Close engine decision only after results are recorded in [ENGINE_EVALUATION.md](ENGINE_EVALUATION.md).
+**Important limitations:** The board currently resolves synchronously with a simple result flash. The above evidence is **not** a verified Android APK, signed AAB, browser export, particle benchmark or five-level game.
 
-**Gate:** no serious Android/browser blockers, reproducible exports, responsive touch and acceptable device performance.
+## Priority 0: Engine feasibility and robust interaction (M0 + M1 in parallel)
 
-## P0 — Phase 1: Match-3 engine (first implementation)
+### M0: Android / web proof of concept | [Issue #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4)
 
-**Deliverable:** a real, mouse-and-touch-playable 8 x 8 board using placeholder/generated geometric crystals.
+- [ ] Export a debug APK and perform at least one real Android device test.
+- [ ] Prove release AAB signing/export without exposing credentials.
+- [ ] Export Godot web build and test desktop/mobile browsers.
+- [ ] Record FPS, RAM, load time, gestures, safe areas and pause/resume behavior.
+- [ ] Add effects stress benchmark and document engine go/no-go.
+- [ ] Review required native SDK capabilities before final engine approval.
 
-- [ ] Initialize Godot 4.7.2 + GDScript and a GitHub Actions headless test workflow.
-- [ ] Define board, crystal, action, match and objective models.
-- [x] Generate a board with no starting matches and at least one legal swap.
-- [x] Implement orthogonal touch/mouse swaps and invalid move rejection.\n- [ ] Animate swap/rollback with clear visual feedback.
-- [x] Consume one move for a valid swap and zero for invalid swaps.
-- [x] Detect 3+ horizontal/vertical runs and intersections.
-- [x] Resolve clears, gravity, refill and repeated cascades in the pure rules engine.
-- [x] Temporarily lock input while basic result feedback plays.\n- [ ] Add ordered domain events and proper multi-stage animation locking.
-- [x] Detect deadlocks and generate a fresh legal board (blocker-free prototype only).
-- [x] Add one total-collection target and basic win/loss.
-- [x] Add seeded rules tests; expand edge-case and device coverage.
+**Exit gate:** documented Android+web export paths, physical-device evidence and explicit production engine sign-off. See [Engine Evaluation](ENGINE_EVALUATION.md), [QA Plan](QA_TEST_PLAN.md) and [Export Guide](ANDROID_EXPORT.md).
 
-**Exit gate:** five minutes of continuous play without incorrect counts, frozen board, duplicate actions, or crashes; tests green; at least one playable level reaches both win and loss outcomes.
+### M1: Reliable, animated match-3 loop | [Issue #3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3)
 
-## P1 — Phase 2: Gameplay depth (not started)
+- [ ] Return ordered swap/match/clear/drop/spawn/cascade events from deterministic rules.
+- [ ] Animate valid swaps and invalid-swap rollback.
+- [ ] Animate gravity, refill, cascades and deadlock recovery; enforce input lock.
+- [ ] Verify exact move costs, score and objective collection through chained events.
+- [ ] Add regression tests for last-move victory, restart/pause during effects and deadlocks.
+- [ ] Do extended manual mouse/touch playthroughs and fix stuck-board problems.
 
-**Deliverable:** the original Cosmic Crystals mechanic set.
+**Exit gate:** reliable, readable gameplay on a stable board, tested with both input modalities. No double moves, frozen cascades or wrong win/loss counts.
 
-- [ ] Four-match Star Beam (row/column).
-- [ ] Five-match Supernova.
-- [ ] T/L Cosmic Bomb and precedence handling.
-- [ ] Defined special + special combinations.
-- [ ] Asteroid blockers with health and adjacent-clear damage.
-- [ ] Nova energy accumulation, ready state and cancelable targeting.
-- [ ] Nova Pulse row + column effect, objective damage, zero-move use.
-- [ ] Score and three-star rating.
-- [ ] Five complete level configurations with tutorial ramps.
-- [ ] Regression tests for chained effects, blocked cells and level-end edges.
+## Priority 1: Distinctive cosmic gameplay and a complete player journey
 
-**Exit gate:** special pieces behave deterministically, Nova resolves correctly, and all five levels can be won legitimately with the intended mechanics.
+### M2: Cosmic mechanics | [Issue #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6)
 
-## P1 — Phase 3: Core user journey (not started)
+- [ ] Straight four-match Star Beam.
+- [ ] Straight five-match Supernova; T/L Cosmic Bomb and explicit creation precedence.
+- [ ] Deterministic special+special interactions, with chain-reaction regression tests.
+- [ ] Asteroid blockers and correct adjacent/special-effect damage.
+- [ ] Nova energy meter, cancelable targeting, row+column blast and zero-move activation.
+- [ ] Balance specials and Nova energy through repeated playtests.
 
-**Deliverable:** persistent progression and interface.
+### M3: Five-level Lyra vertical slice | [Issue #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7)
 
-- [ ] Home, puzzle, pause, victory and defeat screens.
-- [ ] Basic Lyra galaxy map with five connected level nodes.
-- [ ] Locked/unlocked/completed nodes and best-stars display.
-- [ ] Save settings and progression locally with schema version.
-- [ ] Contextual tutorial for swaps, beams, blockers, and Nova.
-- [ ] Settings for sound/music and reduced motion.
-- [ ] Clear readable objective, moves, score, star and Nova HUD.
+- [ ] Data-driven levels 1–5, gradually introducing collections, specials, blockers and Nova.
+- [ ] Three-star thresholds, scored wins and losses, moves and collection objectives.
+- [ ] Home screen, galaxy map, pause, results and tutorial flow.
+- [ ] Best-stars and unlock tracking, saved locally using a validated versioned schema.
+- [ ] End-to-end tests for progression, replay, restart, and corrupted/old saves.
 
-**Exit gate:** a new player can start, learn, win level 1, unlock level 2, reload and resume progression without developer intervention.
+**Exit gate:** a first-time player can finish five levels, relight Lyra nodes, close/reopen the game and retain valid progress. The separately published 20-level/four-constellation vision is *not* counted as implemented here.
 
-## P2 — Phase 4: Visual identity and UX
+## Priority 2: Quality and publication
 
-- [ ] Replace placeholder tiles with the six unique silhouette-based crystals.
-- [ ] Implement a polished dark cosmic color system and contrast audit.
-- [ ] Add restrained swap, clear, fall, cascade and special effects.
-- [ ] Add original or properly licensed music and sound, user-mutable.
-- [ ] Add constellation illumination and victory celebrations.
-- [ ] Polish onboarding, errors, focus/touch affordances and accessibility.
+### M4: Visual/audio/mobile UX | [Issue #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8)
 
-**Exit gate:** UI is readable and responsive on small phones, animations don't interfere with rules, and reduced-motion mode is respected.
+- [ ] Six uniquely shaped jewel-like crystals with clear selected/special states.
+- [ ] Polished nebula backdrop, low-cost particle effects, feedback and constellations.
+- [ ] Responsive HUD and safe-area-aware portrait layouts.
+- [ ] Original/properly licensed music and sound with separate controls.
+- [ ] Reduced motion, visual clarity, contrast and smaller-device checks.
 
-## P2 — Phase 5: Cross-platform validation
+### M5: Cross-platform release candidate and QA | [Issue #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9)
 
-- [ ] Test recent desktop browsers and mobile Safari/Chrome.
-- [ ] Check portrait phone safe areas, short-screen layout and scaling.
-- [ ] Profile long cascades and special combinations on representative devices.
-- [ ] Export native Godot Android APK and signed AAB, then verify the install and signing workflow. Test web export and later iOS export separately.
-- [ ] Validate pause/resume, audio unlocking, touch and save behavior on devices.
-- [ ] Document development, build and release steps.
+- [ ] Run full five-level regression tests on modest and recent Android hardware.
+- [ ] Test supported web browsers and interaction/resume edge cases.
+- [ ] Measure sustained performance, memory and startup on chosen device classes.
+- [ ] Verify signed build process and app data/permission compliance.
+- [ ] Resolve critical/high issues and record QA evidence.
 
-**Exit gate:** reproducible browser build and device-tested packaged builds; no blocker bugs.
+### M6: Google Play release readiness | [Issue #10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10)
 
-## P3 — After MVP
+- [ ] Confirm package identifier, release versioning, signing ownership and Play requirements.
+- [ ] Prepare original listing, store graphics, support details, and accurate privacy/data disclosures.
+- [ ] Test a signed AAB in an internal/closed track, capture feedback and fix blockers.
+- [ ] Record publication decision, tag release and document exact build/commit.
+- [ ] Distinguish Play test distribution from **public production availability**.
 
-- [ ] Expand from 5 to 20 curated levels.
-- [ ] Expand from 1 to 4 constellations.
-- [ ] Add additional blockers/goals, then explore Gravity Flux.
-- [ ] Add analytics and playtest-informed difficulty tuning only with appropriate privacy design.
-- [ ] Consider daily challenges, cloud saves and other ongoing content later.
+**Exit gate:** the first five-level build is actually verified through the selected Play release process. See [Release Plan](RELEASE_PLAN.md).
 
-## Definition of done for each gameplay feature
+## Priority 3: Post-MVP (not blocking initial Android launch)
 
-- Works from both mouse and touch.
-- Domain code is separated from visual animation.
-- Correct behavior is covered by a deterministic test.
-- New feature doesn't break existing save data.
-- Clear user feedback and accessible affordances exist.
-- Godot project import/parser and automated tests pass; export and device validation must pass before platform claims.
+### M7: Larger galaxy and optional iOS | [Issue #11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11)
 
-## Suggested first three engineering changes
+- [ ] Design and test levels 6–20, with four constellations.
+- [ ] Consider Gravity Flux, extra blockers and daily content only after balancing.
+- [ ] Prove native iOS export, signing and device compatibility as a separate project gate.
+- [ ] Reevaluate cloud saves, analytics, monetization and account systems based on explicit requirements.
 
-1. **Project bootstrapping:** Godot 4.7.2/GDScript prototype, basic scene and passing headless CI; Android/web export remains open.
-2. **Pure board engine:** seeded generation, swap validation and match/cascade tests already present; expand for specials and blockers.
-3. **Turn resolver:** existing synchronous gravity/refill/cascades and basic HUD; refactor to event-driven animation and broaden tests.
+## Work sequencing
 
-No implementation task should be marked finished based solely on this document; verify it in source and tests.
+M0 and M1 can progress in parallel. M2 relies on M1's event/state foundations. M3 relies on M2 for intended tutorial content. M4 can prototype visuals concurrently but cannot close until M3 is integrated. M5 requires M0–M4 evidence; M6 requires M5. M7 is out of scope for the first release.
+
+**Change-control rule:** update the milestone issue first, update [PROJECT_STATUS.md](PROJECT_STATUS.md) whenever state changes, and revise this roadmap if critical path/scope changes. Do not turn unchecked tasks into checkmarks without verification. There are no committed delivery dates or assigned team owners.
