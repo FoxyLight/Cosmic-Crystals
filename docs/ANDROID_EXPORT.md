@@ -43,7 +43,7 @@ Follow the [Godot 4.7 Android export guide](https://docs.godotengine.org/en/4.7/
 4. Use either the uploaded CI APK or locally export a **debug APK** outside Git, then install on an ARM64 Android phone with `adb install -r <path-to-apk>`. CI generates a new temporary debug signing key each run; if an earlier debug build has a different signer, you may need to uninstall first, which may clear saved app data.
 5. Verify swipes, two-tap swaps, board legibility, back/pause/resume, restart, screen cutouts, battery drain, and 30-second effects stress behavior.
 
-Never commit keystores or export credentials. `.gitignore` excludes common signing formats.
+Never commit keystores or export credentials. `.gitignore` excludes common signing formats. The project now sets `config/icon="res://assets/icon.svg"` to a **provisional** original Cosmic Crystals icon; the strengthened CI guard detected the previously absent icon as an Android export error, even though older builds appeared successful. Replace this prototype icon with production-approved store artwork during M4/M6.
 
 ## 4. Export an AAB for Google Play
 

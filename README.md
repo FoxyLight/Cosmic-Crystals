@@ -32,6 +32,10 @@ The [separately published concept page](https://cosmic-crystals-starweaver-jneal
 
 The [M2 Powers and Nova guide](docs/M2_SPECIALS_NOVA.md) records the implemented power interactions, Nova meter, deterministic tests and remaining blocker work. The [M0/M1 implementation notes](docs/M0_M1_IMPLEMENTATION.md) describe the new event stream, test coverage and build artifacts. The detailed [milestone register](docs/MILESTONES.md) defines dependencies, exit gates and evidence. Tracking is implemented with **GitHub Issues as milestone trackers**, not native GitHub Milestone objects. No dates or owners have been committed.
 
+## M2 Star Beam regression fix
+
+A physical Android playtest revealed that matching four gems did not visibly produce a Star Beam. Investigation found a GDScript **parse error hidden by the previous CI workflow** in the first M2 preview, not a verified error in the four-match rules themselves. [PR #18](https://github.com/FoxyLight/Cosmic-Crystals/pull/18) corrects the syntax and adds real-scene four-match smoke coverage plus an engine-log guard so APK exports cannot silently pass with failed gameplay-script loading. Beam icons and the `STAR BEAM FORGED!` message are also clearer. A fresh Android retest is required before this defect is closed. See [M2 mechanics](docs/M2_SPECIALS_NOVA.md) and [bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17).
+
 ## Run the prototype
 
 1. Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/).

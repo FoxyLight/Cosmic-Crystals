@@ -237,8 +237,8 @@ func _draw_hud() -> void:
 	draw_rect(nova, Color("#296D83") if phase == "nova_targeting" else
 		(Color("#4A3488") if charged else Color("#202947")))
 	draw_rect(nova, Color("#B9F4FF") if charged else Color("#485879"), false, 1.2)
-\tvar fraction: float = float(board.nova_energy) / float(BoardScript.NOVA_MAX) if board != null else 0.0
-\tdraw_rect(Rect2(nova.position + Vector2(3, 31), Vector2((nova.size.x - 6.0) * fraction, 3)), Color("#89E8FF"))
+	var fraction: float = float(board.nova_energy) / float(BoardScript.NOVA_MAX) if board != null else 0.0
+	draw_rect(Rect2(nova.position + Vector2(3, 31), Vector2((nova.size.x - 6.0) * fraction, 3)), Color("#89E8FF"))
 	var energy: int = board.nova_energy if board != null else 0
 	draw_string(font, nova.position + Vector2(8, 23),
 		"NOVA %d/%d" % [energy, BoardScript.NOVA_MAX],
@@ -305,10 +305,17 @@ func _draw_power_icon(center: Vector2, radius: float, power: int, opacity: float
 	var shadow: Color = Color(0.05, 0.09, 0.24, opacity * 0.80)
 	if power == BoardScript.BEAM_ROW or power == BoardScript.BEAM_COLUMN:
 		var direction: Vector2 = Vector2(1, 0) if power == BoardScript.BEAM_ROW else Vector2(0, 1)
-		var start: Vector2 = center - direction * radius * 0.59
-		var finish: Vector2 = center + direction * radius * 0.59
-		draw_line(start, finish, shadow, maxf(2.5, radius * 0.23), true)
-		draw_line(start, finish, Color(1, 0.98, 0.72, opacity), maxf(1.5, radius * 0.12), true)
+		# A persistent cyan halo makes the newly forged Beam recognizable
+		# against every gem color, not just during the short creation pulse.
+		draw_arc(center, radius * 0.78, 0.0, TAU, 24,
+			Color(0.38, 0.96, 1.0, opacity * 0.98),
+			maxf(1.7, radius * 0.11), true)
+		var start: Vector2 = center - direction * radius * 0.64
+		var finish: Vector2 = center + direction * radius * 0.64
+		draw_line(start, finish, shadow, maxf(3.0, radius * 0.29), true)
+		draw_line(start, finish, Color(1.0, 0.99, 0.75, opacity),
+			maxf(2.0, radius * 0.17), true)
+		draw_circle(center, radius * 0.11, Color(1, 1, 1, opacity))
 	elif power == BoardScript.BOMB:
 		draw_arc(center, radius * 0.43, 0, TAU, 20, shadow, maxf(2.5, radius * 0.20), true)
 		draw_arc(center, radius * 0.43, 0, TAU, 20, ink, maxf(1.5, radius * 0.10), true)
@@ -511,7 +518,15 @@ func _apply_outcome(outcome: Dictionary, use_move: bool) -> void:
 		if bool(outcome["used_nova"]):
 			feedback = "NOVA PULSE!  +%d points (no move spent)" % int(outcome["score"])
 		elif int(outcome["created"]) != BoardScript.NONE:
-			feedback = "SPECIAL FORGED!  +%d points" % int(outcome["score"])
+			var created_kind: int = int(outcome["created"])
+			var power_name: String = "SPECIAL"
+			if created_kind == BoardScript.BEAM_ROW or created_kind == BoardScript.BEAM_COLUMN:
+				power_name = "STAR BEAM"
+			elif created_kind == BoardScript.BOMB:
+				power_name = "COSMIC BOMB"
+			elif created_kind == BoardScript.SUPERNOVA:
+				power_name = "SUPERNOVA"
+			feedback = "%s FORGED!  +%d points" % [power_name, int(outcome["score"])]
 		elif int(outcome["activated"]) > 0:
 			feedback = "COSMIC CHAIN!  +%d points" % int(outcome["score"])
 		else:
