@@ -25,7 +25,7 @@
 
 **Root cause confirmed in the initial GitHub Actions logs:** `scripts/prototype.gd` failed to parse because two lines contained literal `\\t` sequences. Godot logged a script error but exited successfully; the old workflow incorrectly passed and exported an APK. [Bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17) and [PR #18](https://github.com/FoxyLight/Cosmic-Crystals/pull/18) track the corrective work.
 
-The patch fixes indentation, adds a real gameplay-scene four-match regression test, makes Star Beam's icon/forging message more obvious, and strengthens CI to fail on engine errors. Automated checks are required; **Android phone confirmation is still outstanding**. See [M2 guide](M2_SPECIALS_NOVA.md) and [QA plan](QA_TEST_PLAN.md). M2 remains open.
+The patch fixes indentation, adds a real gameplay-scene four-match regression test, makes Star Beam's icon/forging message more obvious, configures the missing provisional `assets/icon.svg` for Android export, and strengthens CI to fail on engine errors. Automated checks are required; **Android phone confirmation is still outstanding**. See [M2 guide](M2_SPECIALS_NOVA.md) and [QA plan](QA_TEST_PLAN.md). M2 remains open.
 
 ## Milestone rollup
 
