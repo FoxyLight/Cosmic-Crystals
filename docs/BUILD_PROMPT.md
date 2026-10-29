@@ -6,7 +6,7 @@ Use this prompt with an AI coding agent that has access to this repository.
 
 Act as an experienced gameplay engineer, casual puzzle designer, technical artist and cross-platform architect. Develop **Cosmic Crystals: A Starweaver's Journey**, an original match-3 puzzle adventure for web, iOS and Android.
 
-**Read first:** [GAME_DESIGN.md](GAME_DESIGN.md), [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md), [ROADMAP.md](ROADMAP.md) and the repository README. Preserve existing project work. Do not claim that a feature is implemented unless its code exists and has been tested.
+**Read first:** [PROJECT_STATUS.md](PROJECT_STATUS.md), [MILESTONES.md](MILESTONES.md), [ROADMAP.md](ROADMAP.md), [GAME_DESIGN.md](GAME_DESIGN.md), [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md), [DECISIONS.md](DECISIONS.md), and the repository README. For QA/export or release changes also read [QA_TEST_PLAN.md](QA_TEST_PLAN.md) and [RELEASE_PLAN.md](RELEASE_PLAN.md). Preserve existing project work. Do not claim that a feature is implemented unless its code exists and has been tested.
 
 ## Product promise
 
@@ -35,6 +35,12 @@ Use Godot 4.7.2 standard edition with GDScript and the Compatibility renderer. T
 
 Separate board state, turn resolution, objectives, blockers, specials, scoring and persistence from scenes, sprites and effects. Use an explicit state machine to prevent input while animations resolve. Save with versioned schemas.
 
+## GitHub milestones and current boundaries
+
+The foundation is already committed and headless CI-tested. Use [M0 #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4) for Android/web feasibility and [M1 #3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) for event-driven animated turns. Then work through [M2 #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6), [M3 #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7), [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8), [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9), and [M6 #10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10). [M7 #11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) is explicitly post-MVP.
+
+**Do not** treat a successful headless Godot run as Android APK/AAB export or on-device testing. Do not describe a five-level vertical slice or special powers as already present. Update the milestone issue with evidence for each completed task.
+
 ## Implement incrementally
 
 1. Continue the existing Godot project and seeded match-3 engine; keep headless tests green and record the Android/web export results.
@@ -59,7 +65,7 @@ Separate board state, turn resolution, objectives, blockers, specials, scoring a
 
 **Important:** A published concept page exists, but this repository started empty. Do not treat the published page's 20-level claim as evidence that those levels are implemented in this repo. If importing its source becomes possible, inspect and reconcile rather than overwriting it.
 
-For every change, summarize files modified, tests run, known limitations, and the next logical task. The goal is a genuinely playable game, not a static interface.
+For every change, link a milestone issue, summarize files modified, tests run, relevant Android/web devices tested, known limitations, and the next logical task. Update [PROJECT_STATUS.md](PROJECT_STATUS.md) and the milestone register when status or scope changes. The goal is a genuinely playable game, not a static interface.
 
 
 ## Current implementation note (2026-10-29)

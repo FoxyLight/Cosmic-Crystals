@@ -2,49 +2,70 @@
 
 **Restore the stars. Awaken the universe.**
 
-Cosmic Crystals is an Android-first match-3 puzzle adventure for Android, web and later iOS. Players match luminous crystals, charge the Nova Pulse, complete puzzle objectives, and gradually restore constellations extinguished by **The Great Eclipse**.
+An Android-first cosmic match-3 puzzle adventure for Android and web, with iOS a later option. As a Starweaver, players match luminous crystals, awaken **Nova Pulse**, and restore constellations extinguished by **The Great Eclipse**.
 
-## Development status (2026-10-29)
+## Project status
 
-A **Godot 4.7.2 + GDScript** gameplay technology spike has been merged into `main` in [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5). Its initial CI run passes Godot project parsing and deterministic board tests. **Android APK/AAB, web export and real-device performance are not yet verified.**
+**Snapshot: 2026-10-29.** Godot 4.7.2 (GDScript, Compatibility renderer) is the working engine candidate. The playable prototype and automated rules checks are on `main`; [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5) was merged and the [Godot headless workflow passed](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782).
 
-This code is a small playable match-3 prototype, **not** a finished 5-level game: it supports an 8×8 seeded board, six crystal types, touch/mouse swaps, match detection, gravity/refill, cascades, a simple score/move counter and a single collection objective. Swap and fall animations, blockers, special pieces, Nova Pulse, galaxy map, saves and polished visuals are planned, not present.
+**Implemented and headlessly tested:** seeded 8×8 boards with six crystal types, valid/invalid swap logic, match detection, gravity, refill, cascades and legal move checks. The one-screen prototype has procedural crystal visuals, mouse/touch controls, a move/score HUD and a basic collection win/lose loop.
 
-A [separately published Cosmic Crystals concept](https://cosmic-crystals-starweaver-jneal.fxylght.chatgpt.site) advertises 20 levels and 4 constellations, but that site's source is not imported into this repository.
+**Not yet verified:** Android APK/AAB builds, real-device performance and web exports. **Not yet implemented:** full swap/fall animations, special pieces, Nova Pulse, asteroid blockers, five designed levels, constellation map, progress persistence, production art/audio and app-store deployment.
+
+The [separately published concept page](https://cosmic-crystals-starweaver-jneal.fxylght.chatgpt.site) references 20 levels and four constellations. Its source is not imported here, and those features are **future vision**, not claims about this repository.
+
+## Milestones and current priorities
+
+| Milestone | Objective | Status | Tracking |
+| --- | --- | --- | --- |
+| Foundation | Godot spike, rules and CI | Complete | [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5) |
+| M0 | Android APK/AAB and web export validation | In progress | [#4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4) |
+| M1 | Reliable animated match-3 turns | In progress | [#3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) |
+| M2 | Special crystals, asteroids and Nova | Not started | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) |
+| M3 | Five-level Lyra slice, map and saves | Not started | [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) |
+| M4 | Cosmic art, audio and accessible UX | Not started | [#8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) |
+| M5 | Android/web release-candidate QA | Not started | [#9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
+| M6 | Google Play test/release preparation | Not started | [#10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10) |
+| M7 | 20 levels, four constellations, optional iOS | Deferred | [#11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) |
+
+The detailed [milestone register](docs/MILESTONES.md) defines dependencies, exit gates and evidence. Tracking is implemented with **GitHub Issues as milestone trackers**, not native GitHub Milestone objects. No dates or owners have been committed.
 
 ## Run the prototype
 
 1. Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/).
-2. Open/import `project.godot` in Godot.
-3. Press **F5** to run the scene.
-4. Drag from one crystal to an adjacent crystal, or tap two adjacent ones. Make matches and collect 30 crystals in 18 moves. After a win or loss, tap to restart; press **R** on desktop to restart.
+2. Clone the repo, import/open `project.godot` in Godot and press **F5**.
+3. Drag from one crystal to an orthogonally adjacent crystal, or tap two adjacent crystals. Collect 30 crystals within 18 moves. Tap after finishing to restart; press **R** to restart on desktop.
 
-Run automated rule checks with:
+Headless checks:
 
 ```bash
 godot --headless --path . --editor --quit
 godot --headless --path . --script res://tests/test_board.gd
+godot --headless --path . --quit-after 120
 ```
 
-GitHub Actions repeats these commands on branch pushes and pull requests.
+These checks are automated in [GitHub Actions](.github/workflows/godot-checks.yml). They do **not** export Android binaries or prove mobile UX.
 
-## Project documents
+## Documentation index
 
-- [Game Design Document](docs/GAME_DESIGN.md): themes, crystal types, special pieces, Nova Pulse, goals, and galaxy progression.
-- [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md): Godot-first architecture, deterministic domain, testing and save-state strategy.
-- [Roadmap](docs/ROADMAP.md): milestones and exit criteria.
-- [Build Prompt](docs/BUILD_PROMPT.md): implementation brief for coding agents.
-- [Engine Evaluation](docs/ENGINE_EVALUATION.md): Android engine tradeoffs and still-open go/no-go gates.
-- [Android/Web Export Guide](docs/ANDROID_EXPORT.md): environment setup and device validation instructions.
+| What you need | Reference |
+| --- | --- |
+| Current achievement vs missing work | [Project Status](docs/PROJECT_STATUS.md) |
+| Milestone owners/criteria and issue links | [Milestone Register](docs/MILESTONES.md) |
+| Execution order and scope | [Roadmap](docs/ROADMAP.md) |
+| Concept, gameplay and visuals | [Game Design](docs/GAME_DESIGN.md) |
+| Implementation and domain architecture | [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md) |
+| Coding-agent instructions | [Build Prompt](docs/BUILD_PROMPT.md) |
+| Godot engine decision/evidence gate | [Engine Evaluation](docs/ENGINE_EVALUATION.md) |
+| Why key technical/product choices were made | [Decisions](docs/DECISIONS.md) |
+| Acceptance and device/browser tests | [QA Test Plan](docs/QA_TEST_PLAN.md) |
+| Android APK/AAB and web export setup | [Android and Web Export](docs/ANDROID_EXPORT.md) |
+| Android release and Play process | [Release Plan](docs/RELEASE_PLAN.md) |
+| Known project risks/dependencies | [Risk Register](docs/RISKS.md) |
+| Branch, test and PR process | [Contributing](CONTRIBUTING.md) |
 
-## Direction
+## Working agreement
 
-**Godot 4.7.2 standard edition + GDScript + Compatibility renderer** is the current development candidate for native Android and shared web export, replacing our earlier Phaser/Vite/Capacitor coding direction. Production selection will be finalized only after Android and web export/device benchmarks.
+This GitHub repository is the canonical source of truth. Use scoped issues and PRs, keep the [Milestone Register](docs/MILESTONES.md) and [Project Status](docs/PROJECT_STATUS.md) synchronized with real evidence, and do not mark untested product features or platform exports as complete.
 
-The first release target remains **five polished levels in one constellation**. Expand to the 20-level, four-constellation vision after the core experience is tested and stable.
-
-## Next milestone
-
-Complete the Android APK/AAB and Web export proof of concept, then add an ordered animation-event pipeline and on-device particle stress test. Track the engine decision in [Issue #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4).
-
-This repository is our source of truth going forward. Keep code and documentation aligned, write tests for new gameplay rules, and do not mark a feature complete without verification.
+**Immediate focus:** M0 Android/Web real build validation (#4) and M1 event-driven gameplay animations (#3). M2 through M7 follow the milestone gates.
