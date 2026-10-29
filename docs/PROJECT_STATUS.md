@@ -15,7 +15,7 @@
 - **Verified in PR #13 CI:** Web and Android debug APK artifacts generated, expanded event replay tests and 120-frame scene smoke test passed ([workflow](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)).
 - **Unverified:** device/browser runtime compatibility and measurements, AAB Gradle/release signing, Play distribution, physical-device input and thermal behavior.
 - **M1 in progress:** ordered turn events and basic swap/clear/drop animations are coded; manual device playtesting, last-move/interruption tests and production UI are pending.
-- **M4 visual accessibility patch (PR #14):** player feedback identified Solar Amber/white Lunar Opal confusion on Android. New warm/icy fills, dark per-kind outlines and unique geometric silhouettes are implemented with a separate headless visual regression test. Physical-device confirmation is pending; M4 remains open. See [Visual Identity](VISUAL_PALETTE.md).
+- **M4 visual accessibility patch (PR #14):** player feedback identified Solar Amber/white Lunar Opal confusion on Android. New warm/icy fills, dark per-kind outlines and unique geometric silhouettes are implemented with a separate headless visual regression test. The player subsequently tested the updated Android build and confirmed it **looks a lot better** (positive qualitative follow-up, 2026-10-29). Controlled brightness/grayscale checks, broader readability tests and M4 production visual/art/audio acceptance remain open; M4 is not complete. See [Visual Identity](VISUAL_PALETTE.md).
 - **Missing product systems:** special pieces, asteroids, Nova Pulse, five complete levels, star map, local saving, tutorials, production audio and release flows.
 
 ## Milestone rollup

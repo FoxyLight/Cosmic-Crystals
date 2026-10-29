@@ -42,6 +42,12 @@ godot --headless --path . --quit-after 120
 
 GitHub Actions additionally produces Android debug APK and Web artifacts. `tests/test_visuals.gd` validates that the palette has six entries, amber and opal have intentionally different warm/cool color components, every gem outline is darker than its fill, and all six crystal shapes have distinct vertex counts. These checks **cannot** prove human perceptual distinction on a physical screen.
 
+## Android follow-up feedback (2026-10-29)
+
+After testing the updated build on their Android phone, the player responded: **"Ok that looks a lot better."** This confirms a **positive subjective improvement** over the prior difficult-to-distinguish gold/white gems. No phone model, brightness setting, controlled side-by-side result, color-vision test, or measured performance was supplied with that feedback. We must not claim those checks passed.
+
+The warm Solar Amber vs icy Lunar Opal palette and distinct outlines/silhouettes are retained as our provisional visual baseline. Complete the detailed acceptance checklist below as part of M4 visual accessibility testing.
+
 ## Android visual acceptance checklist
 
 To validate the next APK using the [export guide](ANDROID_EXPORT.md) and [QA plan](QA_TEST_PLAN.md):
