@@ -83,6 +83,12 @@ docs/
 - Use a controlled IDLE/SWAPPING/RESOLVING/NOVA_TARGETING/WON/LOST state machine.
 - Version save data and validate locally stored progression and settings.
 
+## Player device evidence: Android gameplay smoke passed
+
+**2026-10-29:** The player reports **“Human playtest passes”** after running the playable Android prototype. This supplies the first positive real-device **gameplay smoke** evidence. The latest suggested artifact was `0.2.0-dev.82.1+gb5e1737d`, although the installed APK version was not independently inspected. See [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md).
+
+**Production sign-off remains pending:** no measured FPS/memory/latency, no device model/OS notes, no systematic resume/safe-area check, no real browser test, and no signed release AAB. Continue Godot as the development candidate, not a formally approved production release engine.
+
 ## Spike progress (2026-10-29)
 
 - [x] Godot 4.7.2/GDScript project configured with Compatibility renderer.
