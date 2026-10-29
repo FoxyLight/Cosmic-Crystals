@@ -43,7 +43,7 @@ A milestone is **Done** only if all its exit criteria have demonstrable evidence
 **Latest M2 implementation:** [Asteroid Blockers](M2_ASTEROIDS.md) adds six fixed
 1/2-HP rocks, adjacency and all power/Nova interactions, one hit per wave,
 segmented gravity/refill, preserved deadlock inventories and ordered damage
-animations. 861,090 new rules assertions and 46 new real-scene assertions pass
+animations. 862,246 new rules assertions and 46 new real-scene assertions pass
 locally, alongside all existing tests. Product base is `0.3.0`; the established
 CI version/manifest/checksum pipeline is preserved. This is ready for CI export
 and a **new Android blocker playtest**. **M2 stays in progress/open** until that

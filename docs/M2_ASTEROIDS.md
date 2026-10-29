@@ -80,10 +80,10 @@ swap/rollback, power creation, reshuffle and explicit PLAY AGAIN remain intact.
 
 Godot **4.7.2 stable**, local Windows headless checks:
 
-- `tests/test_asteroids.gd`: **861,090 assertions, zero failures**. Covers setup,
+- `tests/test_asteroids.gd`: **862,246 assertions, zero failures**. Covers setup,
   atomic rejection, damage/destruction, real match damage, row/column reach,
   all four powers, all 16 ordered power pairs with blockers, Nova chains,
-  overlap deduplication, segmented refill, blocked deadlocks, isolated earned
+  overlap deduplication, a 58-power dense chain, segmented refill, blocked deadlocks, isolated earned
   power recovery and 125 seeds × 12 paired turns with full event replay.
 - `tests/test_asteroid_scene.gd`: **46 assertions, zero failures**. Real scene
   setup, three-state snapshot playback, input locking, impact-before-fall,

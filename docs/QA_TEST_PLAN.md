@@ -13,7 +13,7 @@ The immediately preceding requested scope covered four/five-match special creati
 
 ## 1. Current automated coverage
 
-**Asteroid regression addition:** `tests/test_asteroids.gd` passes **861,090
+**Asteroid regression addition:** `tests/test_asteroids.gd` passes **862,246
 assertions** across fixed fixtures, 16 ordered power pairs with blockers and
 125 seeds × 12 paired turns with full three-layer event replay.
 `tests/test_asteroid_scene.gd` passes **46 assertions**, including hit-before-fall,

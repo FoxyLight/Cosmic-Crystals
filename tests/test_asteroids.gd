@@ -113,6 +113,10 @@ func _run() -> void:
 	var bad: Dictionary = b.play_swap(26, 27)
 	_check(not bad["valid"] and bad["events"].is_empty() and before == b.cells, "Blocked swap is no-op")
 	_check(bad["score"] == 0 and bad["nova_gain"] == 0, "Blocked swap gives no score/energy")
+	b.cells[25] = 3
+	b.cells[26] = 3
+	b.cells[29] = 3
+	_check(not b.find_matches().has(25) and not b.find_matches().has(26), "A blocker interrupts a potential same-color run")
 	for i in [24, 25, 26, 29, 30, 31]:
 		b.cells[i] = 3
 	_check(not b.find_matches().has(27) and not b.find_matches().has(28), "No matching through blockers")
@@ -199,6 +203,22 @@ func _run() -> void:
 	_check(_first_hit(no)["indices"].has(3) and _first_hit(no)["indices"].has(27), "Nova passes through blockers in cross")
 	_check(_first_hit(no)["destroyed"].has(24), "Nova destroys cracked blocker")
 	_check(no["activated"] >= 2, "Nova chains powers around blockers")
+
+	# Dense adversarial chain: every movable gem is a power; all 58 powers
+	# trigger once, while six direct/adjacent rock overlaps remain single hits.
+	var dense = _fixture(650)
+	dense.place_asteroids({18: 2, 21: 2, 27: 2, 36: 2, 42: 2, 45: 2})
+	for i in range(64):
+		if not dense.is_blocked(i):
+			dense.specials[i] = Board.BEAM_ROW
+	dense.specials[0] = Board.BEAM_COLUMN
+	dense.specials[9] = Board.BEAM_COLUMN
+	var dense_out: Dictionary = _blast(dense, [0])
+	_check(dense_out["activated"] == 58, "Long chain activates each of 58 powers exactly once")
+	_check(dense_out["events"][0]["indices"].size() == 58 and dense_out["events"][0]["score_delta"] == 580, "Dense blast counts only 58 unique crystals")
+	_check(_first_hit(dense_out)["indices"].size() == 6, "Dense chain hits all six blockers in one wave")
+	for i in _first_hit(dense_out)["indices"]:
+		_check(_first_hit(dense_out)["asteroids_after"][i] == 1, "Many overlapping powers still cause one damage")
 
 	# Segmented physics: no piece crosses row 3's rock, a power falls within
 	# the lower region, and new pieces refill both regions independently.

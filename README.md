@@ -11,7 +11,7 @@ with armored/cracked states take adjacent-clear and special/Nova damage,
 break, and refill with blocker-safe gravity. Each wave damages a rock once;
 later cascades can hit again. Win the test round by collecting 30 crystals
 **and clearing all rocks** within 18 moves. Damage feedback and remaining-rock
-HUD are included. Local Godot 4.7.2 tests pass: 861,090 blocker assertions,
+HUD are included. Local Godot 4.7.2 tests pass: 862,246 blocker assertions,
 46 new real-scene assertions and every existing suite. The versioned CI APK/Web
 pipeline is preserved. **New Android blocker playtest and balance are pending;
 M2 remains open.** Full rules, evidence and phone checklist:

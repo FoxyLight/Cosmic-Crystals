@@ -21,7 +21,7 @@ parallel infrastructure tasks. M3 progression has not started.
 power/Nova damage, one-hit-per-wave deduplication, segmented gravity/refill,
 inventory-preserving blocked deadlocks and impact/crack/destruction rendering
 are implemented. The prototype has six rocks and requires both 30 crystals and
-all rocks within 18 moves. **861,090 new rules assertions and 46 real-scene
+all rocks within 18 moves. **862,246 new rules assertions and 46 real-scene
 assertions pass locally**, with all existing suites retained. CI still produces
 uniquely versioned APKs, verified manifests, checksums and Web exports. See
 [M2 Asteroids](M2_ASTEROIDS.md) for evidence, limitations and the device checklist.

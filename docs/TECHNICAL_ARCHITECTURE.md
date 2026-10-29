@@ -14,7 +14,7 @@ gem/power pairs, preserving rock positions/HP and exact inventory. The renderer
 uses event snapshots for hits/cracks/destruction and locks input until playback
 ends. Both crystal and rock goals are checked after resolution. See
 [M2 Asteroids](M2_ASTEROIDS.md) for damage semantics, bounded recovery limitations,
-861,090 rules assertions and 46 real-scene assertions. All original suites and
+862,246 rules assertions and 46 real-scene assertions. All original suites and
 strict CI error-log validation remain active; physical Android QA is pending.
 
 - `project.godot`: Compatibility renderer and portrait-oriented baseline.
