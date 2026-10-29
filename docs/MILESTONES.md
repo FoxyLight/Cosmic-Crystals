@@ -10,7 +10,7 @@ are uncommitted. Close a milestone only with all its acceptance evidence.
 | M0 | Platform viability | In progress | [#4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4): full matrix, metrics, AAB, engine sign-off |
 | M1 | Animated loop | In progress | [#3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3): extended hardware/interruption acceptance |
 | M2 | Powers/Nova/rocks | Implemented; tuning open | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6): automated, asteroid smoke accepted on 9101 |
-| M3 | Five-level Lyra | Implementation locally verified; human gate pending | [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7): new CI and on-phone campaign/restart test |
+| M3 | Five-level Lyra | Main CI verified; APK 9801 installed; human gate pending | [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7): on-phone campaign/restart test |
 | M4 | Art/audio/accessibility | In progress | [#8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8): visual slice/basic reduced motion; full gates open |
 | M5 | Release candidate | Not started | [#9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
 | M6 | Play distribution | Not started | [#10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10) |
