@@ -186,7 +186,10 @@ func _draw_animated_event(rect: Rect2) -> void:
 				if marked.has(index):
 					_draw_crystal(_center_of(index, rect), radius * (1.0 - t * 0.46), int(before[index]), 1.0 - t, int(before_powers[index]))
 				else:
-					_draw_crystal(_center_of(index, rect), radius, int(before[index]))
+					# Unaffected special crystals must remain visibly marked
+					# while another group clears (not only on settled frames).
+					_draw_crystal(_center_of(index, rect), radius,
+						int(before[index]), 1.0, int(before_powers[index]))
 		"fall":
 			for move in active_event["moves"]:
 				var from_index: int = int(move["from"])
