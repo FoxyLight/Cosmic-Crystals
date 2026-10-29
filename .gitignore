@@ -1,0 +1,25 @@
+# Godot-generated state and local exports
+.godot/
+.import/
+.export/
+build/
+dist/
+*.apk
+*.aab
+*.pck
+*.zip
+
+# Secrets and signing material must never enter Git
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+.env
+.env.*
+!.env.example
+
+# Editors and OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
