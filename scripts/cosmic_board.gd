@@ -2,7 +2,7 @@ extends "res://scripts/board.gd"
 class_name CosmicBoard
 ## M2 special-piece and Nova rules. Extends the proven seeded M1 board.
 ## Parallel integer arrays keep rules independent of Godot scenes and tweens.
-## This is a blocker-free slice: asteroid rules are a separate M2 deliverable.
+## Fixed asteroid durability is independent of crystal colors and powers.
 
 const NONE: int = 0
 const BEAM_ROW: int = 1
@@ -13,12 +13,40 @@ const NOVA_MAX: int = 20
 
 var specials: Array[int] = []
 var nova_energy: int = 0
+var asteroids: Array[int] = []
 
 
 func _init(seed_value: int = 20261029) -> void:
 	super(seed_value)
 	specials.resize(WIDTH * HEIGHT)
 	specials.fill(NONE)
+	asteroids.resize(WIDTH * HEIGHT)
+	asteroids.fill(0)
+
+
+func is_blocked(index: int) -> bool:
+	return index >= 0 and index < asteroids.size() and asteroids[index] > 0
+
+
+func place_asteroids(layout: Dictionary) -> bool:
+	# Explicit setup operation, never called during turns or deadlock recovery.
+	# Reject the complete layout before mutation, including occupied powers.
+	for key in layout:
+		if not key is int or key < 0 or key >= cells.size():
+			return false
+		if not layout[key] is int or layout[key] < 1 or layout[key] > 2:
+			return false
+		if is_blocked(key) or specials[key] != NONE:
+			return false
+	for key in layout:
+		asteroids[key] = int(layout[key])
+		cells[key] = EMPTY
+	return true
+
+
+func _swappable(a: int, b: int) -> bool:
+	return is_adjacent(a, b) and not is_blocked(a) and not is_blocked(b) \
+		and cells[a] != EMPTY and cells[b] != EMPTY
 
 
 func _special_at(index: int) -> int:
@@ -35,7 +63,7 @@ func _swap_both(a: int, b: int) -> void:
 
 
 func would_match(a: int, b: int) -> bool:
-	if not is_adjacent(a, b):
+	if not _swappable(a, b):
 		return false
 	# Specials are activated by swapping, even when colors do not match.
 	if _special_at(a) != NONE or _special_at(b) != NONE:
@@ -45,7 +73,7 @@ func would_match(a: int, b: int) -> bool:
 
 func play_swap(a: int, b: int) -> Dictionary:
 	var result: Dictionary = _empty_result()
-	if not is_adjacent(a, b):
+	if not _swappable(a, b):
 		return result
 	var before: Array[int] = cells.duplicate()
 	var before_power: Array[int] = specials.duplicate()
@@ -127,7 +155,7 @@ func _empty_result() -> Dictionary:
 		"valid": false, "cleared": 0, "score": 0, "cascades": 0,
 		"collected": {}, "reshuffled": false, "events": [],
 		"used_nova": false, "nova_gain": 0, "created": NONE,
-		"activated": 0
+		"activated": 0, "asteroids_hit": 0, "asteroids_destroyed": 0
 	}
 
 
@@ -143,7 +171,9 @@ func _event_from(events: Array, type_name: String, before: Array[int],
 		"before": before.duplicate(),
 		"after": cells.duplicate(),
 		"specials_before": before_power.duplicate(),
-		"specials_after": specials.duplicate()
+		"specials_after": specials.duplicate(),
+		"asteroids_before": asteroids.duplicate(),
+		"asteroids_after": asteroids.duplicate()
 	}
 	for key in details:
 		event[key] = details[key]
@@ -224,9 +254,11 @@ func _expand_seeds(initial: Array[int], result: Dictionary,
 		head += 1
 		if index < 0 or index >= cells.size() or marked.has(index):
 			continue
-		if cells[index] == EMPTY:
+		if cells[index] == EMPTY and not is_blocked(index):
 			continue
 		marked[index] = true
+		if is_blocked(index):
+			continue
 		var special: int = specials[index]
 		if special == NONE:
 			continue
@@ -267,6 +299,18 @@ func _resolve(initial: Array[int], result: Dictionary, reward: Dictionary,
 			break
 		var before: Array[int] = cells.duplicate()
 		var before_power: Array[int] = specials.duplicate()
+		var hits: Dictionary = {}
+		var gems: Array[int] = []
+		for index in cleared:
+			if is_blocked(index):
+				hits[index] = true
+			else:
+				gems.append(index)
+				_mark_adjacent_asteroids(index, hits)
+		# The retained reward is still part of the matching group.
+		if chain == 1 and not reward.is_empty():
+			_mark_adjacent_asteroids(int(reward["index"]), hits)
+		cleared = gems
 		var totals: Dictionary = result["collected"]
 		for index in cleared:
 			var kind: int = cells[index]
@@ -289,6 +333,7 @@ func _resolve(initial: Array[int], result: Dictionary, reward: Dictionary,
 				result["created"] = int(reward["kind"])
 				_event(result["events"], "special_create", before, before_power,
 					{"index": anchor, "kind": int(reward["kind"])})
+		_damage_asteroids(hits, result, chain)
 		_fall_with_powers(result["events"])
 		pending = find_matches()
 
@@ -315,17 +360,21 @@ func _resolve(initial: Array[int], result: Dictionary, reward: Dictionary,
 
 func _shuffle_deadlocked_board() -> bool:
 	# Fisher-Yates over the existing inventory, so kind totals cannot change.
-	# Current M2 grid has no asteroid blockers. This is not a generic
-	# blocker-aware shuffle; M2's blocker task will extend this contract.
+	# Fixed blockers never enter the movable inventory. Powers travel with gems.
 	if not find_matches().is_empty() or has_legal_move():
 		return false
 	var original: Array[int] = cells.duplicate()
 	var original_specials: Array[int] = specials.duplicate()
+	var movable: Array[int] = []
+	for index in range(cells.size()):
+		if not is_blocked(index) and cells[index] != EMPTY:
+			movable.append(index)
 	for _attempt in range(2048):
 		cells = original.duplicate()
 		specials = original_specials.duplicate()
-		for i in range(cells.size() - 1, 0, -1):
-			var j: int = rng.randi_range(0, i)
+		for slot in range(movable.size() - 1, 0, -1):
+			var i: int = movable[slot]
+			var j: int = movable[rng.randi_range(0, slot)]
 			var tmp: int = cells[i]
 			cells[i] = cells[j]
 			cells[j] = tmp
@@ -346,22 +395,62 @@ func _fall_with_powers(events: Array) -> void:
 	var moves: Array[Dictionary] = []
 	var spawns: Array[Dictionary] = []
 	for col in range(WIDTH):
-		var write_row: int = HEIGHT - 1
-		for read_row in range(HEIGHT - 1, -1, -1):
-			var src: int = read_row * WIDTH + col
-			if before[src] == EMPTY:
+		var bottom: int = HEIGHT - 1
+		while bottom >= 0:
+			if is_blocked(bottom * WIDTH + col):
+				bottom -= 1
 				continue
-			var dst: int = write_row * WIDTH + col
-			cells[dst] = before[src]
-			specials[dst] = before_power[src]
-			moves.append({"from": src, "to": dst, "kind": before[src], "special": before_power[src]})
-			write_row -= 1
-		var remaining: int = write_row + 1
-		while write_row >= 0:
-			var dst: int = write_row * WIDTH + col
-			cells[dst] = rng.randi_range(0, KIND_COUNT - 1)
-			specials[dst] = NONE
-			spawns.append({"from_row": write_row - remaining, "to": dst,
-				"kind": cells[dst], "special": NONE})
-			write_row -= 1
+			var top: int = bottom
+			while top > 0 and not is_blocked((top - 1) * WIDTH + col):
+				top -= 1
+			_fall_segment(col, top, bottom, before, before_power, moves, spawns)
+			bottom = top - 1
 	_event(events, "fall", before, before_power, {"moves": moves, "spawns": spawns})
+
+
+func _fall_segment(col: int, top: int, bottom: int, before: Array[int],
+		before_power: Array[int], moves: Array[Dictionary], spawns: Array[Dictionary]) -> void:
+	var write_row: int = bottom
+	for read_row in range(bottom, top - 1, -1):
+		var src: int = read_row * WIDTH + col
+		if before[src] == EMPTY:
+			continue
+		var dst: int = write_row * WIDTH + col
+		cells[dst] = before[src]
+		specials[dst] = before_power[src]
+		moves.append({"from": src, "to": dst, "kind": before[src], "special": before_power[src]})
+		write_row -= 1
+	var remaining: int = write_row - top + 1
+	while write_row >= top:
+		var dst: int = write_row * WIDTH + col
+		cells[dst] = rng.randi_range(0, KIND_COUNT - 1)
+		specials[dst] = NONE
+		spawns.append({"from_row": write_row - remaining, "to": dst,
+			"kind": cells[dst], "special": NONE, "segment_top": top})
+		write_row -= 1
+
+
+func _mark_adjacent_asteroids(index: int, hits: Dictionary) -> void:
+	for neighbor in [index - WIDTH, index + WIDTH, index - 1, index + 1]:
+		if is_adjacent(index, neighbor) and is_blocked(neighbor):
+			hits[neighbor] = true
+
+
+func _damage_asteroids(hits: Dictionary, result: Dictionary, chain: int) -> void:
+	if hits.is_empty():
+		return
+	var before: Array[int] = asteroids.duplicate()
+	var indices: Array[int] = []
+	var destroyed: Array[int] = []
+	for key in hits:
+		var index: int = int(key)
+		asteroids[index] -= 1
+		indices.append(index)
+		if asteroids[index] == 0:
+			destroyed.append(index)
+	indices.sort()
+	destroyed.sort()
+	result["asteroids_hit"] = int(result["asteroids_hit"]) + indices.size()
+	result["asteroids_destroyed"] = int(result["asteroids_destroyed"]) + destroyed.size()
+	_event(result["events"], "asteroid_hit", cells, specials,
+		{"asteroids_before": before, "indices": indices, "destroyed": destroyed, "chain": chain})

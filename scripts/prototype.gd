@@ -1,12 +1,13 @@
 extends Control
 ## Animated Android-first match-3 prototype, with a clearly labeled synthetic
 ## 30-second drawing stress check. M2 adds specials and Nova Pulse.
-## Asteroids, save data and level progression remain unimplemented.
+## M2 asteroids share the immutable event stream; progression remains M3.
 
 const BoardScript = preload("res://scripts/cosmic_board.gd")
 const Visuals = preload("res://scripts/crystal_visuals.gd")
 const GOAL: int = 30
 const STARTING_MOVES: int = 18
+const ASTEROID_LAYOUT: Dictionary = {18: 2, 21: 2, 27: 1, 36: 1, 42: 2, 45: 2}
 
 const SWAP_SECONDS: float = 0.17
 const CLEAR_SECONDS: float = 0.19
@@ -16,6 +17,7 @@ const RESHUFFLE_SECONDS: float = 0.28
 var board = null
 var display_cells: Array[int] = []
 var display_specials: Array[int] = []
+var display_asteroids: Array[int] = []
 var moves_left: int = STARTING_MOVES
 var collected: int = 0
 var score: int = 0
@@ -49,8 +51,12 @@ func _ready() -> void:
 
 func _reset_game() -> void:
 	board = BoardScript.new(20261029 + int(Time.get_ticks_msec() % 100000))
+	board.place_asteroids(ASTEROID_LAYOUT)
+	if not board.has_legal_move():
+		board._shuffle_deadlocked_board()
 	display_cells = board.cells.duplicate()
 	display_specials = board.specials.duplicate()
+	display_asteroids = board.asteroids.duplicate()
 	moves_left = STARTING_MOVES
 	collected = 0
 	score = 0
@@ -60,7 +66,7 @@ func _reset_game() -> void:
 	active_event = {}
 	finished = false
 	won = false
-	feedback = "Drag or tap two neighboring crystals"
+	feedback = "Match beside asteroids to crack them"
 	feedback_ok = true
 	flash_time = 0.0
 	queue_redraw()
@@ -153,6 +159,7 @@ func _draw() -> void:
 		_draw_snapshot(display_cells, rect)
 	else:
 		_draw_animated_event(rect)
+	_draw_asteroids(rect)
 
 	if flash_time > 0.0:
 		var tint: Color = Color(0.20, 0.90, 0.86, flash_time * 0.20) if feedback_ok else Color(1, 0.25, 0.40, flash_time * 0.23)
@@ -213,8 +220,13 @@ func _draw_animated_event(rect: Rect2) -> void:
 				var to_index: int = int(spawn["to"])
 				var start_row: int = int(spawn["from_row"])
 				var start: Vector2 = _center_of(to_index, rect)
+				var segment_top: int = int(spawn.get("segment_top", 0))
+				# Refill appears inside its region, never flying through a rock.
+				if segment_top > 0:
+					start_row = maxi(segment_top, start_row)
 				start.y = rect.position.y + (float(start_row) + 0.5) * (rect.size.x / 8.0)
-				_draw_crystal(start.lerp(_center_of(to_index, rect), eased), radius, int(spawn["kind"]), 1.0, int(spawn.get("special", 0)))
+				_draw_crystal(start.lerp(_center_of(to_index, rect), eased), radius,
+					int(spawn["kind"]), t if segment_top > 0 else 1.0, int(spawn.get("special", 0)))
 		"special_create":
 			_draw_snapshot(active_event["after"], rect, active_event["specials_after"])
 			var target: int = int(active_event["index"])
@@ -230,6 +242,71 @@ func _draw_animated_event(rect: Rect2) -> void:
 			_draw_snapshot(active_event["after"], rect, active_event["specials_after"])
 
 
+func _draw_asteroids(rect: Rect2) -> void:
+	var snapshot: Array = display_asteroids
+	var hitting: bool = active_event.get("type", "") == "asteroid_hit"
+	if not active_event.is_empty():
+		snapshot = active_event.get("asteroids_before", display_asteroids)
+	var t: float = clampf(event_elapsed / event_duration, 0.0, 1.0) if hitting else 0.0
+	var radius: float = rect.size.x / 8.0 * 0.37
+	for index in range(snapshot.size()):
+		var health: int = int(snapshot[index])
+		if health <= 0:
+			continue
+		var center: Vector2 = _center_of(index, rect)
+		var opacity: float = 1.0
+		var scale_factor: float = 1.0
+		if hitting and active_event["indices"].has(index):
+			center.x += sin(t * TAU * 2.0) * radius * 0.09 * (1.0 - t)
+			if active_event["destroyed"].has(index):
+				opacity = 1.0 - t
+				scale_factor = 1.0 - t * 0.45
+			elif t >= 0.5:
+				health = int(active_event["asteroids_after"][index])
+			draw_arc(center, radius * (1.0 + t * 0.5), 0.0, TAU, 20,
+				Color(1.0, 0.65, 0.31, 1.0 - t), 2.0, true)
+			for shard in range(5):
+				var direction: Vector2 = Vector2.from_angle(TAU * float(shard) / 5.0)
+				draw_circle(center + direction * radius * (0.7 + t * 1.0),
+					radius * 0.10 * (1.0 - t), Color(0.88, 0.66, 0.43, 1.0 - t))
+		_draw_asteroid(center, radius * scale_factor, health, opacity)
+
+
+func _draw_asteroid(center: Vector2, radius: float, health: int, opacity: float) -> void:
+	# Original procedural rock: irregular, desaturated bronze/slate with craters.
+	var points: PackedVector2Array = PackedVector2Array()
+	for i in range(9):
+		var angle: float = -PI * 0.5 + TAU * float(i) / 9.0
+		var edge: float = 1.0 if i % 3 == 0 else 0.86
+		points.append(center + Vector2.from_angle(angle) * radius * edge)
+	draw_colored_polygon(points, Color(0.54, 0.45, 0.38, opacity))
+	var border: PackedVector2Array = points.duplicate()
+	border.append(points[0])
+	draw_polyline(border, Color(0.78, 0.65, 0.49, opacity), maxf(1.5, radius * 0.06), true)
+	draw_circle(center + Vector2(-0.29, -0.23) * radius, radius * 0.22,
+		Color(0.25, 0.23, 0.28, opacity))
+	draw_circle(center + Vector2(0.32, 0.24) * radius, radius * 0.14,
+		Color(0.31, 0.27, 0.30, opacity))
+	if health == 1:
+		var crack: PackedVector2Array = PackedVector2Array([
+			center + Vector2(0.1, -0.78) * radius, center + Vector2(-0.16, -0.1) * radius,
+			center + Vector2(0.18, 0.18) * radius, center + Vector2(-0.13, 0.79) * radius])
+		draw_polyline(crack, Color(0.10, 0.09, 0.17, opacity), maxf(2.0, radius * 0.13), true)
+		draw_polyline(crack, Color(1.0, 0.64, 0.30, opacity), maxf(1.0, radius * 0.045), true)
+	# One/two bright durability pips remain legible at small phone sizes.
+	for pip in range(health):
+		draw_circle(center + Vector2((float(pip) - float(health - 1) * 0.5) * 0.30, 0.52) * radius,
+			radius * 0.075, Color(1.0, 0.87, 0.62, opacity))
+
+
+func _asteroids_remaining() -> int:
+	var count: int = 0
+	for durability in board.asteroids:
+		if durability > 0:
+			count += 1
+	return count
+
+
 func _draw_starfield() -> void:
 	for i in range(85):
 		var px: float = fposmod(float(i * 173 + 29), maxf(size.x, 1.0))
@@ -242,7 +319,7 @@ func _draw_hud() -> void:
 	var font: Font = ThemeDB.fallback_font
 	var header_size: int = 29 if size.x >= 420.0 else 23
 	draw_string(font, Vector2(20, 48), "COSMIC CRYSTALS", HORIZONTAL_ALIGNMENT_LEFT, -1, header_size, Color("#DDEAFF"))
-	draw_string(font, Vector2(22, 77), "A STARWEAVER'S JOURNEY  /  ENGINE SPIKE", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#97A4CA"))
+	draw_string(font, Vector2(22, 77), "ASTEROIDS LEFT  %d  /  MATCH BESIDE OR BLAST" % _asteroids_remaining() if board != null else "A STARWEAVER'S JOURNEY", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#D1BDA3"))
 	draw_string(font, Vector2(22, 116), "CRYSTALS  %d / %d" % [collected, GOAL], HORIZONTAL_ALIGNMENT_LEFT, -1, 19, Color("#39D5FF"))
 	draw_string(font, Vector2(22, 144), "MOVES  %d     SCORE  %d" % [moves_left, score], HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color("#FFCB65"))
 	var progress_width: float = minf(size.x - 44.0, 360.0)
@@ -385,7 +462,7 @@ func _draw_result_overlay(rect: Rect2) -> void:
 	draw_string(font, Vector2(rect.position.x, rect.get_center().y - 60.0),
 		title, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 23, title_color)
 	draw_string(font, Vector2(rect.position.x, rect.get_center().y - 17.0),
-		"CRYSTALS %d/%d    SCORE %d" % [collected, GOAL, score],
+		"CRYSTALS %d/%d    ASTEROIDS %d" % [collected, GOAL, _asteroids_remaining()],
 		HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 17, Color("#DDEAFF"))
 	var button: Rect2 = _replay_rect()
 	draw_rect(button, Color("#284D83"))
@@ -437,7 +514,7 @@ func _handle_touch(pointer: Vector2, pressed: bool) -> void:
 				feedback = "Nova cancelled. Charge saved."
 			elif phase == "idle" and board.can_use_nova():
 				phase = "nova_targeting"
-				feedback = "Tap any crystal to blast its row and column"
+				feedback = "Tap a tile: Nova blasts its row and column"
 			queue_redraw()
 		return
 	if press_index == -2:
@@ -456,6 +533,10 @@ func _handle_touch(pointer: Vector2, pressed: bool) -> void:
 	if phase == "nova_targeting":
 		var target: int = release_index if release_index >= 0 else start_index
 		_take_nova(target)
+		return
+	if board.is_blocked(start_index):
+		selected = -1
+		feedback = "Asteroids stay put. Match beside or blast."
 		return
 	var drag: Vector2 = pointer - press_position
 	var threshold: float = _board_rect().size.x / 8.0 * 0.28
@@ -506,7 +587,7 @@ func _event_duration(kind: String) -> float:
 	match kind:
 		"swap", "swap_back":
 			return SWAP_SECONDS
-		"clear":
+		"clear", "asteroid_hit":
 			return CLEAR_SECONDS
 		"fall":
 			return FALL_SECONDS
@@ -521,11 +602,13 @@ func _animate_event(event: Dictionary) -> void:
 	event_duration = _event_duration(str(event["type"]))
 	display_cells = event["before"].duplicate()
 	display_specials = event["specials_before"].duplicate()
+	display_asteroids = event["asteroids_before"].duplicate()
 	queue_redraw()
 	while event_elapsed < event_duration:
 		await get_tree().process_frame
 	display_cells = event["after"].duplicate()
 	display_specials = event["specials_after"].duplicate()
+	display_asteroids = event["asteroids_after"].duplicate()
 	active_event = {}
 	queue_redraw()
 
@@ -555,6 +638,7 @@ func _apply_outcome(outcome: Dictionary, use_move: bool) -> void:
 		await _animate_event(event)
 	display_cells = board.cells.duplicate()
 	display_specials = board.specials.duplicate()
+	display_asteroids = board.asteroids.duplicate()
 	if bool(outcome["valid"]):
 		if use_move:
 			moves_left -= 1
@@ -579,7 +663,7 @@ func _apply_outcome(outcome: Dictionary, use_move: bool) -> void:
 			feedback = "CASCADE x%d  +%d points" % [int(outcome["cascades"]), int(outcome["score"])]
 		if bool(outcome["reshuffled"]):
 			feedback = "Stars realigned. New moves available!"
-		if collected >= GOAL:
+		if collected >= GOAL and _asteroids_remaining() == 0:
 			finished = true
 			won = true
 		elif moves_left <= 0:
