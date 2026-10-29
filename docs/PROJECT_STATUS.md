@@ -41,6 +41,12 @@ A player reported repeated board resets after adding powerful M2 combos. The sou
 
 This does not change the temporary 30-crystal goal or add multi-level progression. If Android loses the application process completely, persistent progress remains an M3 feature rather than a solved reset cause.
 
+## Android APK versioning safeguard (2026-10-29)
+
+[PR #24](https://github.com/FoxyLight/Cosmic-Crystals/pull/24) implements automatic CI version stamping. Each APK gets a distinct numeric `versionCode`, human-readable `0.2.0-dev.<run>.<attempt>+g<sha>` version name and matching filename. Every artifact carries a Git commit/run build manifest and a SHA-256 checksum. Android `aapt` must confirm the values are truly inside the APK, and the version generator has unit tests.
+
+The optional persistent debug keystore integration is **not enabled merely by merging code**: a maintainer must privately configure the `COSMIC_DEBUG_KEYSTORE_BASE64` repository secret. Until then, the build metadata explicitly says `ephemeral-ci` and the temporary signing key can prevent installing over older builds despite increasing version codes. M0/M6 release AAB signing and real device validation remain open. See [APK Versioning](ANDROID_VERSIONING.md).
+
 ## Milestone rollup
 
 | Workstream | Tracking issue | Status |
