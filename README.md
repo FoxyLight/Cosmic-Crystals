@@ -38,6 +38,10 @@ A physical Android playtest revealed that matching four gems did not visibly pro
 
 **M2 combination audit:** [PR #20](https://github.com/FoxyLight/Cosmic-Crystals/pull/20) adds exhaustive checks for 96 ordered special-combo and edge-orientation scenarios, a real-scene test for Beam/Bomb/Supernova formation and Nova HUD controls, and fixes power icons disappearing during nearby crystal-clearing animations. Follow [issue #19](https://github.com/FoxyLight/Cosmic-Crystals/issues/19); Android confirmation is still required.
 
+## Why a board could appear to reset
+
+The single-round prototype has a short **30-crystal target and 18-move budget**. Star Beams, Bombs and Nova can reach that target quickly. Previously any touch after the win/loss state immediately restarted the game. [PR #22](https://github.com/FoxyLight/Cosmic-Crystals/pull/22) adds a visible result overlay requiring an intentional **PLAY AGAIN** tap; ordinary taps are ignored. A separate deadlock recovery that previously regenerated the grid now reshuffles the **same gem inventory**, retaining moves, score and Nova charge. See [issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21) and [QA](docs/QA_TEST_PLAN.md). Android retest of these fixes is outstanding.
+
 ## Run the prototype
 
 1. Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/).
