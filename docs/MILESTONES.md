@@ -40,6 +40,16 @@ A milestone is **Done** only if all its exit criteria have demonstrable evidence
 
 ## What is in the current game
 
+**Latest M2 implementation:** [Asteroid Blockers](M2_ASTEROIDS.md) adds six fixed
+1/2-HP rocks, adjacency and all power/Nova interactions, one hit per wave,
+segmented gravity/refill, preserved deadlock inventories and ordered damage
+animations. 861,090 new rules assertions and 46 new real-scene assertions pass
+locally, alongside all existing tests. Product base is `0.3.0`; the established
+CI version/manifest/checksum pipeline is preserved. This is ready for CI export
+and a **new Android blocker playtest**. **M2 stays in progress/open** until that
+acceptance and balancing evidence exists. No M3 campaign/map/save work is part
+of this slice. Earlier historical descriptions below have narrower scope.
+
 **M2 progress:** PR #16 implemented Star Beam, Cosmic Bomb, Supernova and Nova Pulse; PR #18 repaired the shared gameplay-script loading bug. [Compatibility audit #19](https://github.com/FoxyLight/Cosmic-Crystals/issues/19) now tests all 96 ordered special-pair/position scenarios plus real scene creation/targeting. A separate overlay regression for surviving special pieces has been fixed. See the [M2 guide](M2_SPECIALS_NOVA.md) for confirmed automated coverage. **M2 remains open** for asteroid blockers, balance, device acceptance and broader gameplay QA.
 
 

@@ -13,6 +13,17 @@ The immediately preceding requested scope covered four/five-match special creati
 
 ## 1. Current automated coverage
 
+**Asteroid regression addition:** `tests/test_asteroids.gd` passes **861,090
+assertions** across fixed fixtures, 16 ordered power pairs with blockers and
+125 seeds × 12 paired turns with full three-layer event replay.
+`tests/test_asteroid_scene.gd` passes **46 assertions**, including hit-before-fall,
+input locking, invalid/valid move costs, last-move victory/loss and rock-targeted
+zero-move Nova. The same scene script ran under the desktop Compatibility
+renderer without engine errors. All seven earlier suites still pass. Both new
+scripts run in CI under the strict error-log guard. Android version-policy and
+manifest checks are unchanged. This proves no Android readability/performance
+claim. [Full rules, limitations and phone checklist](M2_ASTEROIDS.md).
+
 The repository runs Godot headless import, `tests/test_board.gd`, the new `tests/test_visuals.gd` style assertions and a 120-frame scene smoke test in GitHub Actions, plus Android debug APK and Web export jobs.
 
 **Evidence:** [original main branch run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782), plus [M0/M1 CI run with debug APK and Web artifacts](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043) on PR #13.
@@ -27,10 +38,10 @@ The expanded seeded board test covers 125 seeds, no starting matches, adjacent l
 | Input validation | Adjacent legal and illegal swaps, wrapping across row boundaries, same-tile taps | Automated swap/edge checks; manual gesture testing open |
 | Matching | Horizontal/vertical 3+, intersection union and simultaneous multi-group | Intersection/seeded checks; expand simultaneous cases |
 | Resolution | Gravity stability, refill, chain reactions, event playback invariants | Expanded automated replay/invariant checks |
-| Move budget | Illegal swap spends 0; legal spends 1; last-move win overrides loss | Basic logic implemented; last-move regression pending |
-| Deadlocks | No legal move reshuffles without deleting blockers/specials | Prototype-only reset; production logic missing |
+| Move budget | Illegal swap spends 0; legal spends 1; last-move win overrides loss | Real-scene regression including both crystal/rock goals passes |
+| Deadlocks | No legal move reshuffles without deleting blockers/specials | Exact movable inventory, fixed HP and isolated power recovery tested |
 | Special pieces | 4/5/T/L creation precedence; combined triggers; no double-count | First M2 rules coded and tested; phone balancing pending |
-| Blockers | Adjacent matches vs special and Nova damage; durability rules | Not implemented |
+| Blockers | Adjacent matches vs special and Nova damage; durability rules | Implemented and automated; physical Android acceptance pending |
 | Nova Pulse | Charge, cancel, row/column, zero-move activation, reset | M2 rules + touch targeting implemented; manual cancellation/charge feel QA open |
 | Progression | 5-level unlocks, stars, replay, terminal screens and save load | Not implemented |
 | Persistence | Version migration, malformed/truncated save, app restart | Not implemented |

@@ -8,6 +8,18 @@
 
 ## What is implemented
 
+**Latest slice: [M2 Asteroid Blockers](M2_ASTEROIDS.md)** adds a third parallel
+64-cell durability array, one hit per simultaneous wave, adjacency/direct power
+damage, fixed-region gravity and inventory-preserving recovery. All existing
+power rules remain. Beams/Nova pass through rocks, Bombs hit their area, and
+Supernova-cleared crystals damage adjacent rocks; double Supernova hits all
+rocks once. Damage adds no crystal score/energy. `asteroid_hit` events retain
+both durability snapshots for ordered impact/crack/destruction animation. The
+18-move prototype now requires 30 crystals and all six rocks. New headless and
+scene tests pass; the earlier Android baseline pass does not cover this slice.
+The history below documents earlier pre-blocker work. New Android testing and
+balance remain open in #6; M3 campaign/saves are out of scope.
+
 This incremental extension inherits the previous [CrystalBoard](../scripts/board.gd) matching/generation behavior, leaving the proven M1 rules/tests intact. It adds a second **64-cell special-type array** alongside the six crystal kinds:
 
 | Type ID | Name | Created by | Activated by | Effect |
@@ -100,7 +112,7 @@ This fix does not change the temporary 30-gem target, eliminate legitimate reshu
 
 ## Next unresolved work
 
-- **Asteroid blockers** and their adjacent-match, special-area and Nova damage. A blocker cannot safely be added as just a gem kind; model blocker durability/occupancy separately and test gravity and deadlock behavior.
+- Physical Android acceptance of the implemented asteroid rules, readability and region refill in [M2 Asteroids](M2_ASTEROIDS.md).
 - Human testing of all power combinations on a physical Android device; adjust HUD/target areas, animations and balance based on evidence.
 - More stress/property tests for long power-trigger chains, limiting cascade iterations without deleting previously earned specials, and last-move outcomes.
 - Data-driven Nova energy and per-level rules; additional polished effects and accessibility controls.

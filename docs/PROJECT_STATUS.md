@@ -11,9 +11,23 @@ The player confirms **“Human playtest passes”** after the Star Beam/combo/No
 
 The [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md) records the pass, the exact evidence boundary, and the remaining M0/M1/M2 requirements. The reported gameplay reset issue and power audit may be accepted at smoke-test level; full milestone gates remain open.
 
-**Next gameplay priority:** Asteroid blockers and interactions with adjacent matches, special beams/bombs, Nova and blocker-safe gravity/reshuffles. Debug signing persistence and full device/web QA remain parallel infrastructure tasks.
+**Next gameplay priority:** Android acceptance of the new asteroid slice and
+power/Nova balance. Debug signing persistence and full device/web QA remain
+parallel infrastructure tasks. M3 progression has not started.
 
 ## Executive summary
+
+**New M2 slice, product `0.3.0`:** asteroid occupancy/durability, adjacent and
+power/Nova damage, one-hit-per-wave deduplication, segmented gravity/refill,
+inventory-preserving blocked deadlocks and impact/crack/destruction rendering
+are implemented. The prototype has six rocks and requires both 30 crystals and
+all rocks within 18 moves. **861,090 new rules assertions and 46 real-scene
+assertions pass locally**, with all existing suites retained. CI still produces
+uniquely versioned APKs, verified manifests, checksums and Web exports. See
+[M2 Asteroids](M2_ASTEROIDS.md) for evidence, limitations and the device checklist.
+**M2 remains in progress:** new physical Android playtest, balance and broader
+platform/performance acceptance are pending. The earlier player pass covers the
+pre-blocker baseline. Historical sections below describe their earlier scope.
 
 **Status: Godot M0/M1 implementation underway; headless rules tests and automated web/debug-APK exports pass, but device/browser QA and Android release distribution remain unproven.**
 
@@ -72,7 +86,7 @@ The optional persistent debug keystore integration is **not enabled merely by me
 
 1. **M0:** Use the now repeatable CI APK/Web exports for actual device/browser playtests. Establish an AAB Gradle signing pipeline and record the Godot go/no-go.
 2. **M1:** Event stream and basic animations are implemented in PR #13; test interaction timing on devices and add last-move/interruption regression coverage.
-3. **M2:** The core special pieces and targeted Nova are coded with deterministic tests; next verify phone play and implement asteroid blockers, power balance and stronger chain regression.
+3. **M2:** Core powers, Nova and asteroid blockers are coded and tested; next verify this new slice on Android and tune balance. See [M2 Asteroids](M2_ASTEROIDS.md).
 4. **M3–M4:** Build and polish the complete five-level Lyra journey.
 5. **M5–M6:** Test, sign and distribute once exit gates are met.
 
