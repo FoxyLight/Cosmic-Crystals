@@ -22,7 +22,7 @@ Godot gameplay/results screen in line with the earlier web/Android design.
 Responsive geometry, safe-area conversion, native HUD labels/buttons, updated
 facets/colors, help/pause and hidden diagnostics are implemented. All ten
 GDScript suites and four Android version-policy tests pass locally, including
-1,459 new geometry/actual-control/mouse/touch/focus checks. Desktop Compatibility
+1,471 new geometry/actual-control/mouse/touch/focus checks. Desktop Compatibility
 renders were inspected at 320x568, 376x746 and 1280x800. New Android visual
 acceptance remains pending; no FPS/browser/device result is inferred.
 
