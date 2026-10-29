@@ -5,6 +5,14 @@
 **Primary milestone register:** [MILESTONES.md](MILESTONES.md)  
 **Status rule:** evidence before checkmarks; dates below are snapshot dates rather than delivery commitments.
 
+## Android playtest sign-off: player-reported PASS (2026-10-29)
+
+The player confirms **“Human playtest passes”** after the Star Beam/combo/Nova fixes, accidental restart correction, and versioned APK rollout. This is evidence of a successful **practical Android gameplay smoke test**. It does **not** establish that every combo/performance/interruption case was individually tested or independently measure the device. The immediately recommended artifact was [v0.2.0-dev.82.1](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40958771036), but its installation was not verified over ADB.
+
+The [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md) records the pass, the exact evidence boundary, and the remaining M0/M1/M2 requirements. The reported gameplay reset issue and power audit may be accepted at smoke-test level; full milestone gates remain open.
+
+**Next gameplay priority:** Asteroid blockers and interactions with adjacent matches, special beams/bombs, Nova and blocker-safe gravity/reshuffles. Debug signing persistence and full device/web QA remain parallel infrastructure tasks.
+
 ## Executive summary
 
 **Status: Godot M0/M1 implementation underway; headless rules tests and automated web/debug-APK exports pass, but device/browser QA and Android release distribution remain unproven.**
