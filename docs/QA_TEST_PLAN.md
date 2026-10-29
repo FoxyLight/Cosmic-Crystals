@@ -13,7 +13,7 @@ The immediately preceding requested scope covered four/five-match special creati
 
 ## 1. Current automated coverage
 
-**Presentation regression:** `tests/test_game_layout.gd` adds 1,459 checks for
+**Presentation regression:** `tests/test_game_layout.gd` adds 1,471 checks for
 nine viewport geometries with three safe-area configurations each, square board,
 nonoverlapping panels, complete dialog bounds, actual control bounds, full help
 text, real mouse/touch dispatch, no double Nova toggles, pause/resume board

@@ -88,7 +88,7 @@ outcomes are automated. New Android blocker acceptance and balance remain open.
 **Presentation implementation (`0.3.1`):** gameplay and results now follow the
 earlier browser/Android look, with responsive/safe-area geometry, native readable
 HUD, goal art, local fonts, improved facets, blue/green separation and help/pause.
-The 1,459-check UI suite passes; physical Android visual and exported-browser
+The 1,471-check UI suite passes; physical Android visual and exported-browser
 acceptance remain open. This is a bounded M4 slice before M3, not a campaign or
 complete accessibility/audio milestone. See [Visual Pass](VISUAL_PASS.md).
 

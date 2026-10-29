@@ -25,6 +25,14 @@ It does not import the previous web engine or start the M3 campaign/map/saves.
 - Synthetic stress drawing is available through desktop **F9**, away from the
   player HUD. It remains a development workload, not a device benchmark claim.
 
+## Exported web icon correction
+
+The first exported-browser preview exposed boxed star/pause glyphs that the
+desktop system font fallback had hidden. Brand/Nova/result/pause marks now use
+original bundled SVG textures, not font glyphs; the field-guide instructions
+also avoid a font-dependent arrow. This keeps these marks consistent offline
+on Android and web. The follow-up remains presentation-only.
+
 ## Implementation boundaries
 
 `board.gd` and `cosmic_board.gd` are unchanged. Score, move budget, objectives,
@@ -56,7 +64,7 @@ The source fonts were downloaded from the Google Fonts repository on 2026-10-29.
 ## Verification
 
 - All **ten** GDScript suites pass locally under Godot 4.7.2; all nine previous
-  suites are retained. The new UI suite reports **1,459 checks, zero failures**.
+  suites are retained. The new UI suite reports **1,471 checks, zero failures**.
 - Geometry checks cover 320×568, 360×640, 376×746, 400×760, 430×932, 768×1024,
   1280×720, 1440×900 and 900×480, each with three safe-area configurations.
 - Real UI controls are checked at narrow phone, standard phone and desktop

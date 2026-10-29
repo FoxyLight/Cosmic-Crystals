@@ -3,6 +3,9 @@ extends Control
 ## This view reads the controller; it never scores, resolves or mutates a board.
 const TITLE_FONT = preload("res://assets/fonts/Outfit.ttf")
 const BODY_FONT = preload("res://assets/fonts/DM-Sans.ttf")
+const STAR_ICON = preload("res://assets/brand-star.svg")
+const PAUSE_ICON = preload("res://assets/pause.svg")
+const RETRY_ICON = preload("res://assets/retry-gem.svg")
 const TEXT = Color("#F0EFFF")
 const MUTED = Color("#B4B5D0")
 const VIOLET = Color("#C4A3FF")
@@ -34,7 +37,7 @@ func _ready() -> void:
 	_panel("moves")
 	_panel("nova", Color("#282142"), Color("#655083"))
 	_label("brand", "COSMIC CRYSTALS", 16, TEXT, true)
-	_label("brand_mark", "✧", 36, VIOLET, true)
+	_icon("brand", STAR_ICON)
 	_label("brand_sub", "A STARWEAVER'S JOURNEY", 9, MUTED)
 	_label("eyebrow", "A LITTLE MATCH. A LITTLE MAGIC.", 10, VIOLET)
 	_label("title", "Asteroid field", 28, TEXT, true)
@@ -54,7 +57,8 @@ func _ready() -> void:
 	_label("score_count", "0", 27, TEXT, true)
 	_label("moves_name", "MOVES LEFT", 10, MUTED)
 	_label("moves_count", "18", 29, TEXT, true)
-	_label("nova_name", "✧  NOVA PULSE", 12, VIOLET, true)
+	_label("nova_name", "NOVA PULSE", 12, VIOLET, true)
+	_icon("nova", STAR_ICON)
 	_label("nova_charge", "GATHERING ENERGY · 0%", 9, MUTED)
 	_label("caption", "Match beside asteroids to crack them", 11, MUTED)
 	_label("aside", "Restore a little starlight.\n\nMatch three crystals. Crack the asteroids.\nUse your Nova when the stars align.", 15, MUTED)
@@ -63,14 +67,18 @@ func _ready() -> void:
 	_track("rocks", GOLD)
 	_track("nova", VIOLET)
 	_button("help", "?", func(): game.open_overlay("help"), true)
-	_button("pause", "Ⅱ", func(): game.open_overlay("pause"), true)
+	_button("pause", "", func(): game.open_overlay("pause"), true)
+	buttons["pause"].icon = PAUSE_ICON
+	buttons["pause"].expand_icon = true
+	buttons["pause"].icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	buttons["pause"].add_theme_constant_override("icon_max_width", 22)
 	_button("nova", "Gathering…", func(): game.toggle_nova())
 	shade = ColorRect.new()
 	shade.color = Color(0.025, 0.03, 0.09, 0.86)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(shade)
 	_panel("dialog", Color("#211C3B"), Color("#70558F"))
-	_label("modal_mark", "✧", 52, VIOLET, true)
+	_icon("modal", STAR_ICON)
 	_label("modal_eyebrow", "A LITTLE STARLIGHT RESTORED", 10, VIOLET)
 	_label("modal_title", "Beautifully done.", 32, TEXT, true)
 	_label("modal_body", "", 15, MUTED)
@@ -81,7 +89,7 @@ func _ready() -> void:
 	_button("guide", "How to play", func(): game.open_overlay("help"))
 	_button("back", "Back to game", func(): game.close_overlay())
 	_button("stress", "Run effects check", func(): game._toggle_stress_test(); game.close_overlay())
-	for key in ["modal_mark", "modal_eyebrow", "modal_title", "modal_body", "modal_score"]:
+	for key in ["modal_eyebrow", "modal_title", "modal_body", "modal_score"]:
 		labels[key].horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		labels[key].vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
@@ -93,6 +101,16 @@ func _style(bg: Color, line: Color, radius: int = 16) -> StyleBoxFlat:
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(radius)
 	return style
+
+
+func _icon(key: String, texture: Texture2D) -> void:
+	var icon: TextureRect = TextureRect.new()
+	icon.texture = texture
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icons[key] = icon
+	add_child(icon)
 
 
 func _panel(key: String, bg: Color = Color("#1B1D35"), line: Color = Color("#39334F")) -> void:
@@ -174,7 +192,7 @@ func refresh(layout: Dictionary) -> void:
 	for key in ["goals", "score", "moves", "nova"]:
 		_rect(panels[key], layout[key])
 	var header: Rect2 = layout["header"]
-	_place("brand_mark", Rect2(header.position + Vector2(0, 3), Vector2(34, 44)))
+	_rect(icons["brand"], Rect2(header.position + Vector2(0, 3), Vector2(34, 44)))
 	_place("brand", Rect2(header.position + Vector2(40, 7), Vector2(header.size.x - 156, 22)))
 	_place("brand_sub", Rect2(header.position + Vector2(40, 30), Vector2(header.size.x - 156, 15)))
 	labels["brand"].add_theme_font_size_override("font_size", 14 if header.size.x < 340 else 16)
@@ -209,7 +227,8 @@ func refresh(layout: Dictionary) -> void:
 	var nova: Rect2 = layout["nova"]
 	var energy: int = game.board.nova_energy
 	var charged: bool = game.board.can_use_nova()
-	_place("nova_name", Rect2(nova.position + Vector2(12, 8), Vector2(nova.size.x * 0.5 - 16, 20)))
+	_rect(icons["nova"], Rect2(nova.position + Vector2(12, 12), Vector2(12, 12)))
+	_place("nova_name", Rect2(nova.position + Vector2(30, 8), Vector2(nova.size.x * 0.5 - 34, 20)))
 	_place("nova_charge", Rect2(nova.position + Vector2(12, 30), Vector2(nova.size.x * 0.5 - 18, 16)))
 	labels["nova_charge"].text = "READY TO SHINE" if charged else "CHARGING · %d%%" % (energy * 100 / game.BoardScript.NOVA_MAX)
 	_meter("nova", Rect2(nova.position + Vector2(12, nova.size.y - 12), Vector2(nova.size.x * 0.5 - 18, 4)), float(energy) / game.BoardScript.NOVA_MAX)
@@ -229,7 +248,8 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 	_rect(shade, Rect2(Vector2.ZERO, size))
 	shade.visible = visible_modal
 	panels["dialog"].visible = visible_modal
-	for key in ["modal_mark", "modal_eyebrow", "modal_title", "modal_body", "modal_score"]:
+	icons["modal"].visible = visible_modal
+	for key in ["modal_eyebrow", "modal_title", "modal_body", "modal_score"]:
 		labels[key].visible = visible_modal
 	for key in ["replay", "resume", "guide", "back", "stress"]:
 		if modal != last_modal or not visible_modal:
@@ -241,14 +261,14 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 	_rect(panels["dialog"], dialog)
 	var x: float = dialog.position.x + 24
 	var width: float = dialog.size.x - 48
-	_place("modal_mark", Rect2(x, dialog.position.y + 18, width, 64))
+	_rect(icons["modal"], Rect2(dialog.get_center().x - 26, dialog.position.y + 24, 52, 52))
 	_place("modal_eyebrow", Rect2(x, dialog.position.y + 86, width, 20))
 	_place("modal_title", Rect2(x, dialog.position.y + 109, width, 44))
 	_place("modal_body", Rect2(x, dialog.position.y + 158, width, dialog.size.y - 303))
 	_place("modal_score", Rect2(x, dialog.end.y - 145, width, 46))
 	labels["modal_score"].text = ""
 	if modal == "result":
-		labels["modal_mark"].text = "✧" if game.won else "◇"
+		icons["modal"].texture = STAR_ICON if game.won else RETRY_ICON
 		labels["modal_eyebrow"].text = "A LITTLE STARLIGHT RESTORED" if game.won else "THE STARS ARE STILL WITH YOU"
 		labels["modal_title"].text = "Beautifully done." if game.won else "One more try?"
 		labels["modal_body"].text = "Every little match brings the galaxy back to light." if game.won else "%d / %d crystals collected\n%d asteroids still to clear" % [mini(game.collected, game.GOAL), game.GOAL, game._asteroids_remaining()]
@@ -256,10 +276,10 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 		_rect(buttons["replay"], layout["replay"])
 		buttons["replay"].visible = true
 	elif modal == "help":
-		labels["modal_mark"].text = "✧"
+		icons["modal"].texture = STAR_ICON
 		labels["modal_eyebrow"].text = "YOUR LITTLE FIELD GUIDE"
 		labels["modal_title"].text = "Follow the stars."
-		labels["modal_body"].text = "Match 3 by swapping neighbors. Match 4, 5 or a T/L for powers.\n\nMatch beside rocks or blast them. Two pips → one → clear."
+		labels["modal_body"].text = "Match 3 by swapping neighbors. Match 4, 5 or a T/L for powers.\n\nMatch beside rocks or blast them. Two hits break solid rocks."
 		labels["modal_score"].add_theme_font_size_override("font_size", 14)
 		labels["modal_score"].text = "Fill Nova, then tap a tile. No move spent."
 		_rect(buttons["back"], layout["replay"])
@@ -271,7 +291,7 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 		_rect(buttons["stress"], layout["replay"])
 		buttons["stress"].visible = true
 	else:
-		labels["modal_mark"].text = "Ⅱ"
+		icons["modal"].texture = PAUSE_ICON
 		labels["modal_eyebrow"].text = "THE GALAXY CAN WAIT"
 		labels["modal_title"].text = "A little breather."
 		labels["modal_body"].text = "Your crystals will be right here."

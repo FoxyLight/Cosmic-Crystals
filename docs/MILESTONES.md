@@ -43,7 +43,7 @@ A milestone is **Done** only if all its exit criteria have demonstrable evidence
 **M4 presentation slice now in progress:** gameplay/results use the earlier
 web/Android styling with responsive complete HUD, matching local typography,
 faceted/color-separated gems, clear rock goals, help/pause and hidden diagnostics.
-The new 1,459-check UI suite and all existing suites pass locally. New physical
+The new 1,471-check UI suite and all existing suites pass locally. New physical
 Android visual acceptance and wider browser/accessibility/audio work remain
 open; this does not finish M4. The preceding asteroid build passed the player's
 phone smoke test (build 9101), recorded in #6. [Visual evidence and remaining
