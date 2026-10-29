@@ -296,21 +296,48 @@ func _resolve(initial: Array[int], result: Dictionary, reward: Dictionary,
 		var gain: int = int(result["cleared"]) + int(result["activated"]) * 4
 		result["nova_gain"] = mini(NOVA_MAX - nova_energy, gain)
 		nova_energy = mini(NOVA_MAX, nova_energy + gain)
-	# Existing special pieces are enough to make a swap legal. Never delete them
-	# on deadlock recovery. With no powers left, original seeded fallback is safe.
-	if not find_matches().is_empty() or not has_legal_move():
+	# A deadlocked board must shuffle existing crystals, not generate 64 new
+	# colors. Score, move budget, Nova energy and surviving powers stay intact.
+	if not find_matches().is_empty():
+		# Pathological MAX_CASCADES guard; do not hide unresolved effects by
+		# silently replacing the whole board.
+		push_warning("Maximum cascade count reached before the board settled")
+	elif not has_legal_move():
 		var before: Array[int] = cells.duplicate()
 		var before_power: Array[int] = specials.duplicate()
-		if specials.has(BEAM_ROW) or specials.has(BEAM_COLUMN) or specials.has(BOMB) or specials.has(SUPERNOVA):
-			# A spontaneous match after max cascade count can be retried later,
-			# but do not destroy earned specials. This case should be unreachable
-			# except an extreme MAX_CASCADES chain.
-			push_warning("Cascade guard reached with special pieces still present")
-		else:
-			super.generate()
-			specials.fill(NONE)
+		if _shuffle_deadlocked_board():
 			result["reshuffled"] = true
-			_event(result["events"], "reshuffle", before, before_power)
+			_event(result["events"], "reshuffle", before, before_power,
+				{"reason": "no_legal_moves"})
+		else:
+			push_error("Could not reshuffle existing crystals into a playable board")
+
+
+func _shuffle_deadlocked_board() -> bool:
+	# Fisher-Yates over the existing inventory, so kind totals cannot change.
+	# Current M2 grid has no asteroid blockers. This is not a generic
+	# blocker-aware shuffle; M2's blocker task will extend this contract.
+	if not find_matches().is_empty() or has_legal_move():
+		return false
+	var original: Array[int] = cells.duplicate()
+	var original_specials: Array[int] = specials.duplicate()
+	for _attempt in range(2048):
+		cells = original.duplicate()
+		specials = original_specials.duplicate()
+		for i in range(cells.size() - 1, 0, -1):
+			var j: int = rng.randi_range(0, i)
+			var tmp: int = cells[i]
+			cells[i] = cells[j]
+			cells[j] = tmp
+			var special_tmp: int = specials[i]
+			specials[i] = specials[j]
+			specials[j] = special_tmp
+		if find_matches().is_empty() and has_legal_move():
+			return true
+	# Preserve the original board rather than fabricating a new gem inventory.
+	cells = original
+	specials = original_specials
+	return false
 
 
 func _fall_with_powers(events: Array) -> void:

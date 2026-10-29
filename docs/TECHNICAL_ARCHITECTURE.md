@@ -69,6 +69,12 @@ The **event log** now includes separate gem and special snapshots, including fal
 
 Keep progress storage under Godot `user://`, version save schemas, and persist only completed, stable progress. Do not save a half-resolved turn.
 
+### Replay and deadlock protection
+
+The result phase must never interpret an ordinary board tap as “restart”. A visible overlay provides a dedicated PLAY AGAIN rectangle that requires both press and release inside it. The HUD, score, Nova charge and final board remain available until deliberate replay. Domain deadlock recovery now permutes the current gem and special inventories instead of calling `super.generate()`. It preserves color counts, produces a match-free board with a legal swap, emits an ordered `reshuffle` event, and leaves objective counters unaffected. See [QA](QA_TEST_PLAN.md) and [issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21).
+
+The current grid still lacks blockers, so this inventory shuffle is **not** a blocker-aware algorithm. Future blocker work must update this guarantee rather than silently replacing pieces. The 30-crystal single-round goal remains provisional for M3 level design.
+
 ### Input and visuals
 
 The prototype supports drag/swipe and tap-two-adjacent input through `_input`, selecting one orthogonal neighbor even for longer drags. It locks input while playing the ordered swap, rollback, clear, fall and refill effects. Future work: manual Android gesture QA, pause/restart interruption handling, safe areas, reduced motion and accessibility.

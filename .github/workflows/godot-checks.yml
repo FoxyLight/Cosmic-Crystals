@@ -43,6 +43,8 @@ jobs:
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_power_matrix.gd
       - name: Verify special creation and Nova in the playable scene
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_power_scene.gd
+      - name: Prevent accidental replay and preserve crystals on deadlock
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_replay_and_shuffle.gd
       - name: Run the prototype scene headlessly for 120 frames
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --quit-after 120
 
