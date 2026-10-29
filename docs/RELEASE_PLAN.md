@@ -9,7 +9,9 @@
 - **MVP goal:** Five playable Lyra levels, distinctive special pieces and Nova Pulse, galaxy progression, local saves, accessible and polished UI/audio.
 - **Later content:** 20 levels/four constellations and iOS. Do not count future content toward first Android acceptance.
 
-Decide a versioning scheme before the first distributed test build. Android version code must increase with each uploaded build. Record the exact commit SHA and package identifier for every release candidate.
+**Android debug preview versioning is implemented:** [Android APK Versioning](ANDROID_VERSIONING.md). The source [VERSION](../VERSION) holds the base SemVer (`0.2.0`), CI derives a unique `versionCode` from GitHub run number/attempt and a `versionName` that includes the short Git SHA, exports a versioned APK and validates the embedded manifest with Android `aapt`. The artifact contains a checksum and a JSON build manifest. Optional persistent **debug-only** signing requires a private repository secret; until configured, CI's temporary debug certificates can require uninstall/reinstall on phones.
+
+**Still undecided for Play releases:** Gradle AAB export, secure **release** signing identity, production versionCode allocation and upload/test-track readiness. A debug APK version code scheme is not proof of a production release. The release code must increase with each uploaded app version and stay within Google Play's limit. Record exact commit SHA/package ID for every release candidate.
 
 ## Android debug/test preparation (M0)
 
