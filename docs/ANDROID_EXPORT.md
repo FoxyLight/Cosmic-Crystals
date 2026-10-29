@@ -16,6 +16,12 @@ Press **F6** on `scenes/Prototype.tscn` or **F5** to run the main scene. In the 
 
 The M1 prototype now plays ordered swap/rollback, clear, drop and refill animations with input locked during resolution. The **STRESS 30S** button is a synthetic drawing workload that displays FPS; it does not simulate the final game's particles.
 
+## Android preview APK versioning (automatic in CI)
+
+From [PR #24](https://github.com/FoxyLight/Cosmic-Crystals/pull/24), the Android CI job builds a uniquely numbered APK instead of always writing `cosmic-crystals-debug.apk` with versionCode 1. Download the **latest main-branch** artifact under [Actions](https://github.com/FoxyLight/Cosmic-Crystals/actions/workflows/godot-checks.yml), named `cosmic-crystals-android-v...`. The ZIP contains `cosmic-crystals-v...-debug.apk`, `build-info.json` and `SHA256SUMS.txt`. Use the **actual filename** in `adb install -r`, and inspect `build-info.json` for `versionCode`, `versionName`, Git commit and signing mode.
+
+The workflow sets `versionCode` and `versionName` in the Godot export preset at build time, then reads the embedded Android APK manifest back using `aapt` and fails on a mismatch. A privately configured stable debug key can make subsequent main-branch APK upgrades compatible; without that secret, CI's temporary signing certificates still change and a one-time uninstall may be required. Complete procedure and future release distinction: [Android APK Versioning](ANDROID_VERSIONING.md).
+
 ## 2. CI artifacts and automated rules tests
 
 Open the [successful GitHub Actions run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043). In **Artifacts**, download `cosmic-crystals-android-debug` (APK) or `cosmic-crystals-web` (HTML/JS/WASM/PCK). Extract the ZIP on your computer. These are **seven-day artifacts** signed for development only, not long-lived release links. See [M0/M1 Implementation](M0_M1_IMPLEMENTATION.md) for details.
