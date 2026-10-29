@@ -32,6 +32,14 @@ The expanded seeded board test covers 125 seeds, no starting matches, adjacent l
 
 All domain-level tests should be deterministic (fixed seed, fixed starting board, known expected events) and independent of visual tween timing.
 
+## Complete M2 combo compatibility audit
+
+Following [issue #19](https://github.com/FoxyLight/Cosmic-Crystals/issues/19), the automated matrix in `tests/test_power_matrix.gd` verifies 96 ordered special-pair/position/orientation scenarios across both Beams, Cosmic Bomb and Supernova, including independent first-blast footprint, power activation counts, exact unique clearing, scoring and gem/special preservation through gravity. Nova's cross-chain with three different specials is also checked. `tests/test_power_scene.gd` exercises special formation and NOVA targeting/cancel through the real gameplay scene.
+
+One confirmed on-screen behavior was corrected: **unaffected power icons disappeared temporarily during other matches' clearing animations**; all non-cleared gems now render their special overlays throughout clearing.
+
+**Manual test still required:** On Android, create and activate each power and at least Beam+Beam, Beam+Bomb, Bomb+Bomb and Supernova+another-special. Verify the colored power icon remains visible even while nearby gems clear, Nova cancel retains charge, all blasts visibly reach the right tiles, and no double-collection or stuck animations occurs. Record the device and build in #19 / #6.
+
 ## Star Beam gameplay regression and CI parser gate
 
 The first M2 APK had a **hidden scene-script parse error** despite green GitHub Actions. [Bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17) tracks the defect and Android retest.
