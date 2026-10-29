@@ -174,9 +174,10 @@ func refresh(layout: Dictionary) -> void:
 	for key in ["goals", "score", "moves", "nova"]:
 		_rect(panels[key], layout[key])
 	var header: Rect2 = layout["header"]
-	_place("brand_mark", Rect2(header.position + Vector2(0, -1), Vector2(34, 44)))
-	_place("brand", Rect2(header.position + Vector2(40, 3), Vector2(header.size.x - 136, 22)))
-	_place("brand_sub", Rect2(header.position + Vector2(40, 26), Vector2(header.size.x - 136, 15)))
+	_place("brand_mark", Rect2(header.position + Vector2(0, 3), Vector2(34, 44)))
+	_place("brand", Rect2(header.position + Vector2(40, 7), Vector2(header.size.x - 156, 22)))
+	_place("brand_sub", Rect2(header.position + Vector2(40, 30), Vector2(header.size.x - 156, 15)))
+	labels["brand"].add_theme_font_size_override("font_size", 14 if header.size.x < 340 else 16)
 	_rect(buttons["help"], layout["help_button"])
 	_rect(buttons["pause"], layout["pause_button"])
 	buttons["help"].disabled = blocked or not idle
