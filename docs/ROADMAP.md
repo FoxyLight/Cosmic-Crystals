@@ -49,12 +49,15 @@
 
 ### M2: Cosmic mechanics | [Issue #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6)
 
-- [ ] Straight four-match Star Beam.
-- [ ] Straight five-match Supernova; T/L Cosmic Bomb and explicit creation precedence.
-- [ ] Deterministic special+special interactions, with chain-reaction regression tests.
+**Partial playable implementation:** Godot PR #16 adds tested specials, combo unions and targetable Nova. See [M2 Gameplay Guide](M2_SPECIALS_NOVA.md). Android feel/balance and blockers remain open.
+
+- [x] Straight four-match Star Beam, horizontal/vertical orientations and line clear.
+- [x] Straight five-match Supernova, T/L Cosmic Bomb and deterministic five > T/L > four precedence.
+- [x] Implement first-pass Beam+Beam, Beam+Bomb, Bomb+Bomb and Supernova combos with no double-counting.
+- [ ] Android playtest and tune special combinations and long-chain behavior.
 - [ ] Asteroid blockers and correct adjacent/special-effect damage.
-- [ ] Nova energy meter, cancelable targeting, row+column blast and zero-move activation.
-- [ ] Balance specials and Nova energy through repeated playtests.
+- [x] Add 20-charge Nova meter, cancelable targeting, row+column blast and zero-move activation.
+- [ ] Balance specials and Nova energy on physical Android, and add edge-case chain tests.
 
 ### M3: Five-level Lyra vertical slice | [Issue #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7)
 

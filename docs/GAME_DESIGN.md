@@ -78,6 +78,8 @@ Design decision for implementation: prioritize straight-five detection over T/L 
 
 **Combination behavior** is a balancing item. Initially implement and test at least Beam+Beam, Bomb+Bomb, and Beam+Bomb, then define Supernova combinations explicitly before shipping. Never silently treat an unsupported special combination as a normal swap.
 
+**Implementation status (M2 prototype, 2026-10-29):** The first playable Star Beam, Cosmic Bomb, Supernova and Nova Pulse rules are now in [CosmicBoard](../scripts/cosmic_board.gd) and documented with first-pass combo behavior in [M2 Gameplay Guide](M2_SPECIALS_NOVA.md). This prototype supports swap activation without a 3-match, one initial special creation per move, and chain-triggered blast unions. Exact balancing, asteroid blockers and human Android acceptance remain outstanding; see M2 issue #6.
+
 ## 5. Signature power: Nova Pulse
 
 - Successful matches generate Nova energy; cascades and special combinations award configurable bonuses.
@@ -87,7 +89,7 @@ Design decision for implementation: prioritize straight-five detection over T/L 
 - Nova Pulse consumes **zero** regular moves, then resets the meter to empty.
 - The player can cancel targeting without using the charge.
 - Targeting is unavailable while a board animation is in flight.
-- All energy thresholds, rewards, and special interactions are data-driven.
+- Prototype values: charge threshold 20, +1 per cleared crystal, +4 per triggered special, capped at 20. These are **currently constants**, not yet per-level data. Move threshold and bonuses to level data before M3 balancing is finalized.
 
 Balance goal: powerful enough to rescue a tough board, but infrequent enough that planning matters.
 
@@ -144,7 +146,7 @@ Audio: optional background ambience; unobtrusive selection/match sounds; escalat
 - Input: drag/swipe and tap-two-to-swap plus mouse.
 - Independent readable silhouettes; scalable text and strong contrast.
 - Aim for smooth 60 FPS on capable devices, with performance degradation gracefully handled.
-- Web first; iOS/Android packaging and platform testing after browser gameplay works.
+- Android-first: Godot native debug APK builds and Web export are automated in CI; real Android/browser test coverage and a signed release AAB remain separate validation gates.
 
 ## 11. Non-goals for first playable release
 

@@ -1,8 +1,9 @@
 extends Control
 ## Animated Android-first match-3 prototype, with a clearly labeled synthetic
-## 30-second drawing stress check. Specials, blockers and saves are still planned.
+## 30-second drawing stress check. M2 adds specials and Nova Pulse.
+## Asteroids, save data and level progression remain unimplemented.
 
-const BoardScript = preload("res://scripts/board.gd")
+const BoardScript = preload("res://scripts/cosmic_board.gd")
 const Visuals = preload("res://scripts/crystal_visuals.gd")
 const GOAL: int = 30
 const STARTING_MOVES: int = 18
@@ -14,6 +15,7 @@ const RESHUFFLE_SECONDS: float = 0.28
 
 var board = null
 var display_cells: Array[int] = []
+var display_specials: Array[int] = []
 var moves_left: int = STARTING_MOVES
 var collected: int = 0
 var score: int = 0
@@ -48,6 +50,7 @@ func _ready() -> void:
 func _reset_game() -> void:
 	board = BoardScript.new(20261029 + int(Time.get_ticks_msec() % 100000))
 	display_cells = board.cells.duplicate()
+	display_specials = board.specials.duplicate()
 	moves_left = STARTING_MOVES
 	collected = 0
 	score = 0
@@ -86,11 +89,15 @@ func _process(delta: float) -> void:
 func _board_rect() -> Rect2:
 	# Reserve HUD + stress control space on portrait phones.
 	var available_width: float = maxf(120.0, size.x - 28.0)
-	var available_height: float = maxf(120.0, size.y - 310.0)
+	var available_height: float = maxf(120.0, size.y - 345.0)
 	var side: float = minf(minf(available_width, available_height), 640.0)
-	var top: float = maxf(205.0, (size.y - side) * 0.52)
+	var top: float = maxf(232.0, (size.y - side) * 0.52)
 	top = minf(top, maxf(110.0, size.y - side - 76.0))
 	return Rect2(Vector2((size.x - side) * 0.5, top), Vector2(side, side))
+
+
+func _nova_rect() -> Rect2:
+	return Rect2(Vector2(20.0, 178.0), Vector2(138.0, 36.0))
 
 
 func _stress_rect() -> Rect2:
@@ -144,11 +151,13 @@ func _draw() -> void:
 	_draw_footer(rect)
 
 
-func _draw_snapshot(snapshot: Array, rect: Rect2) -> void:
+func _draw_snapshot(snapshot: Array, rect: Rect2, powers: Array = []) -> void:
+	var snapshot_powers: Array = display_specials if powers.is_empty() else powers
 	for index in range(snapshot.size()):
 		var kind: int = int(snapshot[index])
 		if kind >= 0:
-			_draw_crystal(_center_of(index, rect), rect.size.x / 8.0 * 0.34, kind)
+			_draw_crystal(_center_of(index, rect), rect.size.x / 8.0 * 0.34,
+				kind, 1.0, int(snapshot_powers[index]))
 
 
 func _draw_animated_event(rect: Rect2) -> void:
@@ -156,6 +165,7 @@ func _draw_animated_event(rect: Rect2) -> void:
 	var eased: float = t * t * (3.0 - 2.0 * t)
 	var kind: String = str(active_event["type"])
 	var before: Array = active_event["before"]
+	var before_powers: Array = active_event.get("specials_before", display_specials)
 	var radius: float = rect.size.x / 8.0 * 0.34
 	match kind:
 		"swap", "swap_back":
@@ -163,9 +173,9 @@ func _draw_animated_event(rect: Rect2) -> void:
 			var b: int = int(active_event["b"])
 			for index in range(before.size()):
 				if index != a and index != b and int(before[index]) >= 0:
-					_draw_crystal(_center_of(index, rect), radius, int(before[index]))
-			_draw_crystal(_center_of(a, rect).lerp(_center_of(b, rect), eased), radius, int(before[a]))
-			_draw_crystal(_center_of(b, rect).lerp(_center_of(a, rect), eased), radius, int(before[b]))
+					_draw_crystal(_center_of(index, rect), radius, int(before[index]), 1.0, int(before_powers[index]))
+			_draw_crystal(_center_of(a, rect).lerp(_center_of(b, rect), eased), radius, int(before[a]), 1.0, int(before_powers[a]))
+			_draw_crystal(_center_of(b, rect).lerp(_center_of(a, rect), eased), radius, int(before[b]), 1.0, int(before_powers[b]))
 		"clear":
 			var marked: Dictionary = {}
 			for index in active_event["indices"]:
@@ -174,7 +184,7 @@ func _draw_animated_event(rect: Rect2) -> void:
 				if int(before[index]) < 0:
 					continue
 				if marked.has(index):
-					_draw_crystal(_center_of(index, rect), radius * (1.0 - t * 0.46), int(before[index]), 1.0 - t)
+					_draw_crystal(_center_of(index, rect), radius * (1.0 - t * 0.46), int(before[index]), 1.0 - t, int(before_powers[index]))
 				else:
 					_draw_crystal(_center_of(index, rect), radius, int(before[index]))
 		"fall":
@@ -182,20 +192,26 @@ func _draw_animated_event(rect: Rect2) -> void:
 				var from_index: int = int(move["from"])
 				var to_index: int = int(move["to"])
 				_draw_crystal(_center_of(from_index, rect).lerp(_center_of(to_index, rect), eased),
-					radius, int(move["kind"]))
+					radius, int(move["kind"]), 1.0, int(move.get("special", 0)))
 			for spawn in active_event["spawns"]:
 				var to_index: int = int(spawn["to"])
 				var start_row: int = int(spawn["from_row"])
 				var start: Vector2 = _center_of(to_index, rect)
 				start.y = rect.position.y + (float(start_row) + 0.5) * (rect.size.x / 8.0)
-				_draw_crystal(start.lerp(_center_of(to_index, rect), eased), radius, int(spawn["kind"]))
+				_draw_crystal(start.lerp(_center_of(to_index, rect), eased), radius, int(spawn["kind"]), 1.0, int(spawn.get("special", 0)))
+		"special_create":
+			_draw_snapshot(active_event["after"], rect, active_event["specials_after"])
+			var target: int = int(active_event["index"])
+			var pulse_color: Color = Color("#FFE8A9", (1.0 - t) * 0.9)
+			draw_arc(_center_of(target, rect), radius * (0.9 + t * 0.55),
+				0.0, TAU, 24, pulse_color, 2.5, true)
 		"reshuffle":
 			if t < 0.5:
-				_draw_snapshot(before, rect)
+				_draw_snapshot(before, rect, before_powers)
 			else:
-				_draw_snapshot(active_event["after"], rect)
+				_draw_snapshot(active_event["after"], rect, active_event["specials_after"])
 		_:
-			_draw_snapshot(active_event["after"], rect)
+			_draw_snapshot(active_event["after"], rect, active_event["specials_after"])
 
 
 func _draw_starfield() -> void:
@@ -216,6 +232,17 @@ func _draw_hud() -> void:
 	var progress_width: float = minf(size.x - 44.0, 360.0)
 	draw_rect(Rect2(Vector2(22, 159), Vector2(progress_width, 7)), Color("#282A51"))
 	draw_rect(Rect2(Vector2(22, 159), Vector2(progress_width * minf(float(collected) / float(GOAL), 1.0), 7)), Color("#39D5FF"))
+	var nova: Rect2 = _nova_rect()
+	var charged: bool = board != null and board.can_use_nova()
+	draw_rect(nova, Color("#296D83") if phase == "nova_targeting" else
+		(Color("#4A3488") if charged else Color("#202947")))
+	draw_rect(nova, Color("#B9F4FF") if charged else Color("#485879"), false, 1.2)
+\tvar fraction: float = float(board.nova_energy) / float(BoardScript.NOVA_MAX) if board != null else 0.0
+\tdraw_rect(Rect2(nova.position + Vector2(3, 31), Vector2((nova.size.x - 6.0) * fraction, 3)), Color("#89E8FF"))
+	var energy: int = board.nova_energy if board != null else 0
+	draw_string(font, nova.position + Vector2(8, 23),
+		"NOVA %d/%d" % [energy, BoardScript.NOVA_MAX],
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#FFFFFF") if charged else Color("#AAB9DA"))
 	var button: Rect2 = _stress_rect()
 	draw_rect(button, Color("#3A2D6A"))
 	draw_rect(button, Color("#39D5FF"), false, 1.0)
@@ -225,7 +252,7 @@ func _draw_hud() -> void:
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#FFCB65"))
 
 
-func _draw_crystal(center: Vector2, radius: float, kind: int, opacity: float = 1.0) -> void:
+func _draw_crystal(center: Vector2, radius: float, kind: int, opacity: float = 1.0, power: int = 0) -> void:
 	if kind < 0 or kind >= Visuals.FILL_HEX.size():
 		return
 
@@ -268,6 +295,31 @@ func _draw_crystal(center: Vector2, radius: float, kind: int, opacity: float = 1
 			center + Vector2(0.36, 0.21) * radius, glint, maxf(1.0, radius * 0.045), true)
 	else:
 		draw_circle(center + Vector2(-0.12, -0.23) * radius, radius * 0.11, glint)
+	_draw_power_icon(center, radius, power, opacity)
+
+
+func _draw_power_icon(center: Vector2, radius: float, power: int, opacity: float) -> void:
+	if power == BoardScript.NONE:
+		return
+	var ink: Color = Color(1.0, 1.0, 1.0, opacity)
+	var shadow: Color = Color(0.05, 0.09, 0.24, opacity * 0.80)
+	if power == BoardScript.BEAM_ROW or power == BoardScript.BEAM_COLUMN:
+		var direction: Vector2 = Vector2(1, 0) if power == BoardScript.BEAM_ROW else Vector2(0, 1)
+		var start: Vector2 = center - direction * radius * 0.59
+		var finish: Vector2 = center + direction * radius * 0.59
+		draw_line(start, finish, shadow, maxf(2.5, radius * 0.23), true)
+		draw_line(start, finish, Color(1, 0.98, 0.72, opacity), maxf(1.5, radius * 0.12), true)
+	elif power == BoardScript.BOMB:
+		draw_arc(center, radius * 0.43, 0, TAU, 20, shadow, maxf(2.5, radius * 0.20), true)
+		draw_arc(center, radius * 0.43, 0, TAU, 20, ink, maxf(1.5, radius * 0.10), true)
+		draw_circle(center, radius * 0.16, Color(1.0, 0.72, 0.35, opacity))
+	elif power == BoardScript.SUPERNOVA:
+		draw_arc(center, radius * 0.46, 0, TAU, 24, ink, maxf(1.5, radius * 0.10), true)
+		for i in range(4):
+			var theta: float = TAU * float(i) / 4.0
+			var ray: Vector2 = Vector2(cos(theta), sin(theta))
+			draw_line(center + ray * radius * 0.20, center + ray * radius * 0.75,
+				Color(1.0, 0.89, 0.36, opacity), maxf(1.5, radius * 0.12), true)
 
 
 func _draw_stress_effects(rect: Rect2) -> void:
@@ -309,14 +361,28 @@ func _input(event: InputEvent) -> void:
 
 
 func _handle_touch(pointer: Vector2, pressed: bool) -> void:
-	if phase != "idle" and phase != "finished":
+	if phase != "idle" and phase != "nova_targeting" and phase != "finished":
 		return
 	if pressed:
+		if _nova_rect().has_point(pointer):
+			press_index = -3
+			return
 		if phase == "idle" and _stress_rect().has_point(pointer):
 			press_index = -2
 			return
 		press_index = _index_at(pointer)
 		press_position = pointer
+		return
+	if press_index == -3:
+		press_index = -1
+		if _nova_rect().has_point(pointer):
+			if phase == "nova_targeting":
+				phase = "idle"
+				feedback = "Nova cancelled. Charge saved."
+			elif phase == "idle" and board.can_use_nova():
+				phase = "nova_targeting"
+				feedback = "Tap any crystal to blast its row and column"
+			queue_redraw()
 		return
 	if press_index == -2:
 		press_index = -1
@@ -329,8 +395,15 @@ func _handle_touch(pointer: Vector2, pressed: bool) -> void:
 	var start_index: int = press_index
 	press_index = -1
 	if start_index < 0:
+		if phase == "nova_targeting":
+			phase = "idle"
+			feedback = "Nova cancelled. Charge saved."
 		return
 	var release_index: int = _index_at(pointer)
+	if phase == "nova_targeting":
+		var target: int = release_index if release_index >= 0 else start_index
+		_take_nova(target)
+		return
 	var drag: Vector2 = pointer - press_position
 	var threshold: float = _board_rect().size.x / 8.0 * 0.28
 	if drag.length() >= threshold:
@@ -394,35 +467,57 @@ func _animate_event(event: Dictionary) -> void:
 	event_elapsed = 0.0
 	event_duration = _event_duration(str(event["type"]))
 	display_cells = event["before"].duplicate()
+	display_specials = event["specials_before"].duplicate()
 	queue_redraw()
 	while event_elapsed < event_duration:
 		await get_tree().process_frame
 	display_cells = event["after"].duplicate()
+	display_specials = event["specials_after"].duplicate()
 	active_event = {}
 	queue_redraw()
 
 
 func _take_turn(a: int, b: int) -> void:
-	# Exactly one resolution coroutine per player action.
 	if phase != "idle":
 		return
 	phase = "resolving"
 	selected = -1
 	press_index = -1
 	var outcome: Dictionary = board.play_swap(a, b)
+	await _apply_outcome(outcome, true)
+
+
+func _take_nova(target: int) -> void:
+	if phase != "nova_targeting" or not board.can_use_nova():
+		return
+	phase = "resolving"
+	selected = -1
+	press_index = -1
+	var outcome: Dictionary = board.use_nova(target)
+	await _apply_outcome(outcome, false)
+
+
+func _apply_outcome(outcome: Dictionary, use_move: bool) -> void:
 	for event in outcome["events"]:
 		await _animate_event(event)
-	# The model's final state, score and goals are authoritative.
 	display_cells = board.cells.duplicate()
+	display_specials = board.specials.duplicate()
 	if bool(outcome["valid"]):
-		moves_left -= 1
+		if use_move:
+			moves_left -= 1
 		collected += int(outcome["cleared"])
 		score += int(outcome["score"])
 		feedback_ok = true
-		feedback = "CASCADE x%d  +%d points" % [int(outcome["cascades"]), int(outcome["score"])]
+		if bool(outcome["used_nova"]):
+			feedback = "NOVA PULSE!  +%d points (no move spent)" % int(outcome["score"])
+		elif int(outcome["created"]) != BoardScript.NONE:
+			feedback = "SPECIAL FORGED!  +%d points" % int(outcome["score"])
+		elif int(outcome["activated"]) > 0:
+			feedback = "COSMIC CHAIN!  +%d points" % int(outcome["score"])
+		else:
+			feedback = "CASCADE x%d  +%d points" % [int(outcome["cascades"]), int(outcome["score"])]
 		if bool(outcome["reshuffled"]):
 			feedback = "Stars realigned. New moves available!"
-		# Last-move completion is a win, evaluated after all cascades settle.
 		if collected >= GOAL:
 			finished = true
 			won = true

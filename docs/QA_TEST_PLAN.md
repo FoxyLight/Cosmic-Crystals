@@ -21,12 +21,14 @@ The expanded seeded board test covers 125 seeds, no starting matches, adjacent l
 | Resolution | Gravity stability, refill, chain reactions, event playback invariants | Expanded automated replay/invariant checks |
 | Move budget | Illegal swap spends 0; legal spends 1; last-move win overrides loss | Basic logic implemented; last-move regression pending |
 | Deadlocks | No legal move reshuffles without deleting blockers/specials | Prototype-only reset; production logic missing |
-| Special pieces | 4/5/T/L creation precedence; combined triggers; no double-count | Not implemented |
+| Special pieces | 4/5/T/L creation precedence; combined triggers; no double-count | First M2 rules coded and tested; phone balancing pending |
 | Blockers | Adjacent matches vs special and Nova damage; durability rules | Not implemented |
-| Nova Pulse | Charge, cancel, row/column, zero-move activation, reset | Not implemented |
+| Nova Pulse | Charge, cancel, row/column, zero-move activation, reset | M2 rules + touch targeting implemented; manual cancellation/charge feel QA open |
 | Progression | 5-level unlocks, stars, replay, terminal screens and save load | Not implemented |
 | Persistence | Version migration, malformed/truncated save, app restart | Not implemented |
 | Interruptions | Restart, pause, background while animation resolves | Not implemented |
+
+**M2:** The new `tests/test_powers.gd` suite validates first-pass Star Beam, Supernova, Cosmic Bomb and special+special effects; tests chargeable Nova cost/target and no overlap double-counting. See [M2 gameplay guide](M2_SPECIALS_NOVA.md). Human phone checks remain open.
 
 All domain-level tests should be deterministic (fixed seed, fixed starting board, known expected events) and independent of visual tween timing.
 
@@ -48,7 +50,7 @@ Record at least:
 Run:
 
 1. Fresh install and launch; collect cold-start time and visible errors.
-2. Repeated drag/swipe and tap-two moves, invalid swaps, fast successive gestures.
+2. Repeated drag/swipe and tap-two moves, invalid swaps, fast successive gestures. **M2:** make row/column Beams, Cosmic Bombs and Supernovas; swap powers and check chain scores; charge Nova, select a target, cancel it without cost and verify the row/column clears without using a move.
 3. Check HUD and board at portrait size and on short/small screens.
 4. Suspend/resume (Home, lock screen, notification/call interruption), audio focus, process termination and restore.
 5. 30-second heavy cascade / future particle-effects scenario, with recorded FPS, RAM and heat observations.
@@ -56,6 +58,8 @@ Run:
 7. Produce and install a debug APK; verify signed AAB generation separately. Do not claim Google Play acceptance until validated in a Play test track.
 
 **Provisional performance goal:** smooth 60 FPS where the device supports it, with no hangs/input loss and acceptable sustained play on modest hardware. Before M5 acceptance, establish recorded numerical floors for the selected test device classes; current hardware baselines are **unknown**.
+
+**M2 on-phone result log:** record whether the Nova button is reachable, powers are distinguishable over each gem silhouette, blast effects remain understandable during cascades, and matches/charge/move cost track actual behavior. These checks are **not** counted as passed by CI.
 
 ## 5. Browser and iOS test matrix
 

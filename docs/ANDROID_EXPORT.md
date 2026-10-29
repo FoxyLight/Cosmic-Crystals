@@ -12,6 +12,7 @@ Press **F6** on `scenes/Prototype.tscn` or **F5** to run the main scene. In the 
 - A valid three-or-more match consumes a move. Invalid swaps keep the original board.
 - Clears resolve gravity/refill and cascades.
 - Collect 30 crystals within 18 moves; tap after winning or losing to restart. Press R on desktop to restart.
+- **M2 gameplay:** form 4/5/T/L matches to forge Star Beams/Supernovas/Bombs, then swap them to trigger their effects. Matches charge a NOVA X/20 control; when full, tap NOVA and then a board tile to blast the row and column **without spending a move**. Tap NOVA again to cancel targeting and keep the charge. See [M2 Gameplay Guide](M2_SPECIALS_NOVA.md).
 
 The M1 prototype now plays ordered swap/rollback, clear, drop and refill animations with input locked during resolution. The **STRESS 30S** button is a synthetic drawing workload that displays FPS; it does not simulate the final game's particles.
 
@@ -25,6 +26,7 @@ With the Godot executable on `PATH`:
 ```bash
 godot --headless --path . --editor --quit
 godot --headless --path . --script res://tests/test_board.gd
+godot --headless --path . --script res://tests/test_powers.gd
 ```
 
 The first command imports/parses the project. The second runs deterministic board rules checks and exits nonzero if any test fails.
