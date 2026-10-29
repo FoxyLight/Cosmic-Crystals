@@ -121,6 +121,33 @@ test saves, not a physical Android pass. Asteroid build 9101 passed the player;
 visual build 9601 was installed but has no separate reported human acceptance.
 **The new M3 APK requires its own test.**
 
+## Verified delivery checkpoint, 2026-10-29
+
+[PR #29](https://github.com/FoxyLight/Cosmic-Crystals/pull/29) merged as
+`e14ef9e959b679346880b3d2adf6d94be145b581`. PR run 97 and
+[merged-main run 98](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40973718330)
+passed gameplay checks, Web export and Android export. All 13 Godot suites and
+five Python tests pass; actual exported catalog/font-license checks pass.
+
+[Android artifact](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40973718330/artifacts/12941532251):
+`cosmic-crystals-v0.4.0-dev.98.1-ge14ef9e9-debug.apk`, embedded versionName
+`0.4.0-dev.98.1+ge14ef9e9`, versionCode **9801**. Downloaded APK manifest/hash
+match build-info; SHA-256 is
+`061f22a3107d1a67cb0d5aa24b35a53db9a9d8670e7eb36498b2b4f28b97e706`.
+Wireless ADB installation succeeded and both installed versions were read back.
+The previously approved disposable pre-campaign build 9601 was replaced after
+ephemeral-CI signature mismatch. Preserve newly earned M3 records before any
+future uninstall; persistent debug signing support remains available.
+
+The served PR-run-97 Web export was played at 376x746 in in-app Chromium to a
+genuine level-1 victory: 460 match score + 375 move bonus = 835, three stars.
+Reload retained 3/15 stars, 1/5 restored and level 2 unlocked. No captured
+warning/error console logs. This is a bounded browser runtime/persistence smoke,
+not a full browser/device matrix. The main Web artifact is available in run 98.
+
+**Human Android campaign/visual acceptance remains pending.** Installation and
+automated tests do not satisfy it. See #7 for current delivery and player results.
+
 ## Android acceptance checklist
 
 Record exact versionName/code, source SHA, signing mode, device/Android version.

@@ -5,8 +5,8 @@ Compatibility renderer. Canonical source: FoxyLight/Cosmic-Crystals.
 
 ## Current implementation
 
-M3's five-level Lyra campaign is implemented and locally verified, ready for
-CI export and a new Android human acceptance test. Home/map/selection/play/
+M3's five-level Lyra campaign is implemented and verified in local and main CI, ready for
+a new Android human acceptance test. Home/map/selection/play/
 results/next/replay are connected; authored goals, budgets, scores, stars,
 unlocks, local progression and nonblocking tutorials are in place. The map
 has exactly five nodes and keeps prior best records on replay. Reduced motion
@@ -27,7 +27,8 @@ persistence/recovery and a complete touch-driven scene campaign with reload.
   no subsequent separate human visual pass. #8 remains open.
 - **Pre-M3 CI baseline:** [main run 96](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40967375848)
   passed tests and Android/Web exports. M3 uses the same guarded pipeline plus
-  new tests and exported-catalog checks. Its own PR/main runs must pass.
+  new tests and exported-catalog checks. PR run 97 and main run 98 passed all
+  three jobs; delivery APK 9801 was installed and read back on the phone.
 - Local M3 disk reload/scene checks are automated evidence, not a physical
   Android close/reopen test or a human campaign pass.
 - Desktop renders/prior Chromium smoke do not establish a full device/browser,
@@ -41,11 +42,11 @@ persistence/recovery and a complete touch-driven scene campaign with reload.
 | M0 | Debug exports/basic smoke; AAB/metrics/device matrix open |
 | M1 | Automated correctness/scene checks; extended hardware/interruption QA open |
 | M2 | Powers/rocks implemented, automated, asteroid smoke accepted; tuning open |
-| M3 | Implementation locally verified; CI and new human acceptance gate remain |
+| M3 | Implementation and main CI verified; APK 9801 installed; human gate pending |
 | M4 | Visual slice/basic reduced motion; broader acceptance/audio open |
 | M5-M6 | Not started |
 | M7 | Expansion/iOS deferred |
 
-Next: complete PR/main CI, verify/install the exact versioned APK, run the
+Next: run the installed M3 APK's
 [M3 Android checklist](M3_LYRA_CAMPAIGN.md), record the player's result in #7,
 and fix findings. Do not close M3 merely because an APK exports.
