@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Provisional source-controlled app icon for Godot import/export. -->
+  <rect width="128" height="128" rx="25" fill="#0B102A"/>
+  <circle cx="64" cy="64" r="49" fill="#27234F" stroke="#4B4389" stroke-width="3"/>
+  <path d="M64 17 L75 48 L108 64 L75 77 L64 111 L50 78 L19 64 L50 49 Z"
+        fill="#39D5FF" stroke="#173F74" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M64 29 L69 58 L95 64 L69 69 L64 97 L58 69 L33 64 L58 58 Z"
+        fill="#D0EDFF"/>
+  <circle cx="64" cy="64" r="9" fill="#FFFFFF"/>
+  <path d="M22 27 L25 34 L32 37 L25 40 L22 47 L19 40 L12 37 L19 34 Z" fill="#ED9B18"/>
+</svg>
