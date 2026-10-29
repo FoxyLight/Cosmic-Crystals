@@ -2,7 +2,7 @@ extends Control
 ## Animated Android-first match-3 prototype, with a clearly labeled synthetic
 ## 30-second drawing stress check. Specials, blockers and saves are still planned.
 
-const BoardScript = preload("res://scripts/board.gd")
+const BoardScript = preload("res://scripts/cosmic_board.gd")
 const Visuals = preload("res://scripts/crystal_visuals.gd")
 const GOAL: int = 30
 const STARTING_MOVES: int = 18
@@ -14,6 +14,7 @@ const RESHUFFLE_SECONDS: float = 0.28
 
 var board = null
 var display_cells: Array[int] = []
+var display_specials: Array[int] = []
 var moves_left: int = STARTING_MOVES
 var collected: int = 0
 var score: int = 0
@@ -48,6 +49,7 @@ func _ready() -> void:
 func _reset_game() -> void:
 	board = BoardScript.new(20261029 + int(Time.get_ticks_msec() % 100000))
 	display_cells = board.cells.duplicate()
+	display_specials = board.specials.duplicate()
 	moves_left = STARTING_MOVES
 	collected = 0
 	score = 0
@@ -86,11 +88,15 @@ func _process(delta: float) -> void:
 func _board_rect() -> Rect2:
 	# Reserve HUD + stress control space on portrait phones.
 	var available_width: float = maxf(120.0, size.x - 28.0)
-	var available_height: float = maxf(120.0, size.y - 310.0)
+	var available_height: float = maxf(120.0, size.y - 345.0)
 	var side: float = minf(minf(available_width, available_height), 640.0)
-	var top: float = maxf(205.0, (size.y - side) * 0.52)
+	var top: float = maxf(232.0, (size.y - side) * 0.52)
 	top = minf(top, maxf(110.0, size.y - side - 76.0))
 	return Rect2(Vector2((size.x - side) * 0.5, top), Vector2(side, side))
+
+
+func _nova_rect() -> Rect2:
+	return Rect2(Vector2(20.0, 178.0), Vector2(138.0, 36.0))
 
 
 func _stress_rect() -> Rect2:
@@ -144,11 +150,13 @@ func _draw() -> void:
 	_draw_footer(rect)
 
 
-func _draw_snapshot(snapshot: Array, rect: Rect2) -> void:
+func _draw_snapshot(snapshot: Array, rect: Rect2, powers: Array = []) -> void:
+	var snapshot_powers: Array = display_specials if powers.is_empty() else powers
 	for index in range(snapshot.size()):
 		var kind: int = int(snapshot[index])
 		if kind >= 0:
-			_draw_crystal(_center_of(index, rect), rect.size.x / 8.0 * 0.34, kind)
+			_draw_crystal(_center_of(index, rect), rect.size.x / 8.0 * 0.34,
+				kind, 1.0, int(snapshot_powers[index]))
 
 
 func _draw_animated_event(rect: Rect2) -> void:
@@ -156,6 +164,7 @@ func _draw_animated_event(rect: Rect2) -> void:
 	var eased: float = t * t * (3.0 - 2.0 * t)
 	var kind: String = str(active_event["type"])
 	var before: Array = active_event["before"]
+	var before_powers: Array = active_event.get("specials_before", display_specials)
 	var radius: float = rect.size.x / 8.0 * 0.34
 	match kind:
 		"swap", "swap_back":
@@ -163,9 +172,9 @@ func _draw_animated_event(rect: Rect2) -> void:
 			var b: int = int(active_event["b"])
 			for index in range(before.size()):
 				if index != a and index != b and int(before[index]) >= 0:
-					_draw_crystal(_center_of(index, rect), radius, int(before[index]))
-			_draw_crystal(_center_of(a, rect).lerp(_center_of(b, rect), eased), radius, int(before[a]))
-			_draw_crystal(_center_of(b, rect).lerp(_center_of(a, rect), eased), radius, int(before[b]))
+					_draw_crystal(_center_of(index, rect), radius, int(before[index]), 1.0, int(before_powers[index]))
+			_draw_crystal(_center_of(a, rect).lerp(_center_of(b, rect), eased), radius, int(before[a]), 1.0, int(before_powers[a]))
+			_draw_crystal(_center_of(b, rect).lerp(_center_of(a, rect), eased), radius, int(before[b]), 1.0, int(before_powers[b]))
 		"clear":
 			var marked: Dictionary = {}
 			for index in active_event["indices"]:
@@ -174,7 +183,7 @@ func _draw_animated_event(rect: Rect2) -> void:
 				if int(before[index]) < 0:
 					continue
 				if marked.has(index):
-					_draw_crystal(_center_of(index, rect), radius * (1.0 - t * 0.46), int(before[index]), 1.0 - t)
+					_draw_crystal(_center_of(index, rect), radius * (1.0 - t * 0.46), int(before[index]), 1.0 - t, int(before_powers[index]))
 				else:
 					_draw_crystal(_center_of(index, rect), radius, int(before[index]))
 		"fall":
@@ -182,20 +191,26 @@ func _draw_animated_event(rect: Rect2) -> void:
 				var from_index: int = int(move["from"])
 				var to_index: int = int(move["to"])
 				_draw_crystal(_center_of(from_index, rect).lerp(_center_of(to_index, rect), eased),
-					radius, int(move["kind"]))
+					radius, int(move["kind"]), 1.0, int(move.get("special", 0)))
 			for spawn in active_event["spawns"]:
 				var to_index: int = int(spawn["to"])
 				var start_row: int = int(spawn["from_row"])
 				var start: Vector2 = _center_of(to_index, rect)
 				start.y = rect.position.y + (float(start_row) + 0.5) * (rect.size.x / 8.0)
-				_draw_crystal(start.lerp(_center_of(to_index, rect), eased), radius, int(spawn["kind"]))
+				_draw_crystal(start.lerp(_center_of(to_index, rect), eased), radius, int(spawn["kind"]), 1.0, int(spawn.get("special", 0)))
+		"special_create":
+			_draw_snapshot(active_event["after"], rect, active_event["specials_after"])
+			var target: int = int(active_event["index"])
+			var pulse_color: Color = Color("#FFE8A9", (1.0 - t) * 0.9)
+			draw_arc(_center_of(target, rect), radius * (0.9 + t * 0.55),
+				0.0, TAU, 24, pulse_color, 2.5, true)
 		"reshuffle":
 			if t < 0.5:
-				_draw_snapshot(before, rect)
+				_draw_snapshot(before, rect, before_powers)
 			else:
-				_draw_snapshot(active_event["after"], rect)
+				_draw_snapshot(active_event["after"], rect, active_event["specials_after"])
 		_:
-			_draw_snapshot(active_event["after"], rect)
+			_draw_snapshot(active_event["after"], rect, active_event["specials_after"])
 
 
 func _draw_starfield() -> void:
