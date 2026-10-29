@@ -10,7 +10,7 @@ An Android-first cosmic match-3 puzzle adventure for Android and web, with iOS a
 
 **Implemented and headlessly tested:** seeded 8×8 boards with six crystal types, valid/invalid swap logic, match detection, gravity, refill, cascades and legal move checks. The one-screen prototype has procedural crystal visuals, mouse/touch controls, a move/score HUD and a basic collection win/lose loop.
 
-**M0/M1 work in PR #13:** event-driven swap/clear/fall/rollback animations and 125-seed regression checks now pass headless CI. GitHub Actions has built a debug Android APK and Web export ([successful CI run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)). **Not yet verified:** installing and playing on a real phone, browser compatibility, FPS/RAM or an AAB release-signing pipeline. **Still missing:** special pieces, Nova Pulse, blockers, five designed levels, galaxy map, saves, production art/audio and store distribution.
+**M0/M1 work merged in PR #13:** event-driven swap/clear/fall/rollback animations and 125-seed regression checks now pass headless CI. GitHub Actions has built a debug Android APK and Web export ([successful CI run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)). **Not yet verified:** installing and playing on a real phone, browser compatibility, FPS/RAM or an AAB release-signing pipeline. **Still missing:** special pieces, Nova Pulse, blockers, five designed levels, galaxy map, saves, production art/audio and store distribution.
 
 The [separately published concept page](https://cosmic-crystals-starweaver-jneal.fxylght.chatgpt.site) references 20 levels and four constellations. Its source is not imported here, and those features are **future vision**, not claims about this repository.
 
@@ -27,6 +27,8 @@ The [separately published concept page](https://cosmic-crystals-starweaver-jneal
 | M5 | Android/web release-candidate QA | Not started | [#9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
 | M6 | Google Play test/release preparation | Not started | [#10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10) |
 | M7 | 20 levels, four constellations, optional iOS | Deferred | [#11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) |
+
+**Mobile visual readability:** After the first Android playtest, the pale yellow and ice-white gems were difficult to distinguish. The [visual contrast patch (PR #14)](https://github.com/FoxyLight/Cosmic-Crystals/pull/14) gives Solar Amber a saturated golden sunburst and Lunar Opal a blue-white elongated shard, plus distinct outlines and facets for all six gem types. See [Crystal Visual Identity](docs/VISUAL_PALETTE.md). The next Android APK needs human visual confirmation; this is not a claim that all M4 visuals are finished.
 
 The [M0/M1 implementation notes](docs/M0_M1_IMPLEMENTATION.md) describe the new event stream, test coverage and build artifacts. The detailed [milestone register](docs/MILESTONES.md) defines dependencies, exit gates and evidence. Tracking is implemented with **GitHub Issues as milestone trackers**, not native GitHub Milestone objects. No dates or owners have been committed.
 
@@ -55,6 +57,7 @@ These checks are automated in [GitHub Actions](.github/workflows/godot-checks.ym
 | M0/M1 animated prototype and CI build results | [Implementation Notes](docs/M0_M1_IMPLEMENTATION.md) |
 | Execution order and scope | [Roadmap](docs/ROADMAP.md) |
 | Concept, gameplay and visuals | [Game Design](docs/GAME_DESIGN.md) |
+| Gem colors, silhouettes and mobile readability QA | [Crystal Visual Identity](docs/VISUAL_PALETTE.md) |
 | Implementation and domain architecture | [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md) |
 | Coding-agent instructions | [Build Prompt](docs/BUILD_PROMPT.md) |
 | Godot engine decision/evidence gate | [Engine Evaluation](docs/ENGINE_EVALUATION.md) |
