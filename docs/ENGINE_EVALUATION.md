@@ -89,13 +89,16 @@ docs/
 - [x] Procedural 8×8 crystal board, tap/swipe/mouse input, simple objectives and HUD.
 - [x] Deterministic board generation, legal swaps, intersections, gravity/refill/cascades and deadlock fallback.
 - [x] CI import/parser and deterministic headless tests passed.
-- [ ] Swap/fall animations driven by ordered events, and a 30-second particle stress scenario.
+- [x] Ordered swap/clear/fall event playback and a 30-second **synthetic drawing** stress scenario.
+- [ ] Real-device stress measurements and animation usability checks.
+- [x] Automated Android debug APK export succeeded in CI.
 - [ ] Real Android APK installation, device touch/memory/FPS and pause/resume tests.
 - [ ] Signed AAB generation and Play distribution verification.
-- [ ] Web export and desktop/mobile browser compatibility tests.
+- [x] Automated Godot Web export succeeded in CI.
+- [ ] Desktop/mobile browser runtime compatibility tests.
 - [ ] Platform service feasibility checks if needed.
 
-**Note:** Automated CI success does not establish a working Android export or measured performance. This is a development-direction decision, not final production sign-off.
+**Note:** Automated CI now establishes generation of a debug Android APK and Web artifact, **but not** a successful device install, browser runtime, AAB release export or measured performance. See [M0/M1 Implementation](M0_M1_IMPLEMENTATION.md). This is a development-direction decision, not final production sign-off.
 
 ## Required decision spike
 
