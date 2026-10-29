@@ -53,6 +53,12 @@ jobs:
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_asteroid_scene.gd
       - name: Verify responsive geometry, actual HUD controls, dialogs and touch input
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_game_layout.gd
+      - name: Verify authored Lyra sessions, objectives, stars and deterministic balance
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_campaign.gd
+      - name: Verify atomic progression saves, replay protection and corruption recovery
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_progress_store.gd
+      - name: Play all five levels through scene touch controls, results, map and reload
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_campaign_scene.gd
       - name: Run the prototype scene headlessly for 120 frames
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --quit-after 120
 
@@ -84,6 +90,7 @@ jobs:
           test -s build/web/index.html
           test -s build/web/index.wasm
           test -s build/web/index.pck
+          python3 scripts/ci/check_campaign_assets.py build/web/index.pck
           du -h build/web/*
       - name: Upload web preview artifact
         uses: actions/upload-artifact@v4
@@ -176,6 +183,7 @@ jobs:
             --aapt "$ANDROID_HOME/build-tools/35.0.0/aapt" \
             --signing-mode "$COSMIC_SIGNING_MODE"
           cat build/android/build-info.json
+          python3 scripts/ci/check_campaign_assets.py "$APK_PATH"
           du -h "$APK_PATH"
       - name: Upload versioned Android debug APK and metadata
         uses: actions/upload-artifact@v4

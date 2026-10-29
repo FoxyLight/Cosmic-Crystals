@@ -59,6 +59,7 @@ func _drain(game: Node) -> Array[String]:
 func _run() -> void:
 	var packed: PackedScene = load("res://scenes/Prototype.tscn")
 	var game: Node = packed.instantiate()
+	game.set("practice_mode", true)
 	root.add_child(game)
 	await process_frame
 	_check(game.get("board").asteroids.count(2) == 4 and game.get("board").asteroids.count(1) == 2, "Playable prototype includes six test asteroids")
