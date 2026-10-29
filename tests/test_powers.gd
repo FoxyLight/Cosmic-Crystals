@@ -157,6 +157,22 @@ func _run() -> void:
 		_events(old, old_power, combo_result, combo, "special combo")
 		_ok(combo.find_matches().is_empty(), "Combo settles to no matches")
 
+	# If a Supernova is caught in another special's area, it targets
+	# its OWN gem color, not the original swap partner's color.
+	var chain = _fixture(981)
+	chain.specials[3 * 8 + 2] = Board.BEAM_ROW
+	chain.specials[3 * 8 + 6] = Board.SUPERNOVA
+	# Row 3, col 6 has color 0 in this fixture; row 0, col 0 also has 0.
+	_ok(chain.cells[3 * 8 + 6] == 0, "Passive Supernova fixture color")
+	var chain_result: Dictionary = chain.play_swap(3 * 8 + 2, 3 * 8 + 3)
+	_ok(chain_result["valid"], "Beam swap can chain into Supernova")
+	_ok(int(chain_result["activated"]) >= 2, "Beam and passive Supernova both activate")
+	var extra_target_cleared: bool = false
+	for event in chain_result["events"]:
+		if event["type"] == "clear" and event["indices"].has(0):
+			extra_target_cleared = true
+	_ok(extra_target_cleared, "Passive Supernova clears its own color off the beam row")
+
 	# Nova Pulse is a charged, zero-move row+column action.
 	var nova = _fixture(120)
 	var refuse = nova.use_nova(3 * 8 + 4)
