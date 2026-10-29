@@ -39,7 +39,7 @@ pre-blocker baseline. Historical sections below describe their earlier scope.
 - **M1 in progress:** ordered turn events and swap/clear/drop animations are implemented and an Android human gameplay smoke passes; last-move/interruption tests, prolonged device sessions and production UI are still pending.
 - **M4 visual accessibility patch (PR #14):** player feedback identified Solar Amber/white Lunar Opal confusion on Android. New warm/icy fills, dark per-kind outlines and unique geometric silhouettes are implemented with a separate headless visual regression test. The player subsequently tested the updated Android build and confirmed it **looks a lot better** (positive qualitative follow-up, 2026-10-29). Controlled brightness/grayscale checks, broader readability tests and M4 production visual/art/audio acceptance remain open; M4 is not complete. See [Visual Identity](VISUAL_PALETTE.md).
 - **M2 first playable slice (PR #16):** Star Beams (row/column), Cosmic Bomb, Supernova, first-pass special combinations, chargeable Nova meter, zero-move targeted Nova Pulse and cancel targeting are coded and headlessly tested. Android gameplay feel/energy balance remain unverified. See [M2 gameplay guide](M2_SPECIALS_NOVA.md).
-- **Missing product systems:** asteroid blockers, five complete levels, star map, local saving, tutorials, production audio and release flows.
+- **Missing product systems:** five complete levels, star map, local saving, tutorials, production audio and release flows.
 
 ## Latest bug fix: M2 Star Beam failure
 

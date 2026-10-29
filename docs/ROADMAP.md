@@ -47,7 +47,7 @@
 
 **Exit gate:** reliable, readable gameplay on a stable board, tested with both input modalities. No double moves, frozen cascades or wrong win/loss counts.
 
-**Gameplay playtest gate:** On 2026-10-29, the player reported **human Android playtest PASS** following the Star Beam/combo/Nova fixes, explicit replay and deadlock shuffle patch, and automatic APK versioning. See [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md). The basic Android gameplay experience now has positive feedback; systematic device metrics, browser checks, AAB and other M0/M1 tasks remain open. **Next M2 feature:** asteroid blockers, with damage/interaction/gravity/deadlock tests.
+**Gameplay playtest gate:** On 2026-10-29, the player reported **human Android playtest PASS** following the Star Beam/combo/Nova fixes, explicit replay and deadlock shuffle patch, and automatic APK versioning. See [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md). The basic Android gameplay experience now has positive feedback; systematic device metrics, browser checks, AAB and other M0/M1 tasks remain open. **New M2 slice:** asteroid blockers and damage/interaction/gravity/deadlock tests are implemented; new Android acceptance is pending.
 
 ## Priority 1: Distinctive cosmic gameplay and a complete player journey
 
