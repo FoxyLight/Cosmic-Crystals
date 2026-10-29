@@ -48,6 +48,8 @@ The single-round prototype has a short **30-crystal target and 18-move budget**.
 
 The source [VERSION](VERSION) is `0.2.0`. See [Android APK Versioning](docs/ANDROID_VERSIONING.md) for the full policy, downloads, wireless ADB installation and optional private persistent debug keystore. **Version numbers alone do not fix a changed signing certificate**, and future signed Google Play AABs remain a separate release process.
 
+**Android gameplay smoke (2026-10-29):** The player reports that the human playtest **passes** after the latest gameplay fixes and versioned build workflow. This is a positive practical checkpoint, while full device metrics, interruption tests, browser QA, Google Play signing and asteroid blockers are unfinished. See the [Android Playtest Report](docs/ANDROID_PLAYTEST_2026_10_29.md). The next development focus is **asteroid blockers** (M2 #6).
+
 ## Run the prototype
 
 1. Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/).
