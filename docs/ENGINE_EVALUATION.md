@@ -1,8 +1,8 @@
 # Engine Evaluation: Android-first Cosmic Crystals
 
 **Date:** 2026-10-29  
-**Status:** PROPOSED — requires a tested device/browser spike before replacing the current technical stack  
-**Context:** The project aims for Android first, with web and iOS targets. The repository currently contains planning documents but no gameplay engine code.
+**Status:** GODOT PROTOTYPE IN PROGRESS — approved for implementation, still awaiting Android/web export and physical-device validation  
+**Context:** The project aims for Android first, with web and iOS targets. A Godot 4.7.2 GDScript prototype and headless tests now exist in the repository's feature branch.
 
 ## Decision question
 
@@ -83,6 +83,20 @@ docs/
 - Use a controlled IDLE/SWAPPING/RESOLVING/NOVA_TARGETING/WON/LOST state machine.
 - Version save data and validate locally stored progression and settings.
 
+## Spike progress (2026-10-29)
+
+- [x] Godot 4.7.2/GDScript project configured with Compatibility renderer.
+- [x] Procedural 8×8 crystal board, tap/swipe/mouse input, simple objectives and HUD.
+- [x] Deterministic board generation, legal swaps, intersections, gravity/refill/cascades and deadlock fallback.
+- [x] CI import/parser and deterministic headless tests passed.
+- [ ] Swap/fall animations driven by ordered events, and a 30-second particle stress scenario.
+- [ ] Real Android APK installation, device touch/memory/FPS and pause/resume tests.
+- [ ] Signed AAB generation and Play distribution verification.
+- [ ] Web export and desktop/mobile browser compatibility tests.
+- [ ] Platform service feasibility checks if needed.
+
+**Note:** Automated CI success does not establish a working Android export or measured performance. This is a development-direction decision, not final production sign-off.
+
 ## Required decision spike
 
 **Before changing the architecture roadmap or starting a full game implementation:**
@@ -95,11 +109,11 @@ docs/
 
 **Success:** Stable full match resolution, no duplicate input while resolving, no major device/browser blockers, reasonable build/download size, and clear implementation path for required platform services.
 
-## Proposed changes after approval
+## Production sign-off and next steps
 
-- Replace Phaser+Vite+Capacitor references in README, TECHNICAL_ARCHITECTURE.md, ROADMAP.md and BUILD_PROMPT.md with Godot+GDScript.
-- Replace the existing Phase 1 bootstrap issue with a Godot-specific implementation plan while preserving historical context.
-- Create the actual Godot project and deterministic test harness.
+- Godot+GDScript is now reflected in README, TECHNICAL_ARCHITECTURE.md, ROADMAP.md and BUILD_PROMPT.md. Do not revert to Phaser without an explicit decision.
+- Maintain Godot-specific GitHub issues for engine bootstrap and validation.
+- The initial Godot project and deterministic test harness are committed; broaden tests and validate the Android/web exports.
 - Keep the game design and UX requirements unchanged.
 
 ## Source material
