@@ -33,6 +33,8 @@
 
 **Exit gate:** documented Android+web export paths, physical-device evidence and explicit production engine sign-off. See [Engine Evaluation](ENGINE_EVALUATION.md), [QA Plan](QA_TEST_PLAN.md) and [Export Guide](ANDROID_EXPORT.md).
 
+**Replay/deadlock usability fix:** [PR #22](https://github.com/FoxyLight/Cosmic-Crystals/pull/22) corrects a reset-like behavior: after quickly reaching the 30-crystal goal via specials, any touch previously restarted the board. The result screen now requires **PLAY AGAIN**, and deadlock recovery rearranges the original gem inventory instead of generating a new distribution. [Issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21) tracks phone verification.
+
 ### M1: Reliable, animated match-3 loop | [Issue #3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3)
 
 - [x] Return ordered immutable swap/clear/fall/refill/reshuffle events from seeded board rules.
