@@ -23,7 +23,7 @@ The Great Eclipse has silenced the constellations. The player is a Starweaver wh
 7. Nova energy charges through matches and combos. Once full, the player selects a cell; Nova Pulse clears its row and column, damages blockers, collects objectives, consumes zero moves, and resets the meter. Targeting is cancelable.
 8. Support collection objectives, asteroid blockers, move limits, scoring, three-star ratings, wins, losses, and five gradually harder levels.
 9. Supply home, galaxy map, gameplay, pause, win/lose, settings and concise tutorial experience. Persist unlocks, best stars and settings locally.
-10. Keep gameplay rules independent of Phaser, animation timing and device input. No accounts or backend for MVP.
+10. Keep gameplay rules independent of Godot scene nodes, animation timing and device input. No accounts or backend for MVP.
 
 ## Visual direction
 
@@ -31,23 +31,23 @@ Premium cosmic fantasy, not a generic candy reskin. Palette: #0B102A, #7C4DFF, #
 
 ## Engineering direction
 
-Prefer TypeScript + Phaser 3 + Vite, testing pure rules with Vitest and seeded RNG. Develop and validate a browser-based version first; use Capacitor later for iOS and Android packaging. Support mobile portrait and desktop responsive layouts with safe areas and accessible touch targets.
+Use Godot 4.7.2 standard edition with GDScript and the Compatibility renderer. Test pure rules headlessly with seeded RandomNumberGenerator. Validate the native Android APK/AAB pipeline first, then Godot web export and later iOS. Do not introduce Phaser, Vite, or Capacitor. Support mobile portrait and desktop responsive layouts with safe areas and accessible touch targets.
 
 Separate board state, turn resolution, objectives, blockers, specials, scoring and persistence from scenes, sprites and effects. Use an explicit state machine to prevent input while animations resolve. Save with versioned schemas.
 
 ## Implement incrementally
 
-1. Bootstrap an executable project and tests.
+1. Continue the existing Godot project and seeded match-3 engine; keep headless tests green and record the Android/web export results.
 2. Build the reliable 8 x 8 engine and one complete win/lose level.
 3. Add special crystals, asteroid blockers, Nova Pulse and tests.
 4. Build five curated levels with tutorial ramp, score, stars and local saves.
 5. Add galaxy progression, art direction, audio and interface polish.
-6. Validate web/mobile performance before packaging native shells.
+6. Measure performance on actual Android hardware, validate a signed AAB and exported web build before production approval.
 7. Expand to 20 levels and four constellations only after the five-level vertical slice is stable.
 
 ## Acceptance criteria
 
-- Project installs, builds, typechecks and tests without errors.
+- Godot project parses successfully, unit tests pass, and native/web exports are independently verified.
 - No invalid swap consumes a move; no valid move consumes multiple moves.
 - Match intersections/cascades/special triggers never double-count crystal collection.
 - Game never accepts overlapping input during turn resolution.
@@ -60,3 +60,8 @@ Separate board state, turn resolution, objectives, blockers, specials, scoring a
 **Important:** A published concept page exists, but this repository started empty. Do not treat the published page's 20-level claim as evidence that those levels are implemented in this repo. If importing its source becomes possible, inspect and reconcile rather than overwriting it.
 
 For every change, summarize files modified, tests run, known limitations, and the next logical task. The goal is a genuinely playable game, not a static interface.
+
+
+## Current implementation note (2026-10-29)
+
+The GitHub project contains a Godot `project.godot`, one scene, a seeded match-3 rules engine, a rudimentary HUD/board and passing headless tests. Do not rewrite these files from scratch or claim that specials, Nova, levels, animations, saves, APK or AAB release builds are complete. Implement incrementally against [ROADMAP.md](ROADMAP.md), and use [ANDROID_EXPORT.md](ANDROID_EXPORT.md) to validate physical-device and web builds.
