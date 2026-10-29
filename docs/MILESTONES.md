@@ -38,7 +38,7 @@ A milestone is **Done** only if all its exit criteria have demonstrable evidence
 
 ## What is in the current game
 
-**M2 progress (PR #16):** Star Beam, Cosmic Bomb, Supernova and targeted Nova Pulse now extend the M1 rules in [CosmicBoard](../scripts/cosmic_board.gd). The [M2 guide](M2_SPECIALS_NOVA.md) specifies first-pass combos and remaining blocker/device tests. M2 stays open until asteroids, balance and phone acceptance pass.
+**M2 progress:** PR #16 implemented Star Beam, Cosmic Bomb, Supernova and Nova Pulse; PR #18 repaired the shared gameplay-script loading bug. [Compatibility audit #19](https://github.com/FoxyLight/Cosmic-Crystals/issues/19) now tests all 96 ordered special-pair/position scenarios plus real scene creation/targeting. A separate overlay regression for surviving special pieces has been fixed. See the [M2 guide](M2_SPECIALS_NOVA.md) for confirmed automated coverage. **M2 remains open** for asteroid blockers, balance, device acceptance and broader gameplay QA.
 
 
 The repository's one-scene prototype provides an 8×8 board with six crystal kinds, touch/mouse selection, match scanning, seeded legal board generation, gravity/refill/cascades, a total collection target, moves and a basic win/loss. The rules compute a turn synchronously but now return an ordered event sequence for animated swap/clear/drop/refill playback (PR #13); the production special-piece/level state model is still missing. It is **not** a five-level game and does **not** yet include specials, Nova, asteroid blockers, persistent progression, platform binaries or commercial SDKs.
