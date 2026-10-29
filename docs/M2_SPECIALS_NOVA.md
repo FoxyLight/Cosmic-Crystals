@@ -62,7 +62,7 @@ Each falling event also carries the special type with the moving gem, preventing
 
 **Confirmed engineering cause:** The initial M2 `scripts/prototype.gd` contained two literal backslash-`t` tokens in the Nova HUD instead of indentation. Godot logged `SCRIPT ERROR: Parse Error` and `Failed to load script` when importing/launching the gameplay scene, yet returned process exit code 0. Our original CI incorrectly called this a passing gameplay build. A downloadable APK alone did not prove the playable scene loaded. See [bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17).
 
-**Fix:** Correct the GDScript indentation, strengthen Star Beam's persistent cyan ring and line icon, and show the exact power name (`STAR BEAM FORGED!`) in result feedback.
+**Fix:** Correct the GDScript indentation, strengthen Star Beam's persistent cyan ring and line icon, and show the exact power name (`STAR BEAM FORGED!`) in result feedback. The stricter Android export checks also caught a previously silent missing-project-icon error; `assets/icon.svg` is now configured as a temporary export-safe app icon. The icon is not final store artwork.
 
 **Preventing recurrence:** CI now wraps every Godot parsing, test, scene launch and export command in a log-error guard that fails if Godot reports script/parser/runtime errors, even with a zero exit code. The guard has self-tests. `tests/test_game_scene.gd` loads the real `Prototype.tscn`, verifies the gameplay script is attached and initialized, performs a four-gem swap through its `_take_turn()` entry point, and asserts that a row Star Beam is forged.
 
