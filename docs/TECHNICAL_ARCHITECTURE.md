@@ -1,212 +1,93 @@
 # Technical Architecture
 
-**Status:** Proposed implementation architecture; no engine source code is present yet (2026-10-29).
+**Direction:** Android-first **Godot 4.7.2 (GDScript)**, with a shared web and future iOS project. This supersedes the earlier Phaser/Vite/Capacitor proposal. Production sign-off is conditional on APK/AAB, browser export, and physical-device tests.
 
-## Stack and delivery
+## Working Godot prototype
 
-- **TypeScript**: domain model, board logic, data types, strict typing.
-- **Phaser 3**: board presentation, tweens, particles, audio, input and game scenes.
-- **Vite**: local dev server, production web builds.
-- **Vitest** (proposed): pure logic tests and reproducible seeded scenarios.
-- **Capacitor** (later): wrap the proven web app for Android and iOS. Do not start native builds until web gameplay is stable.
+- `project.godot`: Compatibility renderer and portrait-oriented baseline.
+- `scenes/Prototype.tscn`: one-screen test scene.
+- `scripts/board.gd`: seedable 8×8 board generation, adjacency, match scan, legal moves, validated swaps, clear/gravity/refill/cascade resolution and deadlock fallback.
+- `scripts/prototype.gd`: procedural starfield and crystals, HUD, touch/mouse selection and drag, move counter, simple collection goal and win/loss.
+- `tests/test_board.gd`: seeded pure-rule tests, intersection counting and stable-board checks.
+- `.github/workflows/godot-checks.yml`: downloads Godot 4.7.2, parses/imports project and runs headless tests.
 
-Use one gameplay model for desktop web, mobile web, and mobile app. Keep the rules platform-agnostic and rendering-independent.
+**Verified:** Initial GitHub Actions run completed successfully. **Not yet verified:** APK, AAB, web export, actual phone touch/UX, graphics stress test, iOS export.
 
-## Suggested file structure
+## Production architecture
+
+Keep the rules independent of Godot Nodes and animation timing. Target structure:
 
 ```text
-src/
-  main.ts
-  game/
-    domain/
-      types.ts
-      board.ts
-      matches.ts
-      swaps.ts
-      gravity.ts
-      refill.ts
-      specialPieces.ts
-      blockers.ts
-      objectives.ts
-      scoring.ts
-      nova.ts
-      legalMoves.ts
-      resolveTurn.ts
-    data/
-      crystals.ts
-      levels/
-        001.ts ... 005.ts
-    state/
-      GameSession.ts
-      ProgressStore.ts
-    scenes/
-      BootScene.ts
-      HomeScene.ts
-      GalaxyMapScene.ts
-      PuzzleScene.ts
-      ResultsScene.ts
-    ui/
-      BoardView.ts
-      HudView.ts
-      TutorialOverlay.ts
-    input/
-      swapGestures.ts
-    audio/
-      AudioManager.ts
-    visuals/
-      effects.ts
-  tests/
-    matches.test.ts
-    swaps.test.ts
-    gravity.test.ts
-    resolveTurn.test.ts
-    specials.test.ts
-    legalMoves.test.ts
-    objectives.test.ts
-    nova.test.ts
-    progress.test.ts
-docs/
+scenes/
+  Home.tscn
+  GalaxyMap.tscn
+  Puzzle.tscn
+  puzzle/BoardView.tscn
+  ui/GameplayHUD.tscn
+scripts/
+  domain/
+    board.gd
+    match_finder.gd
+    turn_resolver.gd
+    gravity.gd
+    special_pieces.gd
+    objectives.gd
+    nova.gd
+  gameplay/
+    session.gd
+    input_controller.gd
+  persistence/
+    progress_store.gd
+data/levels/
+assets/
+tests/
 ```
 
-This structure is a guide, not an assertion that those files already exist. Adjust folder depth for the eventual implementation size.
+These directories are architectural targets, not promises that they exist today.
 
-## Pure domain model
+### State and turn resolution
 
-Represent the board as a rectangular grid of cells. A cell may hold a movable piece, a blocker, or no occupant during resolution.
-
-Avoid putting Phaser sprites, global scene objects or direct UI effects in the domain model.
-
-Illustrative types:
-
-```ts
-type CrystalKind =
-  | 'amethyst' | 'amber' | 'sapphire'
-  | 'ruby' | 'emerald' | 'opal';
-
-type SpecialKind = 'beam-row' | 'beam-column' | 'bomb' | 'supernova';
-
-interface Crystal {
-  id: string;
-  kind: CrystalKind;
-  special?: SpecialKind;
-}
-
-interface Position { row: number; col: number; }
-
-interface BoardCell {
-  crystal: Crystal | null;
-  blocker?: { type: 'asteroid'; health: number };
-}
-
-interface LevelConfig {
-  id: number;
-  width: number;
-  height: number;
-  moves: number;
-  objectives: Array<
-    | { type: 'collect'; crystal: CrystalKind; count: number }
-    | { type: 'destroy-asteroids'; count: number }
-  >;
-  starThresholds: [number, number, number];
-}
-```
-
-Treat the above as an initial schema sketch; refine cell occupancy and blocker layering based on actual gameplay needs.
-
-## Resolution state machine
-
-A move should pass through a controlled state machine:
+The current prototype computes the final board state immediately and flashes a result. Before adding polished gameplay animations, refactor its resolver to produce ordered immutable effects. Let the scene animate those events with an explicit input-lock state machine:
 
 ```text
 IDLE -> SWAPPING -> VALIDATING
-  invalid -> SWAP_BACK -> IDLE
-  valid   -> RESOLVING
-RESOLVING -> APPLY_EFFECTS -> COLLAPSE -> REFILL -> SCAN
-  matches found -> RESOLVING
-  stable -> CHECK_GOALS
-CHECK_GOALS -> WON | LOST | IDLE
+  invalid -> RETURNING -> IDLE
+  valid -> RESOLVING -> CASCADING -> CHECK_GOALS -> IDLE / WON / LOST
+IDLE -> NOVA_TARGETING -> RESOLVING -> CHECK_GOALS
+       cancel -> IDLE
 ```
 
-Nova targeting is a separate state reached from IDLE:
+A tile must be collected/damaged only once per match resolution step; intersections must not double-count. Evaluate victory after every special or cascade finishes. Maintain deterministic seeded randomness and a guard against infinite cascades.
 
-```text
-IDLE -> NOVA_TARGETING -> RESOLVING -> ... -> CHECK_GOALS
-           | cancel
-           v
-          IDLE
+### Domain data
+
+Move from the current integer-only crystal representation to an explicit data model: crystal kind, optional special piece, cell occupancy, blocker durability, score/goal deltas, level move budget, Nova energy and an ordered event log. Prefer typed GDScript classes and Resources/validated JSON for level data.
+
+Keep progress storage under Godot `user://`, version save schemas, and persist only completed, stable progress. Do not save a half-resolved turn.
+
+### Input and visuals
+
+The prototype supports drag/swipe and tap-two-adjacent input through `_input`, then locks input for brief result feedback. Production code must avoid duplicate synthesized touch/mouse events; animate swaps, clears, drops and spawns asynchronously from domain events; and support safe areas, motion reduction, feedback and touch accessibility.
+
+### Tests and quality gates
+
+Headless tests should cover board generation, legal swaps, match intersections, gravity/cascades, reshuffle and eventual special interactions. New code should add tests for specials, Nova, blockers, last-move victory, pause/restart during animations, and save schema migration.
+
+CI runs:
+
+```bash
+godot --headless --path . --editor --quit
+godot --headless --path . --script res://tests/test_board.gd
 ```
 
-Implement an explicit input lock for every non-IDLE state. Asynchronous tweens should **render** an already computed set of domain events, not determine rule outcomes by timing side-effects.
-
-## Determinism and testing
-
-Inject a seedable random-number generator into initial board generation, refill and reshuffling. Avoid `Math.random()` inside domain functions.
-
-`resolveTurn(board, action, level, rng)` should return a new state and an event sequence such as:
-
-- `SwapStarted`, `SwapRejected`, `SwapAccepted`
-- `MatchesFound`, `SpecialCreated`, `CrystalsCleared`
-- `BlockerDamaged`, `CrystalsDropped`, `CrystalsSpawned`
-- `ObjectiveAdvanced`, `NovaCharged`
-- `BoardReshuffled`, `LevelWon`, `LevelLost`
-
-The view can animate these in order without re-calculating game rules. All damage/counting should be idempotent within one resolution step to avoid double-collecting intersecting matches.
-
-## High-risk edge cases
-
-1. Horizontal and vertical matches intersect; count each tile once.
-2. A five-match and T-match appear in one swap; deterministic special precedence.
-3. Special effects trigger other specials; no recursive duplication or infinite loop.
-4. A match clears the final objective while moves reach zero; victory wins after resolution.
-5. Refill leaves no legal move; reshuffle without destroying objective/blocker state.
-6. Tutorial overlays or pause are opened while animations are running; prevent illegal input and preserve pending state.
-7. Restart during a cascade; cancel or isolate in-flight visuals.
-8. Nova activates without using a move; cancel should preserve charge.
-9. Direct touch drag and tap-to-swap inputs generate exactly one domain action per gesture.
-10. Save data from an older version loads safely via schema versioning.
-
-## Persisted data
-
-For MVP, save only durable player progress and settings, not a half-resolved turn:
-
-```ts
-interface SaveData {
-  schemaVersion: number;
-  highestUnlockedLevel: number;
-  bestStarsByLevel: Record<number, 0 | 1 | 2 | 3>;
-  settings: {
-    musicEnabled: boolean;
-    soundEnabled: boolean;
-    reducedMotion: boolean;
-  };
-}
-```
-
-On startup, validate/migrate data and fall back safely if it is malformed. Persist when a level is completed or a setting changes. Make progress independent of renderer/game scene lifecycle.
+CI parser/tests do **not** substitute for Android export or physical-device testing.
 
 ## Platform notes
 
-- Calculate cell size from available viewport; avoid a board that clips on short phones.
-- Respect CSS/env safe areas (or equivalent) for navigation/cutouts.
-- Use device-pixel-ratio limits, pooled effects, and small texture atlases to reduce GPU overhead.
-- Define pointer handling centrally and avoid duplicate touch/click listeners.
-- Don't assume mobile browsers autoplay audio; unlock audio on user gesture.
-- Support reduced motion in animation timelines.
-- Test Android and iOS wrappers only after web release gates pass.
+- Native Android APK for device QA, signed AAB for Play release, using Android SDK, OpenJDK 17 and matching Godot export templates.
+- Godot web export uses Compatibility renderer, WebGL 2 and WebAssembly. Start with single-threaded export.
+- Use GDScript, not Godot 4 C#, so web export remains possible.
+- Prefer real-device measurements before introducing ads, in-app billing and analytics plugins.
+- Package iOS only after Android/web gameplay is stable.
 
-## CI and quality gates
-
-Recommended scripts when implementation begins:
-
-```json
-{
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit"
-  }
-}
-```
-
-Add automated CI to run type checking, tests and production build on pull requests. These commands are targets, not executable today because the repository does not yet contain package files.
+See [Android/Web Export Guide](ANDROID_EXPORT.md), [Engine Evaluation](ENGINE_EVALUATION.md) and [Roadmap](ROADMAP.md).
