@@ -6,6 +6,7 @@ const BODY_FONT = preload("res://assets/fonts/DM-Sans.ttf")
 const STAR_ICON = preload("res://assets/brand-star.svg")
 const PAUSE_ICON = preload("res://assets/pause.svg")
 const RETRY_ICON = preload("res://assets/retry-gem.svg")
+const RATING_STAR = preload("res://assets/rating-star.svg")
 const TEXT = Color("#F0EFFF")
 const MUTED = Color("#B4B5D0")
 const VIOLET = Color("#C4A3FF")
@@ -45,6 +46,9 @@ func _ready() -> void:
 	_label("crystal_count", "0 / 30", 22, TEXT, true)
 	_label("rock_name", "ASTEROIDS", 10, MUTED)
 	_label("rock_count", "6 left", 22, TEXT, true)
+	_label("third_name", "USE NOVA", 10, MUTED)
+	_label("third_count", "0 / 1", 22, TEXT, true)
+	_icon("third", STAR_ICON)
 	for group in ["crystal", "rock"]:
 		var icon: TextureRect = TextureRect.new()
 		icon.texture = preload("res://assets/crystal-goal.svg") if group == "crystal" else preload("res://assets/asteroid-goal.svg")
@@ -66,6 +70,7 @@ func _ready() -> void:
 	_track("crystals", VIOLET)
 	_track("rocks", GOLD)
 	_track("nova", VIOLET)
+	_track("third", VIOLET)
 	_button("help", "?", func(): game.open_overlay("help"), true)
 	_button("pause", "", func(): game.open_overlay("pause"), true)
 	buttons["pause"].icon = PAUSE_ICON
@@ -79,12 +84,19 @@ func _ready() -> void:
 	add_child(shade)
 	_panel("dialog", Color("#211C3B"), Color("#70558F"))
 	_icon("modal", STAR_ICON)
+	for i in range(3):
+		_icon("rating%d" % i, RATING_STAR)
 	_label("modal_eyebrow", "A LITTLE STARLIGHT RESTORED", 10, VIOLET)
 	_label("modal_title", "Beautifully done.", 32, TEXT, true)
 	_label("modal_body", "", 15, MUTED)
 	labels["modal_body"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_label("modal_score", "", 26, GOLD, true)
 	_button("replay", "Play again", func(): game._reset_game())
+	_button("next", "Next level", func(): game.next_level())
+	_button("map", "Return to map", func(): game.go_map())
+	_button("restart", "Restart level", func(): game.request_restart())
+	_button("confirm_leave", "Return to map", func(): game.go_map(true))
+	_button("confirm_restart", "Restart level", func(): game._reset_game())
 	_button("resume", "Keep playing", func(): game.close_overlay())
 	_button("guide", "How to play", func(): game.open_overlay("help"))
 	_button("back", "Back to game", func(): game.close_overlay())
@@ -203,20 +215,39 @@ func refresh(layout: Dictionary) -> void:
 	var heading: Rect2 = layout["heading"]
 	_place("eyebrow", Rect2(heading.position, Vector2(heading.size.x, 16)))
 	_place("title", Rect2(heading.position + Vector2(0, 15), Vector2(heading.size.x, 34)))
+	labels["title"].text = game.session.level["name"]
+	labels["title"].add_theme_font_size_override("font_size", 24 if not game.practice_mode else 28)
+	labels["eyebrow"].text = "LYRA / LEVEL %02d OF 05" % game.current_level_id if not game.practice_mode else "A LITTLE MATCH. A LITTLE MAGIC."
 	var goals: Rect2 = layout["goals"]
-	var half: float = goals.size.x * 0.5
-	for group in ["crystal", "rock"]:
-		var x: float = goals.position.x + (half if group == "rock" else 0)
-		_rect(icons[group], Rect2(x + 10, goals.position.y + 10, 30, 38))
-		_place(group + "_name", Rect2(x + 46, goals.position.y + 7, half - 56, 16))
-		_place(group + "_count", Rect2(x + 46, goals.position.y + 22, half - 56, 28))
-	labels["crystal_count"].text = "%d / %d" % [mini(game.collected, game.GOAL), game.GOAL]
-	var remaining: int = game._asteroids_remaining()
-	labels["rock_count"].text = "All clear" if remaining == 0 else "%d left" % remaining
-	labels["crystal_count"].modulate = Color("#AEF0CD") if game.collected >= game.GOAL else Color.WHITE
-	labels["rock_count"].modulate = Color("#AEF0CD") if remaining == 0 else Color.WHITE
-	_meter("crystals", Rect2(goals.position.x + 46, goals.end.y - 6, half - 60, 3), float(game.collected) / game.GOAL)
-	_meter("rocks", Rect2(goals.position.x + half + 46, goals.end.y - 6, half - 60, 3), float(game.ASTEROID_LAYOUT.size() - remaining) / game.ASTEROID_LAYOUT.size())
+	var objectives: Array = game.session.level["goals"]
+	var count: int = objectives.size()
+	var width: float = goals.size.x / count
+	for i in range(3):
+		var group: String = ["crystal", "rock", "third"][i]
+		var track_key: String = ["crystals", "rocks", "third"][i]
+		var active: bool = i < count
+		for node in [icons[group], labels[group + "_name"], labels[group + "_count"], tracks[track_key], fills[track_key]]:
+			node.visible = active
+		if not active:
+			continue
+		var goal: Dictionary = objectives[i]
+		var x: float = goals.position.x + width * i
+		var icon_width: float = 22 if count == 3 else 30
+		var indent: float = 36 if count == 3 else 46
+		_rect(icons[group], Rect2(x + 8, goals.position.y + 10, icon_width, 32))
+		icons[group].texture = preload("res://assets/asteroid-goal.svg") if goal["type"] == "asteroids" else (preload("res://assets/crystal-goal.svg") if goal["type"] == "collect" else STAR_ICON)
+		_place(group + "_name", Rect2(x + indent, goals.position.y + 7, width - indent - 6, 16))
+		_place(group + "_count", Rect2(x + indent, goals.position.y + 22, width - indent - 6, 28))
+		labels[group + "_name"].text = game.session.goal_label(goal)
+		labels[group + "_name"].add_theme_font_size_override("font_size", 9 if count == 3 else 10)
+		labels[group + "_count"].add_theme_font_size_override("font_size", 19 if count == 3 else 22)
+		var value: int = game.session.goal_progress(goal)
+		var target: int = int(goal["target"])
+		labels[group + "_count"].text = "%d/%d" % [mini(value, target), target] if count == 3 else "%d / %d" % [mini(value, target), target]
+		if goal["type"] == "asteroids":
+			labels[group + "_count"].text = "Clear" if value >= target else "%d left" % game._asteroids_remaining()
+		labels[group + "_count"].modulate = Color("#AEF0CD") if value >= target else Color.WHITE
+		_meter(track_key, Rect2(x + indent, goals.end.y - 6, width - indent - 10, 3), float(value) / target)
 	for group in ["score", "moves"]:
 		var card: Rect2 = layout[group]
 		_place(group + "_name", Rect2(card.position + Vector2(12, 6), Vector2(card.size.x - 24, 16)))
@@ -227,15 +258,20 @@ func refresh(layout: Dictionary) -> void:
 	var nova: Rect2 = layout["nova"]
 	var energy: int = game.board.nova_energy
 	var charged: bool = game.board.can_use_nova()
+	var nova_enabled: bool = game.board.nova_enabled
 	_rect(icons["nova"], Rect2(nova.position + Vector2(12, 12), Vector2(12, 12)))
 	_place("nova_name", Rect2(nova.position + Vector2(30, 8), Vector2(nova.size.x * 0.5 - 34, 20)))
 	_place("nova_charge", Rect2(nova.position + Vector2(12, 30), Vector2(nova.size.x * 0.5 - 18, 16)))
-	labels["nova_charge"].text = "READY TO SHINE" if charged else "CHARGING · %d%%" % (energy * 100 / game.BoardScript.NOVA_MAX)
-	_meter("nova", Rect2(nova.position + Vector2(12, nova.size.y - 12), Vector2(nova.size.x * 0.5 - 18, 4)), float(energy) / game.BoardScript.NOVA_MAX)
+	labels["nova_charge"].text = ("READY TO SHINE" if charged else "CHARGING · %d%%" % (energy * 100 / game.BoardScript.NOVA_MAX)) if nova_enabled else "AWAKENS IN LEVEL 5"
+	_meter("nova", Rect2(nova.position + Vector2(12, nova.size.y - 12), Vector2(nova.size.x * 0.5 - 18, 4)), float(energy) / game.BoardScript.NOVA_MAX if nova_enabled else 0.0)
 	_rect(buttons["nova"], layout["nova_button"])
 	buttons["nova"].text = "Cancel Nova" if game.phase == "nova_targeting" else ("Unleash Nova" if charged else "Gathering…")
 	buttons["nova"].disabled = blocked or not idle or not charged
+	if not nova_enabled:
+		buttons["nova"].text = "Nova rests"
 	_place("caption", layout["caption"])
+	labels["caption"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if not game.practice_mode else TextServer.AUTOWRAP_OFF
+	labels["caption"].add_theme_font_size_override("font_size", 12 if not game.practice_mode else 11)
 	labels["caption"].text = "Choose a tile for your Nova Pulse" if game.phase == "nova_targeting" else game.feedback
 	labels["caption"].modulate = Color.WHITE if game.feedback_ok else Color("#FF9AB4")
 	_place("aside", layout["aside"])
@@ -245,13 +281,16 @@ func refresh(layout: Dictionary) -> void:
 
 func _refresh_modal(layout: Dictionary, modal: String) -> void:
 	var visible_modal: bool = not modal.is_empty()
+	var campaign: bool = game.current_level_id > 0 and not game.practice_mode
 	_rect(shade, Rect2(Vector2.ZERO, size))
 	shade.visible = visible_modal
 	panels["dialog"].visible = visible_modal
 	icons["modal"].visible = visible_modal
+	for i in range(3):
+		icons["rating%d" % i].visible = visible_modal and modal == "result" and campaign and game.won
 	for key in ["modal_eyebrow", "modal_title", "modal_body", "modal_score"]:
 		labels[key].visible = visible_modal
-	for key in ["replay", "resume", "guide", "back", "stress"]:
+	for key in ["replay", "resume", "guide", "back", "stress", "next", "map", "restart", "confirm_leave", "confirm_restart"]:
 		if modal != last_modal or not visible_modal:
 			buttons[key].visible = false
 	if not visible_modal:
@@ -266,46 +305,98 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 	_place("modal_title", Rect2(x, dialog.position.y + 109, width, 44))
 	_place("modal_body", Rect2(x, dialog.position.y + 158, width, dialog.size.y - 303))
 	_place("modal_score", Rect2(x, dialog.end.y - 145, width, 46))
+	labels["modal_body"].add_theme_font_size_override("font_size", 14 if campaign else 15)
+	labels["modal_score"].add_theme_font_size_override("font_size", 14 if modal == "help" else 26)
 	labels["modal_score"].text = ""
+	var order: Array = []
 	if modal == "result":
 		icons["modal"].texture = STAR_ICON if game.won else RETRY_ICON
 		labels["modal_eyebrow"].text = "A LITTLE STARLIGHT RESTORED" if game.won else "THE STARS ARE STILL WITH YOU"
 		labels["modal_title"].text = "Beautifully done." if game.won else "One more try?"
-		labels["modal_body"].text = "Every little match brings the galaxy back to light." if game.won else "%d / %d crystals collected\n%d asteroids still to clear" % [mini(game.collected, game.GOAL), game.GOAL, game._asteroids_remaining()]
+		labels["modal_body"].text = "Every little match brings the galaxy back to light." if game.won else game.session.goals_text()
 		labels["modal_score"].text = "%s starlight" % str(game.score)
-		_rect(buttons["replay"], layout["replay"])
+		buttons["replay"].text = "Replay" if game.won and campaign else ("Try again" if campaign else "Play again")
+		if campaign:
+			labels["modal_eyebrow"].text = "LYRA / LEVEL %d OF 5" % game.current_level_id
+			if game.won:
+				icons["modal"].visible = false
+				for i in range(3):
+					var icon: TextureRect = icons["rating%d" % i]
+					_rect(icon, Rect2(dialog.get_center().x - 67 + i * 48, dialog.position.y + 30, 38, 38))
+					icon.modulate = Color.WHITE if i < game.session.stars() else Color(0.25, 0.25, 0.32)
+				labels["modal_title"].text = "Lyra is alight." if game.current_level_id == 5 else "A star restored."
+				_place("modal_body", Rect2(x, dialog.position.y + 151, width, 44))
+				labels["modal_body"].text = "Match score %d + move bonus %d" % [game.score, game.moves_left * game.session.MOVE_BONUS]
+				_place("modal_score", Rect2(x, dialog.position.y + 198, width, 36))
+				labels["modal_score"].text = "%d starlight" % game.session.rating_score()
+				if game.current_level_id < 5:
+					_rect(buttons["next"], Rect2(x, dialog.end.y - 184, width, 48))
+					buttons["next"].visible = true
+					order.append("next")
+				_rect(buttons["replay"], Rect2(x, dialog.end.y - 128, width, 48))
+			else:
+				_place("modal_body", Rect2(x, dialog.position.y + 158, width, 82))
+				_place("modal_score", Rect2(x, dialog.end.y - 190, width, 36))
+				_rect(buttons["replay"], Rect2(x, dialog.end.y - 128, width, 48))
+			_rect(buttons["map"], layout["replay"])
+			buttons["map"].visible = true
+			order.append("replay")
+			order.append("map")
+			if not game.progress.notice.is_empty():
+				labels["modal_body"].text = game.progress.notice
+		else:
+			_rect(buttons["replay"], layout["replay"])
+			order = ["replay"]
 		buttons["replay"].visible = true
 	elif modal == "help":
 		icons["modal"].texture = STAR_ICON
 		labels["modal_eyebrow"].text = "YOUR LITTLE FIELD GUIDE"
 		labels["modal_title"].text = "Follow the stars."
-		labels["modal_body"].text = "Match 3 by swapping neighbors. Match 4, 5 or a T/L for powers.\n\nMatch beside rocks or blast them. Two hits break solid rocks."
-		labels["modal_score"].add_theme_font_size_override("font_size", 14)
-		labels["modal_score"].text = "Fill Nova, then tap a tile. No move spent."
+		labels["modal_body"].text = game.session.level["tutorial"] + "\n\nComplete every goal before your moves run out." if campaign else "Match 3 by swapping neighbors. Match 4, 5 or a T/L for powers.\n\nMatch beside rocks or blast them. Two hits break solid rocks."
+		labels["modal_score"].text = "Score +25 per unused move\n2 stars: %d / 3 stars: %d" % [game.session.level["star_scores"][1], game.session.level["star_scores"][2]] if campaign else "Fill Nova, then tap a tile. No move spent."
 		_rect(buttons["back"], layout["replay"])
 		buttons["back"].visible = true
+		order = ["back"]
 	elif modal == "tools":
 		labels["modal_eyebrow"].text = "DEVELOPMENT TOOLS"
 		labels["modal_title"].text = "Effects check"
 		labels["modal_body"].text = "Synthetic drawing workload, not gameplay performance evidence.\n\n" + game.stress_report
 		_rect(buttons["stress"], layout["replay"])
 		buttons["stress"].visible = true
+		order = ["stress"]
+	elif modal in ["leave", "restart"]:
+		icons["modal"].texture = RETRY_ICON
+		labels["modal_eyebrow"].text = "YOUR EARNED STARS ARE SAFE"
+		labels["modal_title"].text = "Leave this round?" if modal == "leave" else "Start fresh?"
+		labels["modal_body"].text = "This unfinished round will be discarded. Your saved stars and best scores stay safe."
+		var action: String = "confirm_leave" if modal == "leave" else "confirm_restart"
+		_rect(buttons[action], Rect2(x, dialog.end.y - 128, width, 48))
+		_rect(buttons["resume"], layout["replay"])
+		buttons[action].visible = true
+		buttons["resume"].visible = true
+		order = ["resume", action]
 	else:
 		icons["modal"].texture = PAUSE_ICON
 		labels["modal_eyebrow"].text = "THE GALAXY CAN WAIT"
 		labels["modal_title"].text = "A little breather."
 		labels["modal_body"].text = "Your crystals will be right here."
-		_rect(buttons["resume"], Rect2(x, dialog.end.y - 138, width, 48))
-		_rect(buttons["guide"], layout["replay"])
-		buttons["resume"].visible = true
-		buttons["guide"].visible = true
-	labels["modal_score"].add_theme_font_size_override("font_size", 14 if modal == "help" else 26)
-	# Keep keyboard focus inside the current modal's real controls.
+		if campaign:
+			_place("modal_body", Rect2(x, dialog.position.y + 156, width, 24))
+			order = ["resume", "guide", "restart", "map"]
+			for i in range(order.size()):
+				_rect(buttons[order[i]], Rect2(x, dialog.end.y - 244 + i * 56, width, 48))
+				buttons[order[i]].visible = true
+		else:
+			_rect(buttons["resume"], Rect2(x, dialog.end.y - 138, width, 48))
+			_rect(buttons["guide"], layout["replay"])
+			buttons["resume"].visible = true
+			buttons["guide"].visible = true
+			order = ["resume", "guide"]
 	if modal != last_modal:
-		var order: Array = ["replay"] if modal == "result" else (["resume", "guide"] if modal == "pause" else (["back"] if modal == "help" else ["stress"]))
 		for i in range(order.size()):
 			var button: Button = buttons[order[i]]
 			button.focus_next = button.get_path_to(buttons[order[(i + 1) % order.size()]])
 			button.focus_previous = button.get_path_to(buttons[order[(i - 1 + order.size()) % order.size()]])
-		buttons[order[0]].grab_focus()
+		if not order.is_empty():
+			buttons[order[0]].grab_focus()
 	last_modal = modal

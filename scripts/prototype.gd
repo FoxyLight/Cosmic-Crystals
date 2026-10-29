@@ -7,16 +7,29 @@ const BoardScript = preload("res://scripts/cosmic_board.gd")
 const Visuals = preload("res://scripts/crystal_visuals.gd")
 const Layout = preload("res://scripts/game_layout.gd")
 const Hud = preload("res://scripts/game_hud.gd")
-const GOAL: int = 30
-const STARTING_MOVES: int = 18
-const ASTEROID_LAYOUT: Dictionary = {18: 2, 21: 2, 27: 1, 36: 1, 42: 2, 45: 2}
+const Session = preload("res://scripts/game_session.gd")
+const Levels = preload("res://scripts/level_catalog.gd")
+const Progress = preload("res://scripts/progress_store.gd")
+const CampaignView = preload("res://scripts/campaign_view.gd")
+# Legacy regression fixtures opt in; the actual app opens on Home.
+var practice_mode: bool = false
+var save_path: String = "user://lyra-progress.json"
+var session = Session.new()
+var progress
+var campaign_view
+var screen: String = "game"
+var current_level_id: int = 0
+var map_selection: int = 1
+var pause_after_turn: bool = false
 
 const SWAP_SECONDS: float = 0.17
 const CLEAR_SECONDS: float = 0.19
 const FALL_SECONDS: float = 0.27
 const RESHUFFLE_SECONDS: float = 0.28
 
-var board = null
+var board:
+	get: return session.board
+	set(value): session.board = value
 var hud = null
 var overlay: String = ""
 var board_style: StyleBoxFlat
@@ -25,9 +38,15 @@ var selected_style: StyleBoxFlat
 var display_cells: Array[int] = []
 var display_specials: Array[int] = []
 var display_asteroids: Array[int] = []
-var moves_left: int = STARTING_MOVES
-var collected: int = 0
-var score: int = 0
+var moves_left: int:
+	get: return session.moves_left
+	set(value): session.moves_left = value
+var collected: int:
+	get: return session.collected
+	set(value): session.collected = value
+var score: int:
+	get: return session.score
+	set(value): session.score = value
 var selected: int = -1
 var press_index: int = -1
 var press_position: Vector2 = Vector2.ZERO
@@ -36,8 +55,12 @@ var phase: String = "idle"
 var active_event: Dictionary = {}
 var event_elapsed: float = 0.0
 var event_duration: float = 0.01
-var finished: bool = false
-var won: bool = false
+var finished: bool:
+	get: return session.finished
+	set(value): session.finished = value
+var won: bool:
+	get: return session.won
+	set(value): session.won = value
 var feedback: String = "Swap adjacent crystals to rekindle the stars"
 var feedback_ok: bool = true
 var flash_time: float = 0.0
@@ -53,39 +76,132 @@ var stress_report: String = "Tap STRESS 30S to test effects rendering"
 
 
 func _ready() -> void:
+	get_tree().quit_on_go_back = false
 	board_style = _panel_style(Color("#191B32"), Color("#49405F"), 20)
 	tile_style = _panel_style(Color("#202138"), Color("#38344E"), 7)
 	selected_style = _panel_style(Color("#44365F"), Color("#CCAAFF"), 7)
+	progress = Progress.new(save_path)
+	if not practice_mode:
+		progress.load_progress()
 	hud = Hud.new()
 	hud.game = self
 	add_child(hud)
+	campaign_view = CampaignView.new()
+	campaign_view.game = self
+	add_child(campaign_view)
 	_reset_game()
+	if not practice_mode:
+		screen = "home"
+		map_selection = int(progress.data["highest_unlocked"])
+	_refresh_views()
 
 
 func _reset_game() -> void:
-	board = BoardScript.new(20261029 + int(Time.get_ticks_msec() % 100000))
-	board.place_asteroids(ASTEROID_LAYOUT)
-	if not board.has_legal_move():
-		board._shuffle_deadlocked_board()
+	if phase == "resolving":
+		return
+	if not practice_mode and current_level_id > 0:
+		start_level(current_level_id)
+		return
+	var definition: Dictionary = Levels.practice()
+	definition["seed"] += int(Time.get_ticks_msec() % 100000)
+	session.load_level(definition)
+	_prepare_view()
+
+
+func _prepare_view() -> void:
+	pause_after_turn = false
 	display_cells = board.cells.duplicate()
 	display_specials = board.specials.duplicate()
 	display_asteroids = board.asteroids.duplicate()
-	moves_left = STARTING_MOVES
-	collected = 0
-	score = 0
 	selected = -1
 	press_index = -1
 	phase = "idle"
 	overlay = ""
 	active_event = {}
-	finished = false
-	won = false
-	feedback = "Match beside asteroids to crack them"
+	feedback = str(session.level["tutorial"]) if not progress.data["tutorials_seen"].has(current_level_id) else "Complete every goal. Each little match adds starlight."
 	feedback_ok = true
 	flash_time = 0.0
-	if hud != null:
-		hud.refresh(_layout())
+	_refresh_views()
 	queue_redraw()
+
+
+func start_level(id: int) -> bool:
+	if phase == "resolving" or not progress.can_play(id):
+		return false
+	var definition: Dictionary = Levels.get_level(id)
+	if definition.is_empty():
+		return false
+	current_level_id = id
+	map_selection = id
+	session.load_level(definition)
+	screen = "game"
+	_prepare_view()
+	return true
+
+
+func next_level() -> bool:
+	if not finished or not won or current_level_id >= 5:
+		return false
+	return start_level(current_level_id + 1)
+
+
+func go_map(confirmed: bool = false) -> bool:
+	if phase == "resolving":
+		return false
+	if screen == "game" and not finished and not confirmed:
+		open_overlay("leave")
+		return false
+	screen = "map"
+	overlay = ""
+	selected = -1
+	press_index = -1
+	_refresh_views()
+	return true
+
+
+func show_home() -> void:
+	if phase == "resolving":
+		return
+	screen = "home"
+	overlay = ""
+	press_index = -1
+	_refresh_views()
+
+
+func request_restart() -> void:
+	if phase == "resolving":
+		return
+	open_overlay("restart")
+
+
+func reduced_motion() -> bool:
+	return progress != null and progress.data["settings"]["reduced_motion"]
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if phase == "resolving":
+			pause_after_turn = true
+		elif screen == "map":
+			show_home()
+		elif screen == "game":
+			if not overlay.is_empty(): close_overlay()
+			elif finished: go_map(true)
+			elif phase == "nova_targeting": toggle_nova()
+			else: open_overlay("pause")
+		elif is_inside_tree():
+			get_tree().quit()
+
+
+func _refresh_views() -> void:
+	if hud != null:
+		hud.visible = screen == "game"
+		if hud.visible:
+			hud.refresh(_layout())
+	if campaign_view != null:
+		campaign_view.visible = screen != "game"
+		if campaign_view.visible:
+			campaign_view.refresh(_layout())
 
 
 func _process(delta: float) -> void:
@@ -105,8 +221,7 @@ func _process(delta: float) -> void:
 			var mean_fps: float = stress_fps_total / float(maxi(stress_samples, 1))
 			stress_report = "Draw test: avg %.0f / min %.0f FPS" % [mean_fps, stress_min_fps if stress_samples > 0 else 0.0]
 			print("COSMIC_STRESS: %s" % stress_report)
-	if hud != null:
-		hud.refresh(_layout())
+	_refresh_views()
 	queue_redraw()
 
 
@@ -128,7 +243,7 @@ func _safe_insets() -> Vector4:
 
 
 func _layout() -> Dictionary:
-	return Layout.calculate(size, _safe_insets())
+	return Layout.calculate(size, _safe_insets(), not practice_mode)
 
 
 func _board_rect() -> Rect2:
@@ -157,7 +272,7 @@ func _panel_style(bg: Color, edge: Color, radius: int) -> StyleBoxFlat:
 
 
 func open_overlay(kind: String) -> void:
-	if phase not in ["idle", "nova_targeting"] or finished:
+	if screen != "game" or phase not in ["idle", "nova_targeting"] or finished:
 		return
 	overlay = kind
 	selected = -1
@@ -173,7 +288,7 @@ func close_overlay() -> void:
 
 
 func toggle_nova() -> void:
-	if not overlay.is_empty() or finished:
+	if screen != "game" or not overlay.is_empty() or finished:
 		return
 	if phase == "nova_targeting":
 		phase = "idle"
@@ -208,7 +323,7 @@ func _draw() -> void:
 		draw_circle(Vector2(size.x * 0.93, size.y * 0.44), radius,
 			Color(0.28, 0.20, 0.43, 0.022))
 	_draw_starfield()
-	if board == null:
+	if board == null or screen != "game":
 		return
 	var rect: Rect2 = _board_rect()
 	draw_style_box(board_style, rect.grow(8.0))
@@ -216,6 +331,8 @@ func _draw() -> void:
 	for index in range(64):
 		var origin: Vector2 = rect.position + Vector2(index % 8, int(index / 8)) * tile
 		var selected_cell: bool = phase == "idle" and selected == index
+		if not practice_mode and collected == 0 and selected == -1 and not progress.data["tutorials_seen"].has(current_level_id) and session.level.get("hint", []).has(index):
+			selected_cell = true
 		draw_style_box(selected_style if selected_cell else tile_style,
 			Rect2(origin + Vector2(2, 2), Vector2(tile - 4.0, tile - 4.0)))
 
@@ -225,7 +342,7 @@ func _draw() -> void:
 		_draw_animated_event(rect)
 	_draw_asteroids(rect)
 
-	if flash_time > 0.0:
+	if flash_time > 0.0 and not reduced_motion():
 		var tint: Color = Color(0.20, 0.90, 0.86, flash_time * 0.20) if feedback_ok else Color(1, 0.25, 0.40, flash_time * 0.23)
 		draw_rect(rect, tint)
 	if stress_active:
@@ -372,7 +489,7 @@ func _draw_starfield() -> void:
 	for i in range(85):
 		var px: float = fposmod(float(i * 173 + 29), maxf(size.x, 1.0))
 		var py: float = fposmod(float(i * 241 + 71), maxf(size.y, 1.0))
-		var alpha: float = 0.17 + 0.30 * (0.5 + 0.5 * sin(elapsed * 0.7 + float(i)))
+		var alpha: float = 0.17 + 0.30 * (0.5 + 0.5 * sin((0.0 if reduced_motion() else elapsed) * 0.7 + float(i)))
 		draw_circle(Vector2(px, py), 0.6 + float(i % 3) * 0.42, Color(0.65, 0.8, 1.0, alpha))
 
 
@@ -464,7 +581,7 @@ func _draw_stress_effects(rect: Rect2) -> void:
 	# These effects do not represent finished particle art or GPU benchmarks.
 	for i in range(260):
 		var index: float = float(i)
-		var phase_angle: float = elapsed * (0.75 + float(i % 7) * 0.10) + index * 2.39996
+		var phase_angle: float = (0.0 if reduced_motion() else elapsed) * (0.75 + float(i % 7) * 0.10) + index * 2.39996
 		var radial: float = (0.08 + 0.88 * float((i * 73) % 257) / 257.0) * rect.size.x * 0.46
 		var point: Vector2 = rect.get_center() + Vector2(cos(phase_angle), sin(phase_angle)) * radial
 		var color: Color = Visuals.fill_color(i % Visuals.FILL_HEX.size())
@@ -480,7 +597,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		_handle_touch(event.position, event.pressed)
 	elif event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_ESCAPE:
-			if not overlay.is_empty():
+			if screen == "map":
+				show_home()
+			elif screen == "home":
+				return
+			elif not overlay.is_empty():
 				close_overlay()
 			elif phase == "nova_targeting":
 				toggle_nova()
@@ -488,16 +609,18 @@ func _unhandled_input(event: InputEvent) -> void:
 				open_overlay("pause")
 		elif event.keycode == KEY_F9:
 			open_overlay("tools")
-		elif event.keycode == KEY_R and (phase == "idle" or phase == "finished") and overlay.is_empty():
+		elif event.keycode == KEY_R and (phase == "idle" or phase == "finished") and overlay.is_empty() and screen == "game":
 			_reset_game()
 
 
 func _handle_touch(pointer: Vector2, pressed: bool) -> void:
-	if not overlay.is_empty():
+	if screen != "game" or not overlay.is_empty():
 		return
 	if phase != "idle" and phase != "nova_targeting" and phase != "finished":
 		return
 	if phase == "finished":
+		if not practice_mode:
+			return  # Campaign results are owned exclusively by their GUI buttons.
 		if pressed:
 			# Arm replay only if the initial touch is on the explicit button.
 			press_index = -4 if _replay_rect().has_point(pointer) else -1
@@ -589,6 +712,8 @@ func _toggle_stress_test() -> void:
 
 
 func _event_duration(kind: String) -> float:
+	if reduced_motion():
+		return 0.01
 	match kind:
 		"swap", "swap_back":
 			return SWAP_SECONDS
@@ -624,7 +749,7 @@ func _take_turn(a: int, b: int) -> void:
 	phase = "resolving"
 	selected = -1
 	press_index = -1
-	var outcome: Dictionary = board.play_swap(a, b)
+	var outcome: Dictionary = session.begin_swap(a, b)
 	await _apply_outcome(outcome, true)
 
 
@@ -634,21 +759,23 @@ func _take_nova(target: int) -> void:
 	phase = "resolving"
 	selected = -1
 	press_index = -1
-	var outcome: Dictionary = board.use_nova(target)
+	var outcome: Dictionary = session.begin_nova(target)
 	await _apply_outcome(outcome, false)
 
 
-func _apply_outcome(outcome: Dictionary, use_move: bool) -> void:
+func _apply_outcome(outcome: Dictionary, _use_move: bool) -> void:
+	if outcome.is_empty():
+		phase = "idle"
+		return
 	for event in outcome["events"]:
 		await _animate_event(event)
 	display_cells = board.cells.duplicate()
 	display_specials = board.specials.duplicate()
 	display_asteroids = board.asteroids.duplicate()
 	if bool(outcome["valid"]):
-		if use_move:
-			moves_left -= 1
-		collected += int(outcome["cleared"])
-		score += int(outcome["score"])
+		session.commit_outcome(outcome)
+		if current_level_id > 0:
+			progress.mark_tutorial(current_level_id)
 		feedback_ok = true
 		if bool(outcome["used_nova"]):
 			feedback = "NOVA PULSE!  +%d points (no move spent)" % int(outcome["score"])
@@ -668,15 +795,16 @@ func _apply_outcome(outcome: Dictionary, use_move: bool) -> void:
 			feedback = "CASCADE x%d  +%d points" % [int(outcome["cascades"]), int(outcome["score"])]
 		if bool(outcome["reshuffled"]):
 			feedback = "Stars realigned. New moves available!"
-		if collected >= GOAL and _asteroids_remaining() == 0:
-			finished = true
-			won = true
-		elif moves_left <= 0:
-			finished = true
-			won = false
+		if finished and won and current_level_id > 0:
+			progress.record_victory(session)
 	else:
+		session.commit_outcome(outcome)
 		feedback_ok = false
 		feedback = "That swap doesn't make a match"
 	flash_time = 0.45
 	phase = "finished" if finished else "idle"
+	if pause_after_turn:
+		pause_after_turn = false
+		if not finished:
+			open_overlay("pause")
 	queue_redraw()

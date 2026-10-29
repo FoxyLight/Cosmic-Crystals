@@ -3,7 +3,8 @@ extends RefCounted
 ## Coordinates are viewport units; safe-area conversion is owned by the scene.
 
 
-static func calculate(view_size: Vector2, insets: Vector4 = Vector4.ZERO) -> Dictionary:
+static func calculate(view_size: Vector2, insets: Vector4 = Vector4.ZERO, campaign: bool = false) -> Dictionary:
+	var caption_height: float = 40.0 if campaign else 24.0
 	var area: Rect2 = Rect2(Vector2(insets.x, insets.y),
 		view_size - Vector2(insets.x + insets.z, insets.y + insets.w))
 	var desktop: bool = area.size.x >= 760.0 and area.size.x > area.size.y * 1.15
@@ -22,7 +23,7 @@ static func calculate(view_size: Vector2, insets: Vector4 = Vector4.ZERO) -> Dic
 		result["score"] = Rect2(column_x, y + 224, (column_width - 10) * 0.5, 76)
 		result["moves"] = Rect2(column_x + (column_width + 10) * 0.5, y + 224, (column_width - 10) * 0.5, 76)
 		result["nova"] = Rect2(column_x, y + 312, column_width, 82)
-		result["caption"] = Rect2(x, y + 136 + side + 6, side, 24)
+		result["caption"] = Rect2(x, y + 136 + side + 6, side, caption_height)
 		result["aside"] = Rect2(column_x, y + 416, column_width, 110) if area.size.y >= 580 else Rect2()
 	else:
 		var width: float = minf(area.size.x - 24.0, 440.0)
@@ -40,11 +41,11 @@ static func calculate(view_size: Vector2, insets: Vector4 = Vector4.ZERO) -> Dic
 		result["nova"] = Rect2(x, bottom - 64.0, width, 64)
 		result["score"] = Rect2(x, bottom - 64.0 - gap - 56.0, (width - gap) * 0.5, 56)
 		result["moves"] = Rect2(x + (width + gap) * 0.5, bottom - 64.0 - gap - 56.0, (width - gap) * 0.5, 56)
-		var available: float = result["score"].position.y - gap - 26.0 - y
+		var available: float = result["score"].position.y - gap - caption_height - 2.0 - y
 		var side: float = minf(width - 16.0, available - 16.0)
 		var region_y: float = y + (available - side - 16.0) * 0.5
 		result["board"] = Rect2(x + (width - side) * 0.5, region_y + 8.0, side, side)
-		result["caption"] = Rect2(x, result["score"].position.y - gap - 24.0, width, 24)
+		result["caption"] = Rect2(x, result["score"].position.y - gap - caption_height, width, caption_height)
 		result["aside"] = Rect2()
 	var nova: Rect2 = result["nova"]
 	result["nova_button"] = Rect2(nova.position + Vector2(nova.size.x * 0.52, 6), Vector2(nova.size.x * 0.48 - 12, nova.size.y - 12))
