@@ -33,6 +33,14 @@ The previous GDScript scene-load defect was shared across all power mechanics. A
 
 **Confirmed separate UI bug:** An unaffected special crystal temporarily lost its overlay while another group cleared. The rendering path now retains the correct power marker. Android visual verification is still needed. See [M2 mechanics](M2_SPECIALS_NOVA.md) and [QA plan](QA_TEST_PLAN.md). M2 is not closed.
 
+## Board reset investigation and mitigation (2026-10-29)
+
+A player reported repeated board resets after adding powerful M2 combos. The source reveals two distinct paths: **collecting 30 crystals triggers victory, and any subsequent tap used to restart the entire round**; separately, a deadlocked grid with no legal move was regenerated with brand-new random gems, which looks like a reset even when counters do not change.
+
+[PR #22](https://github.com/FoxyLight/Cosmic-Crystals/pull/22) introduces an explicit **PLAY AGAIN** confirmation on the results overlay and a gem-inventory-preserving deadlock shuffle. [Issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21) tracks Android acceptance. The new seeded regression suite covers replay touch targeting and preserved colors/charge. **A human device retest is still pending.**
+
+This does not change the temporary 30-crystal goal or add multi-level progression. If Android loses the application process completely, persistent progress remains an M3 feature rather than a solved reset cause.
+
 ## Milestone rollup
 
 | Workstream | Tracking issue | Status |
