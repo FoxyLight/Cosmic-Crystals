@@ -7,19 +7,19 @@
 
 The repository currently runs `godot --headless --path . --editor --quit` and `godot --headless --path . --script res://tests/test_board.gd` plus a 120-frame scene smoke test in GitHub Actions.
 
-**Evidence:** [successful main branch run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782).
+**Evidence:** [original main branch run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782), plus [M0/M1 CI run with debug APK and Web artifacts](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043) on PR #13.
 
-The seeded board test exercises initial legal board generation, no starting matches, adjacent legal swaps, illegal nonadjacent swaps, match intersections, stable boards after cascades, crystal clear counts and score. This is **not** a full Android compatibility, performance, save-state, or cross-platform acceptance test.
+The expanded seeded board test covers 125 seeds, no starting matches, adjacent legal swaps, illegal nonadjacent/adjacent swaps, match intersections, stable cascades, unique clears, event-snapshot replay, crystal counts and scores. This is **not** a full Android compatibility, performance, save-state, or cross-platform acceptance test.
 
 ## 2. Rules-level regression matrix
 
 | Area | Required test case | Status |
 | --- | --- | --- |
 | Initial generation | No pre-existing match; at least one move over many seeds | Initial automated coverage |
-| Input validation | Adjacent legal and illegal swaps, wrapping across row boundaries, same-tile taps | Partial automated; expand |
-| Matching | Horizontal/vertical 3+, intersection union and simultaneous multi-group | Partial automated; expand |
-| Resolution | Gravity stability, refill, chain reactions, no infinite cascade | Partial automated; expand |
-| Move budget | Illegal swap spends 0; legal spends 1; last-move win overrides loss | Partial automated; add last-move test |
+| Input validation | Adjacent legal and illegal swaps, wrapping across row boundaries, same-tile taps | Automated swap/edge checks; manual gesture testing open |
+| Matching | Horizontal/vertical 3+, intersection union and simultaneous multi-group | Intersection/seeded checks; expand simultaneous cases |
+| Resolution | Gravity stability, refill, chain reactions, event playback invariants | Expanded automated replay/invariant checks |
+| Move budget | Illegal swap spends 0; legal spends 1; last-move win overrides loss | Basic logic implemented; last-move regression pending |
 | Deadlocks | No legal move reshuffles without deleting blockers/specials | Prototype-only reset; production logic missing |
 | Special pieces | 4/5/T/L creation precedence; combined triggers; no double-count | Not implemented |
 | Blockers | Adjacent matches vs special and Nova damage; durability rules | Not implemented |
@@ -56,7 +56,7 @@ Run:
 - iOS Safari (if available): touch, startup, orientation, WebGL support and limitations. A browser test does **not** prove iOS native export.
 - Use a server (not `file://`) for Godot HTML5 distribution, and record the specific export settings/build.
 
-Browser tests are **pending**, not assumed successful based on the headless workflow.
+Browser runtime tests are **pending** despite successful CI Web export. A generated `.wasm`/HTML5 bundle does not establish browser usability.
 
 ## 5. Release-level acceptance
 
@@ -86,7 +86,7 @@ For each validation, record:
 | Field | Value |
 | --- | --- |
 | Date / tester | TBD |
-| Commit SHA / build ID | TBD |
+| Commit SHA / build ID | Example automated artifact: [PR #13 run 40939726043](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043); fill exact build SHA per manual test |
 | Godot version | 4.7.2 target |
 | Device / Android or browser version | TBD |
 | Test case and steps | TBD |
