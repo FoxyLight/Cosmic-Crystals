@@ -15,27 +15,31 @@
 
 **Evidence:** [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5), [GitHub Actions success](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782).
 
-**Important limitations:** The board currently resolves synchronously with a simple result flash. The above evidence is **not** a verified Android APK, signed AAB, browser export, particle benchmark or five-level game.
+**Important limitations:** The original foundation used a simple result flash. PR #13 adds event-driven playback and successful automated Android **debug APK** and web export artifacts; these are **not** physical-device/browser tests, a signed Play AAB or a five-level game. See [M0/M1 implementation notes](M0_M1_IMPLEMENTATION.md).
 
 ## Priority 0: Engine feasibility and robust interaction (M0 + M1 in parallel)
 
 ### M0: Android / web proof of concept | [Issue #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4)
 
-- [ ] Export a debug APK and perform at least one real Android device test.
+- [x] Generate a debug Android APK using pinned Godot 4.7.2 templates in CI.
+- [ ] Install the APK and complete a physical Android touch/performance test.
 - [ ] Prove release AAB signing/export without exposing credentials.
-- [ ] Export Godot web build and test desktop/mobile browsers.
+- [x] Export the Godot HTML5 build and upload a web artifact in CI.
+- [ ] Serve and test the build on desktop/mobile browsers.
 - [ ] Record FPS, RAM, load time, gestures, safe areas and pause/resume behavior.
-- [ ] Add effects stress benchmark and document engine go/no-go.
+- [x] Add a selectable 30-second synthetic draw/FPS stress mode.
+- [ ] Gather real-device measurements and document production engine go/no-go.
 - [ ] Review required native SDK capabilities before final engine approval.
 
 **Exit gate:** documented Android+web export paths, physical-device evidence and explicit production engine sign-off. See [Engine Evaluation](ENGINE_EVALUATION.md), [QA Plan](QA_TEST_PLAN.md) and [Export Guide](ANDROID_EXPORT.md).
 
 ### M1: Reliable, animated match-3 loop | [Issue #3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3)
 
-- [ ] Return ordered swap/match/clear/drop/spawn/cascade events from deterministic rules.
-- [ ] Animate valid swaps and invalid-swap rollback.
-- [ ] Animate gravity, refill, cascades and deadlock recovery; enforce input lock.
-- [ ] Verify exact move costs, score and objective collection through chained events.
+- [x] Return ordered immutable swap/clear/fall/refill/reshuffle events from seeded board rules.
+- [x] Animate valid swaps and adjacent invalid-swap rollback.
+- [x] Animate gravity, refill and cascades with a locked input phase; reshuffle has a simple fade transition.
+- [ ] Validate animation and input on physical Android.
+- [x] Expand deterministic tests to validate event replay, cleared totals and score consistency.
 - [ ] Add regression tests for last-move victory, restart/pause during effects and deadlocks.
 - [ ] Do extended manual mouse/touch playthroughs and fix stuck-board problems.
 

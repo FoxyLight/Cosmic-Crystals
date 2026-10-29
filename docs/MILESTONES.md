@@ -9,7 +9,7 @@
 
 Each milestone is represented by a **dedicated GitHub tracking issue** with checkboxes and measurable acceptance criteria. These are **issue-based milestone trackers**, not GitHub's native Milestones objects. The connected GitHub tools cannot create or edit native Milestone objects. If native objects are later created manually, link the same M0–M7 codes and issues; do not maintain two contradictory status sources.
 
-- **Primary progress truth:** checked/unchecked tasks and evidence in the linked GitHub issue.
+- **Primary progress truth:** checked/unchecked tasks and evidence in the linked GitHub issue. The current [M0/M1 implementation](M0_M1_IMPLEMENTATION.md) records a verified CI APK/Web export; these do not close either milestone.
 - **Overview:** this register and [PROJECT_STATUS.md](PROJECT_STATUS.md).
 - **Acceptance criteria and test environments:** [QA_TEST_PLAN.md](QA_TEST_PLAN.md).
 - **Product requirements:** [GAME_DESIGN.md](GAME_DESIGN.md).
@@ -38,7 +38,7 @@ A milestone is **Done** only if all its exit criteria have demonstrable evidence
 
 ## What is in the current game
 
-The repository's one-scene prototype provides an 8×8 board with six crystal kinds, touch/mouse selection, match scanning, seeded legal board generation, gravity/refill/cascades, a total collection target, moves and a basic win/loss. It computes resolved board state synchronously, with limited visual feedback. It is **not** a five-level game and does **not** yet include specials, Nova, asteroid blockers, persistent progression, platform binaries or commercial SDKs.
+The repository's one-scene prototype provides an 8×8 board with six crystal kinds, touch/mouse selection, match scanning, seeded legal board generation, gravity/refill/cascades, a total collection target, moves and a basic win/loss. The rules compute a turn synchronously but now return an ordered event sequence for animated swap/clear/drop/refill playback (PR #13); the production special-piece/level state model is still missing. It is **not** a five-level game and does **not** yet include specials, Nova, asteroid blockers, persistent progression, platform binaries or commercial SDKs.
 
 The separately published concept advertises 20 levels and four constellations. Treat that as a **vision**, not a repository acceptance claim.
 
@@ -46,9 +46,9 @@ The separately published concept advertises 20 levels and four constellations. T
 
 ### M0 — Evidence needed before production engine sign-off
 
-1. Android APK installed on a real phone, touch flows checked and failures recorded.
+1. Android **debug APK artifact generated in CI** (achieved); APK installed on a real phone with touch flows checked and results recorded (outstanding).
 2. Release AAB signing/export demonstrated without committing credentials.
-3. Godot web export hosted and tested in desktop and Android browsers, with iOS Safari checked when available.
+3. Godot **Web export generated in CI** (achieved); hosted and tested in desktop and Android browsers, with iOS Safari checked where available (outstanding).
 4. FPS, memory, loading and touch responsiveness observations recorded with device model/OS/build.
 5. Engine go/no-go published in [ENGINE_EVALUATION.md](ENGINE_EVALUATION.md). A green headless CI run alone **does not** satisfy M0.
 

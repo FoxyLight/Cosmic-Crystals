@@ -6,12 +6,12 @@
 
 - `project.godot`: Compatibility renderer and portrait-oriented baseline.
 - `scenes/Prototype.tscn`: one-screen test scene.
-- `scripts/board.gd`: seedable 8×8 board generation, adjacency, match scan, legal moves, validated swaps, clear/gravity/refill/cascade resolution and deadlock fallback.
-- `scripts/prototype.gd`: procedural starfield and crystals, HUD, touch/mouse selection and drag, move counter, simple collection goal and win/loss.
-- `tests/test_board.gd`: seeded pure-rule tests, intersection counting and stable-board checks.
-- `.github/workflows/godot-checks.yml`: downloads Godot 4.7.2, parses/imports project and runs headless tests.
+- `scripts/board.gd`: seedable 8×8 board generation, match scanning, legal swaps, gravity/refill/cascades, deadlock fallback, and immutable ordered `swap`, `swap_back`, `clear`, `fall` and `reshuffle` event snapshots.
+- `scripts/prototype.gd`: procedural starfield/crystals, HUD, touch and swipe/tap input, animated event playback with `phase` locking, score/move/collection goal, win/loss, and a synthetic draw/FPS stress test.
+- `tests/test_board.gd`: 125-seed rules tests, rejected adjacent swaps, intersection deduplication, stable-board checks, complete event replay and scoring invariants.
+- `.github/workflows/godot-checks.yml`: downloads Godot 4.7.2, parses/imports and smoke-tests the scene, runs headless seeded tests, and exports a debug Android APK plus HTML5 artifacts.
 
-**Verified:** Initial GitHub Actions run completed successfully. **Not yet verified:** APK, AAB, web export, actual phone touch/UX, graphics stress test, iOS export.
+**Verified automatically:** Android debug APK and Web artifacts generated, parsing/tests/scenes pass. **Not yet verified:** actual APK install, browser runtime, touch/UX, measured graphics performance, AAB or iOS export.
 
 ## Production architecture
 
@@ -47,7 +47,7 @@ These directories are architectural targets, not promises that they exist today.
 
 ### State and turn resolution
 
-The current prototype computes the final board state immediately and flashes a result. Before adding polished gameplay animations, refactor its resolver to produce ordered immutable effects. Let the scene animate those events with an explicit input-lock state machine:
+The rules engine still calculates the final board state synchronously, but now returns ordered, immutable `before`/`after` frames. The scene animates each frame sequentially without affecting model outcomes, with an explicit `idle` / `resolving` / `finished` input lock. A production state machine will eventually distinguish swap, clear, fall, objective checks and Nova targeting:
 
 ```text
 IDLE -> SWAPPING -> VALIDATING
@@ -61,26 +61,27 @@ A tile must be collected/damaged only once per match resolution step; intersecti
 
 ### Domain data
 
-Move from the current integer-only crystal representation to an explicit data model: crystal kind, optional special piece, cell occupancy, blocker durability, score/goal deltas, level move budget, Nova energy and an ordered event log. Prefer typed GDScript classes and Resources/validated JSON for level data.
+The **event log** is implemented for current blocker-free swaps, clearing and gravity. Next, move from the integer-only crystal representation to explicit crystal/special kind, cell occupancy, blocker durability, objective/goal deltas, level move budget and Nova energy. Prefer typed GDScript classes and Resources/validated JSON for level data.
 
 Keep progress storage under Godot `user://`, version save schemas, and persist only completed, stable progress. Do not save a half-resolved turn.
 
 ### Input and visuals
 
-The prototype supports drag/swipe and tap-two-adjacent input through `_input`, then locks input for brief result feedback. Production code must avoid duplicate synthesized touch/mouse events; animate swaps, clears, drops and spawns asynchronously from domain events; and support safe areas, motion reduction, feedback and touch accessibility.
+The prototype supports drag/swipe and tap-two-adjacent input through `_input`, selecting one orthogonal neighbor even for longer drags. It locks input while playing the ordered swap, rollback, clear, fall and refill effects. Future work: manual Android gesture QA, pause/restart interruption handling, safe areas, reduced motion and accessibility.
 
 ### Tests and quality gates
 
-Headless tests should cover board generation, legal swaps, match intersections, gravity/cascades, reshuffle and eventual special interactions. New code should add tests for specials, Nova, blockers, last-move victory, pause/restart during animations, and save schema migration.
+Headless tests now cover generation over 125 seeds, legal/invalid neighboring swaps, match intersections, gravity/cascades, event continuity, collection/score consistency and stable output boards. New tests are still required for specials, Nova, blockers, last-move victory, pause/restart during animations and save migrations.
 
 CI runs:
 
 ```bash
 godot --headless --path . --editor --quit
 godot --headless --path . --script res://tests/test_board.gd
+godot --headless --path . --quit-after 120
 ```
 
-CI parser/tests do **not** substitute for Android export or physical-device testing.
+CI parser/tests and **successful debug APK/Web exports** do **not** substitute for physical-device/browser testing, AAB signing or store acceptance.
 
 ## Platform notes
 
@@ -90,4 +91,4 @@ CI parser/tests do **not** substitute for Android export or physical-device test
 - Prefer real-device measurements before introducing ads, in-app billing and analytics plugins.
 - Package iOS only after Android/web gameplay is stable.
 
-See [Android/Web Export Guide](ANDROID_EXPORT.md), [Engine Evaluation](ENGINE_EVALUATION.md) and [Roadmap](ROADMAP.md).
+See [M0/M1 Implementation](M0_M1_IMPLEMENTATION.md) for the event protocol and successful CI artifact run, [Android/Web Export Guide](ANDROID_EXPORT.md), [Engine Evaluation](ENGINE_EVALUATION.md) and [Roadmap](ROADMAP.md).

@@ -6,11 +6,11 @@ An Android-first cosmic match-3 puzzle adventure for Android and web, with iOS a
 
 ## Project status
 
-**Snapshot: 2026-10-29.** Godot 4.7.2 (GDScript, Compatibility renderer) is the working engine candidate. The playable prototype and automated rules checks are on `main`; [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5) was merged and the [Godot headless workflow passed](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782).
+**Snapshot: 2026-10-29.** Godot 4.7.2 (GDScript, Compatibility renderer) is the working engine candidate. The foundational prototype and automated rules checks are on `main`; [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5) was merged and the [Godot headless workflow passed](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782).
 
 **Implemented and headlessly tested:** seeded 8×8 boards with six crystal types, valid/invalid swap logic, match detection, gravity, refill, cascades and legal move checks. The one-screen prototype has procedural crystal visuals, mouse/touch controls, a move/score HUD and a basic collection win/lose loop.
 
-**Not yet verified:** Android APK/AAB builds, real-device performance and web exports. **Not yet implemented:** full swap/fall animations, special pieces, Nova Pulse, asteroid blockers, five designed levels, constellation map, progress persistence, production art/audio and app-store deployment.
+**M0/M1 work in PR #13:** event-driven swap/clear/fall/rollback animations and 125-seed regression checks now pass headless CI. GitHub Actions has built a debug Android APK and Web export ([successful CI run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)). **Not yet verified:** installing and playing on a real phone, browser compatibility, FPS/RAM or an AAB release-signing pipeline. **Still missing:** special pieces, Nova Pulse, blockers, five designed levels, galaxy map, saves, production art/audio and store distribution.
 
 The [separately published concept page](https://cosmic-crystals-starweaver-jneal.fxylght.chatgpt.site) references 20 levels and four constellations. Its source is not imported here, and those features are **future vision**, not claims about this repository.
 
@@ -28,7 +28,7 @@ The [separately published concept page](https://cosmic-crystals-starweaver-jneal
 | M6 | Google Play test/release preparation | Not started | [#10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10) |
 | M7 | 20 levels, four constellations, optional iOS | Deferred | [#11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) |
 
-The detailed [milestone register](docs/MILESTONES.md) defines dependencies, exit gates and evidence. Tracking is implemented with **GitHub Issues as milestone trackers**, not native GitHub Milestone objects. No dates or owners have been committed.
+The [M0/M1 implementation notes](docs/M0_M1_IMPLEMENTATION.md) describe the new event stream, test coverage and build artifacts. The detailed [milestone register](docs/MILESTONES.md) defines dependencies, exit gates and evidence. Tracking is implemented with **GitHub Issues as milestone trackers**, not native GitHub Milestone objects. No dates or owners have been committed.
 
 ## Run the prototype
 
@@ -52,6 +52,7 @@ These checks are automated in [GitHub Actions](.github/workflows/godot-checks.ym
 | --- | --- |
 | Current achievement vs missing work | [Project Status](docs/PROJECT_STATUS.md) |
 | Milestone owners/criteria and issue links | [Milestone Register](docs/MILESTONES.md) |
+| M0/M1 animated prototype and CI build results | [Implementation Notes](docs/M0_M1_IMPLEMENTATION.md) |
 | Execution order and scope | [Roadmap](docs/ROADMAP.md) |
 | Concept, gameplay and visuals | [Game Design](docs/GAME_DESIGN.md) |
 | Implementation and domain architecture | [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md) |
@@ -68,4 +69,4 @@ These checks are automated in [GitHub Actions](.github/workflows/godot-checks.ym
 
 This GitHub repository is the canonical source of truth. Use scoped issues and PRs, keep the [Milestone Register](docs/MILESTONES.md) and [Project Status](docs/PROJECT_STATUS.md) synchronized with real evidence, and do not mark untested product features or platform exports as complete.
 
-**Immediate focus:** M0 Android/Web real build validation (#4) and M1 event-driven gameplay animations (#3). M2 through M7 follow the milestone gates.
+**Immediate focus:** use the generated APK/Web artifacts to perform **real-device/browser QA** (M0 #4), review the new animated turn flow and add last-move/interruption regression tests (M1 #3). M2 through M7 follow the milestone gates.
