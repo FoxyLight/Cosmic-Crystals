@@ -1,12 +1,12 @@
 # Engine Evaluation: Android-first Cosmic Crystals
 
 **Date:** 2026-10-29  
-**Status:** GODOT PROTOTYPE IN PROGRESS — approved for implementation, still awaiting Android/web export and physical-device validation  
+**Status:** GODOT PROTOTYPE IN PROGRESS — approved for development; awaiting Android/web exports, physical-device checks, and an evidenced production sign-off  
 **Context:** The project aims for Android first, with web and iOS targets. A Godot 4.7.2 GDScript prototype and headless tests now exist in the repository's main branch.
 
-## Decision question
+## Decision context
 
-Should Cosmic Crystals remain a Phaser 3 + TypeScript + Capacitor browser-first game, or switch to a native-capable engine before implementation?
+We evaluated the earlier Phaser 3 + TypeScript + Capacitor browser-first approach against native-capable alternatives before implementation. Godot 4.7.2 + GDScript is now **adopted for the technology spike**, with final production acceptance held open until Android/web export and device measurements are recorded in [M0 #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4). See [ADR-001](DECISIONS.md) and the [milestone register](MILESTONES.md).
 
 ## Constraints
 
@@ -110,6 +110,8 @@ docs/
 **Success:** Stable full match resolution, no duplicate input while resolving, no major device/browser blockers, reasonable build/download size, and clear implementation path for required platform services.
 
 ## Production sign-off and next steps
+
+Acceptance results must be recorded using the test matrix in [QA_TEST_PLAN.md](QA_TEST_PLAN.md), with the decision mirrored in [PROJECT_STATUS.md](PROJECT_STATUS.md). No app-store readiness is implied by a passing headless CI run.
 
 - Godot+GDScript is now reflected in README, TECHNICAL_ARCHITECTURE.md, ROADMAP.md and BUILD_PROMPT.md. Do not revert to Phaser without an explicit decision.
 - Maintain Godot-specific GitHub issues for engine bootstrap and validation.
