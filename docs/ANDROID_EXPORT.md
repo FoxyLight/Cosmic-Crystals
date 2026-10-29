@@ -1,6 +1,6 @@
 # Android and Web Validation Guide (Godot 4.7.2)
 
-**Status:** Instructions only. No device-based Android APK/AAB or web export has yet been verified.
+**Status (2026-10-29):** GitHub Actions now **successfully generates** an Android debug APK and Godot HTML5/Web artifact ([CI run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)). No Android *device installation*, browser runtime check, or release-signed AAB has been verified.
 
 ## 1. Open and run the prototype
 
@@ -13,9 +13,12 @@ Press **F6** on `scenes/Prototype.tscn` or **F5** to run the main scene. In the 
 - Clears resolve gravity/refill and cascades.
 - Collect 30 crystals within 18 moves; tap after winning or losing to restart. Press R on desktop to restart.
 
-This is an early engine spike with instant board resolution and visual highlight feedback, not fully animated swap/fall sequences.
+The M1 prototype now plays ordered swap/rollback, clear, drop and refill animations with input locked during resolution. The **STRESS 30S** button is a synthetic drawing workload that displays FPS; it does not simulate the final game's particles.
 
-## 2. Run automated rules tests
+## 2. CI artifacts and automated rules tests
+
+Open the [successful GitHub Actions run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043). In **Artifacts**, download `cosmic-crystals-android-debug` (APK) or `cosmic-crystals-web` (HTML/JS/WASM/PCK). Extract the ZIP on your computer. These are **seven-day artifacts** signed for development only, not long-lived release links. See [M0/M1 Implementation](M0_M1_IMPLEMENTATION.md) for details.
+
 
 With the Godot executable on `PATH`:
 
@@ -35,14 +38,14 @@ Follow the [Godot 4.7 Android export guide](https://docs.godotengine.org/en/4.7/
 1. Install **OpenJDK 17**, Android Studio/SDK, Android SDK Platform Tools, and the version-matched Godot export templates.
 2. In Godot **Editor Settings**, set Java SDK and Android SDK paths.
 3. Open **Project > Export**, add an **Android** preset and configure a unique package ID (replace any `com.example.*` placeholder).
-4. Export a **debug APK** to a location outside Git and install on a connected Android device with `adb install -r <path-to-apk>`.
+4. Use either the uploaded CI APK or locally export a **debug APK** outside Git, then install on an ARM64 Android phone with `adb install -r <path-to-apk>`. CI generates a new temporary debug signing key each run; if an earlier debug build has a different signer, you may need to uninstall first, which may clear saved app data.
 5. Verify swipes, two-tap swaps, board legibility, back/pause/resume, restart, screen cutouts, battery drain, and 30-second effects stress behavior.
 
 Never commit keystores or export credentials. `.gitignore` excludes common signing formats.
 
 ## 4. Export an AAB for Google Play
 
-Android App Bundles are the expected Play Store upload format. Install/configure Android SDK and appropriate Godot Android/Gradle build templates, generate a release signing keystore outside the repository, configure release signing and disable debug export before generating AAB.
+Android App Bundles are the expected Play Store upload format. This project's current CI only builds an **APK using pre-built export templates**. To produce an **AAB**, install/configure Android SDK and Godot's **Gradle Android Build template**, enable `gradle_build/use_gradle_build`, select AAB export format, generate a release signing keystore **outside** the repository, configure release signing and disable debug export. The CI ephemeral debug key is not a Play release signing identity.
 
 Reference: [Android Developers' Godot export guide](https://developer.android.com/games/engines/godot/godot-export).
 
@@ -57,7 +60,7 @@ Follow the [Godot 4.7 web export guide](https://docs.godotengine.org/en/4.7/tuto
 3. Prefer the default **single-threaded** web export initially.
 4. Export `index.html` with its associated support files to a `dist/` directory.
 5. Serve the output from a local HTTP server (do not rely on opening it with a `file://` URL).
-6. Verify touch and input in desktop Chromium/Firefox, Android Chrome, and iOS Safari if available.
+6. Verify touch and input in desktop Chromium/Firefox, Android Chrome, and iOS Safari if available. The fact that CI produced a Web artifact does **not** prove browser compatibility.
 
 Web export requires WebAssembly and WebGL 2.0. Godot 4 C# projects cannot export to web; this is a GDScript project intentionally.
 
@@ -76,11 +79,14 @@ Use [Engine Evaluation](ENGINE_EVALUATION.md) to record these separately for eac
 | Web compatibility | Browser/OS/device, errors, first load time |
 | Interruptions | Home, lock, orientation, incoming calls |
 
-A successful headless GitHub Actions run proves that scripts parse and deterministic rules tests run, **not** that the game has been performance-tested or that APK/AAB export succeeds.
+The documented [successful GitHub Actions run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043) proves deterministic checks and **web/debug APK file generation**, but not real-device/browser performance, Android installation, a Gradle AAB, release signing or Play acceptance.
 
 ## 7. Immediate next prototype improvements
 
-- Animate crystal swaps, clear, gravity and refill through events instead of instant board replacement.
-- Add an optional 30-second high-particle stress test scene with an FPS indicator.
+- [x] Introduce ordered swap, rollback, clear, gravity and refill visual events in the prototype.
+- [ ] Manually verify animations, input locking and responsiveness on a real Android phone.
+- [x] Add a 30-second **synthetic draw** stress mode and FPS readout.
+- [ ] Record real Android FPS/RAM/thermal results; later benchmark production particle art.
 - Add orientation and safe-area tests across portrait Android devices.
-- Track Android and web export results in GitHub Issue #4.
+- [x] Record successful automated Android debug APK and Web export artifacts.
+- [ ] Track physical-device and browser validation in GitHub Issue #4.
