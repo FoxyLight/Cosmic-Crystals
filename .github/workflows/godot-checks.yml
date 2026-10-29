@@ -61,3 +61,55 @@ jobs:
           path: build/web/
           if-no-files-found: error
           retention-days: 7
+
+  android-debug-export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android command line SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          test -x "$ANDROID_HOME/platform-tools/adb"
+      - name: Download Godot 4.7.2 editor
+        run: |
+          curl --fail --location --retry 3 \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip" \
+            --output godot.zip
+          unzip -q godot.zip
+          chmod +x Godot_v4.7.2-stable_linux.x86_64
+          mv Godot_v4.7.2-stable_linux.x86_64 godot
+      - name: Install matching Android export templates
+        run: |
+          curl --fail --location --retry 3 \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz" \
+            --output godot-templates.tpz
+          unzip -q godot-templates.tpz -d extracted
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.7.2.stable"
+          cp extracted/templates/* "$HOME/.local/share/godot/export_templates/4.7.2.stable/"
+      - name: Generate ephemeral debug signing key and export APK
+        run: |
+          mkdir -p "$HOME/.android" build/android
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+            -storepass android -keypass android -alias androiddebugkey -keyalg RSA \
+            -keysize 2048 -validity 10000 -dname "CN=Cosmic Crystals Debug,OU=CI,O=Prototype,C=US"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$HOME/.android/debug.keystore"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
+          ./godot --headless --path . --editor --quit
+          ./godot --headless --path . --export-debug Android build/android/cosmic-crystals-debug.apk
+          test -s build/android/cosmic-crystals-debug.apk
+          du -h build/android/cosmic-crystals-debug.apk
+      - name: Upload debug APK for device testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: cosmic-crystals-android-debug
+          path: build/android/cosmic-crystals-debug.apk
+          if-no-files-found: error
+          retention-days: 7
