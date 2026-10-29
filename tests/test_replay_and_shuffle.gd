@@ -87,6 +87,7 @@ func _test_ui() -> void:
 		quit(1)
 		return
 	var game: Node = packed.instantiate()
+	game.set("practice_mode", true)
 	root.add_child(game)
 	await process_frame
 	_check(game.get_script() != null, "Playable script is attached")

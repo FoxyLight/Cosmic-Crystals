@@ -30,6 +30,7 @@ func _fixture(seed: int):
 
 func _fresh_game(scene: PackedScene) -> Node:
 	var game: Node = scene.instantiate()
+	game.set("practice_mode", true)
 	root.add_child(game)
 	_ok(game.get_script() != null, "Game scene script must be compiled and attached")
 	_ok(game.get("board") != null, "Game scene must initialize a board")

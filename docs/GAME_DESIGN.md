@@ -1,7 +1,7 @@
 # Game Design Document
 
-**Project:** Cosmic Crystals: A Starweaver's Journey  
-**Status:** Design specification; not evidence of implemented code  
+**Project:** Cosmic Crystals: A Starweaver's Journey
+**Status:** M3 implementation plus future design; new human Android acceptance pending
 **Last updated:** 2026-10-29
 
 ## 1. Vision
@@ -56,12 +56,12 @@ The Great Eclipse has silenced the galaxy. As a **Starweaver**, the player colle
 
 | Crystal | Visual identity | Palette |
 | --- | --- | --- |
-| Nebula Amethyst | Faceted diamond | Nebula violet `#7C4DFF` |
-| Solar Amber | Six-ray sunburst with warm nucleus | Rich orange-gold `#ED9B18`, dark-brown edge `#733907` |
-| Quantum Sapphire | Pointed hexagon | Starlight cyan / blue `#39D5FF` |
-| Plasma Ruby | Angular star | Plasma pink `#FF66BF` |
-| Aurora Emerald | Teardrop | Aurora mint `#44E3B2` |
-| Lunar Opal | Tall fractured ice shard (prototype silhouette) | Frosted blue-white `#D0EDFF`, navy edge `#2F5C88` |
+| Nebula Amethyst | Faceted diamond | Nebula violet `#B566FF` |
+| Solar Amber | Six-ray sunburst with warm nucleus | Golden amber `#FFC442`, dark-brown edge `#733907` |
+| Quantum Sapphire | Pointed hexagon | Royal blue `#3D65F5` |
+| Plasma Ruby | Angular star | Plasma pink `#FF4F88` |
+| Aurora Emerald | Teardrop | Vibrant green `#24EE78` |
+| Lunar Opal | Tall fractured ice shard (prototype silhouette) | Frosted blue-white `#CAF7FF`, navy edge `#2F5C88` |
 
 Color **and** silhouette must identify each type. Highlight, selected, special, and disabled states need distinct treatment. **Mobile feedback (2026-10-29):** the first yellow and white pieces were too similar. The procedural prototype now uses a stronger warm Solar Amber, icy blue-white Lunar Opal, six unique crystal contours, dark per-kind outlines, and hue-matched facets. See [Crystal Visual Identity](VISUAL_PALETTE.md) for exact fill/edge/facet tokens, automated assertions and remaining Android device acceptance checks. Do not treat these prototype shapes as finalized art.
 
@@ -78,18 +78,18 @@ Design decision for implementation: prioritize straight-five detection over T/L 
 
 **Combination behavior** is a balancing item. Initially implement and test at least Beam+Beam, Bomb+Bomb, and Beam+Bomb, then define Supernova combinations explicitly before shipping. Never silently treat an unsupported special combination as a normal swap.
 
-**Implementation status (M2 prototype, 2026-10-29):** The first playable Star Beam, Cosmic Bomb, Supernova and Nova Pulse rules are now in [CosmicBoard](../scripts/cosmic_board.gd) and documented with first-pass combo behavior in [M2 Gameplay Guide](M2_SPECIALS_NOVA.md). This prototype supports swap activation without a 3-match, one initial special creation per move, and chain-triggered blast unions. Exact balancing and Android acceptance of the new asteroid slice remain outstanding; see M2 issue #6.
+**Implementation status (M2 prototype, 2026-10-29):** The first playable Star Beam, Cosmic Bomb, Supernova and Nova Pulse rules are now in [CosmicBoard](../scripts/cosmic_board.gd) and documented with first-pass combo behavior in [M2 Gameplay Guide](M2_SPECIALS_NOVA.md). This prototype supports swap activation without a 3-match, one initial special creation per move, and chain-triggered blast unions. The asteroid build 9101 passed player smoke; detailed tuning and new campaign/visual acceptance remain open in #6/#7/#8.
 
 ## 5. Signature power: Nova Pulse
 
-- Successful matches generate Nova energy; cascades and special combinations award configurable bonuses.
+- Successful matches generate Nova energy; cascades and special combinations use the shared charge constants.
 - A visible Nova Meter fills and communicates the charged state.
 - When full, tapping/clicking the Nova control enters **targeting mode**.
 - Selecting a board tile clears its entire row and column, damaging blockers per standard rules and counting cleared crystals toward objectives.
 - Nova Pulse consumes **zero** regular moves, then resets the meter to empty.
 - The player can cancel targeting without using the charge.
 - Targeting is unavailable while a board animation is in flight.
-- Prototype values: charge threshold 20, +1 per cleared crystal, +4 per triggered special, capped at 20. These are **currently constants**, not yet per-level data. Move threshold and bonuses to level data before M3 balancing is finalized.
+- Shared Nova values remain named constants: threshold 20, +1 per cleared crystal, +4 per triggered special, capped at 20. M3 introduces Nova in level 5; further rate tuning remains a balance decision.
 
 Balance goal: powerful enough to rescue a tough board, but infrequent enough that planning matters.
 
@@ -102,10 +102,7 @@ adjacent cleared crystal, including special-cleared crystals. Simultaneous
 effects/chain powers are unioned; later cascades can damage again. Beams/Nova
 pass through rocks. Supernova color clears damage rocks by crystal adjacency;
 double Supernova hits all cells. At zero HP the rock disappears before gravity.
-Only crystals award score/collection/Nova energy. The prototype now requires
-30 crystals **and all six rocks**, within the existing 18 moves. This is an
-untuned mechanics test, not a five-level campaign. See [asteroid rules and
-acceptance checklist](M2_ASTEROIDS.md); physical Android acceptance is pending.
+Only crystals award score/collection/Nova energy. The legacy 30-crystal/six-rock/18-move round remains for regressions; the campaign now has five authored configurations. The asteroid baseline passed human smoke; new M3 acceptance is pending. See [asteroid rules](M2_ASTEROIDS.md) and [campaign checklist](M3_LYRA_CAMPAIGN.md).
 
 **MVP objectives**
 
@@ -116,19 +113,17 @@ acceptance checklist](M2_ASTEROIDS.md); physical Android acceptance is pending.
 
 Each level is a data file: id, board or generation seed, available types, moves, goal set, obstacles, star thresholds, tutorial cues. Level rules should be configurable without engine edits.
 
-## 7. Progression
+## 7. Implemented Lyra progression (M3)
 
-**MVP:** five distinct, tested levels in the Lyra constellation.
+Five authored levels now form the journey: First Starlight (matching),
+Starweaver's Spark (forge Beams), Asteroid Passage (durability), Cosmic Convergence
+(Bomb/Supernova/combos), Lyra's Awakening (all + Nova). Each has validated data,
+a stable seeded opening, goals/budget, tutorial and star thresholds.
+[Exact configuration/evidence](M3_LYRA_CAMPAIGN.md).
 
-1. Introduction: single-type collection and swap tutorial.
-2. Two-type collection and limited moves.
-3. Create and trigger Star Beam.
-4. Clear asteroid blockers.
-5. Combine collection, blockers, and Nova Pulse.
-
-**Expanded vision:** 20 levels across four constellations, as advertised by the separately published site. Not yet verified in this repository. Build after the five-level vertical slice is stable.
-
-Complete a level to unlock the next node. Three-star ranking should use per-level score thresholds and/or remaining-move bonuses; choose one consistent method and tune via playtesting. Save earned stars as the best performance, not just last attempt.
+Win all goals after cascades to unlock the next node. Rating adds 25 per unused
+move to match score; win 1-3 stars, loss zero. Independent best records persist
+through replay/restart. Exactly five nodes; expansion stays M7.
 
 ## 8. Screens
 
@@ -138,7 +133,7 @@ cards and Nova below on phones, and an adjacent HUD on wide desktops. Help
 explains powers/rocks/Nova; pause resumes without changing the board. Diagnostic
 controls are absent from the player HUD. Both victory and defeat keep a single
 intentional Play again control and show final score; defeat shows unmet goals.
-This does not implement the planned home/map/campaign/settings journey below.
+M3 now adds Home, the five-node map, campaign flow, local records and reduced motion. Audio/full settings remain later work.
 See [Visual Pass](VISUAL_PASS.md).
 
 

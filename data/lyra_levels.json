@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "levels": [
+    {
+      "kinds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "powers": [],
+      "nova": false,
+      "asteroids": {},
+      "starter_powers": {},
+      "id": 1,
+      "name": "First Starlight",
+      "seed": 1701,
+      "moves": 18,
+      "goals": [
+        {
+          "type": "collect",
+          "kind": -1,
+          "target": 24
+        }
+      ],
+      "star_scores": [
+        0,
+        500,
+        700
+      ],
+      "tutorial": "Swap neighbors to match 3. Collect 24 crystals. Unused moves add score for stars."
+    },
+    {
+      "kinds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "powers": [
+        1,
+        2
+      ],
+      "nova": false,
+      "asteroids": {},
+      "starter_powers": {},
+      "id": 2,
+      "name": "Starweaver's Spark",
+      "seed": 1702,
+      "moves": 22,
+      "opening": "four_match",
+      "goals": [
+        {
+          "type": "collect",
+          "kind": -1,
+          "target": 36
+        },
+        {
+          "type": "beams",
+          "target": 1
+        }
+      ],
+      "star_scores": [
+        0,
+        700,
+        1000
+      ],
+      "tutorial": "Swap the glowing pair to match 4. Your Beam clears a line when swapped.",
+      "hint": [
+        27,
+        19
+      ]
+    },
+    {
+      "kinds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "powers": [
+        1,
+        2
+      ],
+      "nova": false,
+      "asteroids": {
+        "27": 1,
+        "36": 1,
+        "42": 2
+      },
+      "starter_powers": {},
+      "id": 3,
+      "name": "Asteroid Passage",
+      "seed": 1703,
+      "moves": 18,
+      "goals": [
+        {
+          "type": "collect",
+          "kind": -1,
+          "target": 40
+        },
+        {
+          "type": "asteroids",
+          "target": 3
+        }
+      ],
+      "star_scores": [
+        0,
+        1000,
+        1400
+      ],
+      "tutorial": "Match beside rocks or blast them. Two pips become one, then they break."
+    },
+    {
+      "kinds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "powers": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "nova": false,
+      "asteroids": {},
+      "starter_powers": {
+        "27": 3,
+        "28": 4
+      },
+      "id": 4,
+      "name": "Cosmic Convergence",
+      "seed": 1704,
+      "moves": 20,
+      "goals": [
+        {
+          "type": "collect",
+          "kind": -1,
+          "target": 50
+        },
+        {
+          "type": "powers",
+          "target": 2
+        }
+      ],
+      "star_scores": [
+        0,
+        1100,
+        1600
+      ],
+      "tutorial": "Swap the Bomb and Supernova together. Match a T/L or 5 to forge more powers."
+    },
+    {
+      "kinds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "powers": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "nova": true,
+      "asteroids": {
+        "18": 2,
+        "21": 1,
+        "42": 1,
+        "45": 2
+      },
+      "starter_powers": {
+        "27": 2
+      },
+      "id": 5,
+      "name": "Lyra's Awakening",
+      "seed": 1705,
+      "moves": 22,
+      "goals": [
+        {
+          "type": "collect",
+          "kind": -1,
+          "target": 60
+        },
+        {
+          "type": "asteroids",
+          "target": 4
+        },
+        {
+          "type": "nova",
+          "target": 1
+        }
+      ],
+      "star_scores": [
+        0,
+        1500,
+        2100
+      ],
+      "tutorial": "Fill Nova by matching. Tap Nova, then a tile: a cross blast costs no move."
+    }
+  ]
+}

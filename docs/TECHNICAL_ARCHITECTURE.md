@@ -1,135 +1,77 @@
 # Technical Architecture
 
-**Direction:** Android-first **Godot 4.7.2 (GDScript)**, with a shared web and future iOS project. This supersedes the earlier Phaser/Vite/Capacitor proposal. Production sign-off is conditional on APK/AAB, browser export, and physical-device tests.
+Godot 4.7.2 standard, GDScript, Compatibility renderer. Android first; shared
+Web export. Release AAB/iOS/store work is separate from debug previews.
 
-## Working Godot prototype
+## Implemented layers
 
-**Presentation pass:** `scripts/game_layout.gd` provides shared viewport/safe-area
-geometry for HUD controls, rendering and hit targets. The base canvas is 400x760
-with aspect expansion; desktop uses a side column and phones use a vertical
-one-screen composition. `scripts/game_hud.gd` owns native Label/Button panels,
-font variations, meters, modal focus and result/help/pause rendering. The
-controller still plays the same immutable rule events. Pointer events reach
-board `_unhandled_input` only after GUI controls have consumed their own input,
-preventing double Nova toggles. The headless import runs before gameplay tests
-so font/SVG dependencies are imported; every command retains the strict log
-error guard. [Presentation contract and test evidence](VISUAL_PASS.md).
+| File | Responsibility |
+| --- | --- |
+| `scripts/board.gd` | Seeded matching, swaps, legal moves, physics; kind list defaults to six |
+| `scripts/cosmic_board.gd` | Specials/Nova/asteroids, union damage, segmented gravity, inventory shuffle; default mechanics unchanged |
+| `data/lyra_levels.json` | Five authored seeds/openings, mechanics, goals, budgets, ratings, tutorials |
+| `scripts/level_catalog.gd` | Validate/catalog/copy definitions; reject invalid or disabled-mechanic goals |
+| `scripts/game_session.gd` | Level board/counters, pending-turn token, commit boundary, objectives/result/rating |
+| `scripts/progress_store.gd` | Schema-1 records, unlocks, tutorials/settings, safe writes/backup/recovery |
+| `scripts/prototype.gd` | Campaign controller and existing animated board view; historical filename retained |
+| `scripts/game_layout.gd` | Shared safe-area geometry; phone stack / desktop side HUD |
+| `scripts/game_hud.gd` | Native goals/stats/modals, focus, confirmations, results/earned stars |
+| `scripts/campaign_view.gd` | Home, five-node map, selected-level preview, state display/settings |
 
+There is no backend/account/cloud dependency. No additional constellation is
+created. Original code-native art and bundled SIL OFL fonts work offline.
 
-**M2 asteroid extension:** `CosmicBoard.asteroids` is a separate 64-entry 0–2
-durability array; blocked cells have no gem or special. All events carry
-`asteroids_before/after`. A clear wave unions direct/adjacent hits, emits
-`asteroid_hit` after crystal clear/reward and before fall, then resolves cascades.
-Fixed rocks divide columns into independently refilled regions (`segment_top`
-on spawns); destruction reconnects regions. The shuffle permutes only movable
-gem/power pairs, preserving rock positions/HP and exact inventory. The renderer
-uses event snapshots for hits/cracks/destruction and locks input until playback
-ends. Both crystal and rock goals are checked after resolution. See
-[M2 Asteroids](M2_ASTEROIDS.md) for damage semantics, bounded recovery limitations,
-862,246 rules assertions and 46 real-scene assertions. All original suites and
-strict CI error-log validation remain active; physical Android QA is pending.
+## Turn contract
 
-- `project.godot`: Compatibility renderer and portrait-oriented baseline.
-- `scenes/Prototype.tscn`: one-screen test scene.
-- `scripts/board.gd`: stable seeded 8×8 generation/matching and M1 turn/event behavior.
-- `scripts/cosmic_board.gd`: M2 subclass with a parallel 64-entry special array, deterministic Star Beam/Bomb/Supernova creation/trigger chains, capped Nova energy, zero-move row/column target action and dual gem/special event snapshots.
-- `scripts/prototype.gd`: procedural starfield/crystals, readable power icons, HUD with Nova meter and cancelable targeting, touch/swipe input, animated gem+power events with phase locking, collection goal and synthetic draw/FPS stress test.
-- `tests/test_board.gd`: original 125-seed M1 rules and animation event invariants.
-- `tests/test_powers.gd`: seeded M2 special formation/activation, combos, Nova zero-cost/charge, event replay and overlap deduplication.
-- `tests/test_power_matrix.gd`: 96 ordered two-power combinations across center/edge and horizontal/vertical positions, independently expected blast union and exact gem/power/gravity/score invariants.
-- `tests/test_power_scene.gd`: real scene-controller creation of both Beam orientations, Bomb and Supernova, a Beam+Bomb swap and NOVA target/cancel controls.
-- `.github/workflows/godot-checks.yml`: downloads Godot 4.7.2, parses/imports and smoke-tests the scene, runs headless seeded tests, and exports a debug Android APK plus HTML5 artifacts.
+`GameSession.begin_swap/begin_nova` invokes deterministic rules and returns
+immutable events. Board resolution remains synchronous; score, moves, objectives
+and results are **not committed yet**. A pending-turn token locks a second
+action. The scene plays every swap/rollback, clear, reward, rock hit and fall/
+cascade event, then calls `commit_outcome` once. Duplicate/stale callbacks cannot
+grant twice. Victory takes priority on the last move and requires all goals.
+Nova retains zero-move/reset/no-self-charge behavior.
 
-**Verified automatically:** Android debug APK and Web artifacts generated, parsing/tests/scenes pass. **Not yet verified:** actual APK install, browser runtime, touch/UX, measured graphics performance, AAB or iOS export.
+UI navigation/restart is rejected during effects; Android Back queues pause
+until settlement. Restart/leave confirmations act only while idle. Results use
+explicit GUI buttons; extra touches cannot leak into a fresh board. Board input
+uses `_unhandled_input`, after GUI controls consume their own pointer events.
 
-## Production architecture
+## Level configuration
 
-Keep the rules independent of Godot Nodes and animation timing. Target structure:
+The catalog validates five ordered IDs, seeds/budgets, 3-6 distinct kind IDs,
+power IDs, Nova flag, 1/2-HP rocks, max three supported goals, ordered thresholds
+and starter-power occupancy. Session setup resets seeded RNG after kind setup;
+level 2 has an authored four-match opening. Powers travel with their crystals.
 
-```text
-scenes/
-  Home.tscn
-  GalaxyMap.tscn
-  Puzzle.tscn
-  puzzle/BoardView.tscn
-  ui/GameplayHUD.tscn
-scripts/
-  domain/
-    board.gd
-    match_finder.gd
-    turn_resolver.gd
-    gravity.gd
-    special_pieces.gd
-    objectives.gd
-    nova.gd
-  gameplay/
-    session.gd
-    input_controller.gd
-  persistence/
-    progress_store.gd
-data/levels/
-assets/
-tests/
-```
+Only small board hooks changed: generation/refill select from `kinds`, reward
+creation checks `enabled_powers`, and `can_use_nova` checks the stage flag. With
+default fields, every original suite retains its prior behavior. Match scanning,
+scoring, unioned footprints, damage and shuffle algorithms are not rewritten.
+See [powers](M2_SPECIALS_NOVA.md) and [rocks](M2_ASTEROIDS.md).
 
-These directories are architectural targets, not promises that they exist today.
+## Progress and persistence
 
-### State and turn resolution
+`user://lyra-progress.json`, schema 1: five completed flags, five best rating
+scores/stars, derived highest-unlocked, seen tutorial IDs, reduced motion. Wins
+record only after stable terminal commit. No unfinished board is persisted.
+Replay independently maximizes best score/stars.
 
-The rules engine still calculates the final board state synchronously, but now returns ordered, immutable `before`/`after` frames. The scene animates each frame sequentially without affecting model outcomes, with an explicit `idle` / `resolving` / `finished` input lock. A production state machine will eventually distinguish swap, clear, fall, objective checks and Nova targeting:
+Writes validate, flush and verify `.tmp`, back up only a valid prior primary,
+and rename the temporary over the primary. Loading tries supported primary,
+backup, then defaults with a notice. Future schemas remain read-only. Browser
+storage unavailable -> a visible session-only warning. [Full policy](M3_LYRA_CAMPAIGN.md).
 
-```text
-IDLE -> SWAPPING -> VALIDATING
-  invalid -> RETURNING -> IDLE
-  valid -> RESOLVING -> CASCADING -> CHECK_GOALS -> IDLE / WON / LOST
-IDLE -> NOVA_TARGETING -> RESOLVING -> CHECK_GOALS
-       cancel -> IDLE
-```
+## Presentation and quality gates
 
-A tile must be collected/damaged only once per match resolution step; intersections must not double-count. Evaluate victory after every special or cascade finishes. Maintain deterministic seeded randomness and a guard against infinite cascades.
+400x760 canvas expands to the viewport. Native safe-area pixels convert to canvas
+units. Campaign captions reserve two readable lines. Bundled vector icons avoid
+system-glyph fallback; reduced motion shortens events without changing outcomes.
 
-### Domain data
+Ten pre-M3 suites stay active through explicit legacy-practice fixtures. Three
+new suites cover authored sessions, 120 balance runs, recovery and actual scene
+touch play through all five levels/reload. CI imports assets first and retains
+the strict Godot log guard. Version/manifest/checksum/signing checks remain;
+new checks inspect the exported catalog/licenses in actual APK/Web packages.
 
-The **event log** now includes separate gem and special snapshots, including falling power locations. M2 implemented a separate special-type array and Nova charge. Blocker durability and the two prototype goals are now implemented; next introduce configurable multi-goal levels, move budgets and versioned progression. Prefer typed GDScript classes and Resources/validated JSON for level data.
-
-Keep progress storage under Godot `user://`, version save schemas, and persist only completed, stable progress. Do not save a half-resolved turn.
-
-### Replay and deadlock protection
-
-The result phase must never interpret an ordinary board tap as “restart”. A visible overlay provides a dedicated PLAY AGAIN rectangle that requires both press and release inside it. The HUD, score, Nova charge and final board remain available until deliberate replay. Domain deadlock recovery now permutes the current gem and special inventories instead of calling `super.generate()`. It preserves color counts, produces a match-free board with a legal swap, emits an ordered `reshuffle` event, and leaves objective counters unaffected. See [QA](QA_TEST_PLAN.md) and [issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21).
-
-The inventory shuffle now excludes fixed blockers and preserves durability. It
-restores the original board and reports failure if its bounded search cannot
-recover an unsupported layout. No full-board regeneration is used. The
-30-crystal plus six-rock round remains provisional for M3 level design.
-
-### Input and visuals
-
-The prototype supports drag/swipe and tap-two-adjacent input through `_input`, selecting one orthogonal neighbor even for longer drags. It locks input while playing the ordered swap, rollback, clear, fall and refill effects. Future work: manual Android gesture QA, pause/restart interruption handling, safe areas, reduced motion and accessibility.
-
-### Tests and quality gates
-
-Headless tests cover M1 generation, invalid swaps, intersections/cascades/event continuity, plus M2 power formation, swap activation, combinations, Nova Pulse and gem/special event replay. Blockers, last-move outcomes and seeded replay stress are now covered in the asteroid suites. Pause/restart and save migrations remain later work.
-
-CI runs:
-
-```bash
-godot --headless --path . --editor --quit
-godot --headless --path . --script res://tests/test_board.gd
-godot --headless --path . --script res://tests/test_powers.gd
-godot --headless --path . --script res://tests/test_power_matrix.gd
-godot --headless --path . --script res://tests/test_power_scene.gd
-godot --headless --path . --quit-after 120
-```
-
-CI parser/tests and **successful debug APK/Web exports** do **not** substitute for physical-device/browser testing, AAB signing or store acceptance.
-
-## Platform notes
-
-- Native Android APK for device QA, signed AAB for Play release, using Android SDK, OpenJDK 17 and matching Godot export templates.
-- Godot web export uses Compatibility renderer, WebGL 2 and WebAssembly. Start with single-threaded export.
-- Use GDScript, not Godot 4 C#, so web export remains possible.
-- Prefer real-device measurements before introducing ads, in-app billing and analytics plugins.
-- Package iOS only after Android/web gameplay is stable.
-
-See [M2 Gameplay Guide](M2_SPECIALS_NOVA.md), [M0/M1 Implementation](M0_M1_IMPLEMENTATION.md) for the event protocol and successful CI artifact run, [Android/Web Export Guide](ANDROID_EXPORT.md), [Engine Evaluation](ENGINE_EVALUATION.md) and [Roadmap](ROADMAP.md).
+[QA](QA_TEST_PLAN.md) and [M3 acceptance](M3_LYRA_CAMPAIGN.md) distinguish code
+execution/exports from new human acceptance and platform measurements.

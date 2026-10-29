@@ -24,6 +24,7 @@ func _validate() -> void:
 		quit(1)
 		return
 	var game: Node = packed.instantiate()
+	game.set("practice_mode", true)
 	_check(game.get_script() != null, "Prototype must have an attached, compiled script")
 	if game.get_script() == null:
 		game.free()

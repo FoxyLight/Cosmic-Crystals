@@ -66,6 +66,7 @@ func _tap(position: Vector2, touch: bool = false) -> void:
 func _run() -> void:
 	_geometry()
 	var game = load("res://scenes/Prototype.tscn").instantiate()
+	game.set("practice_mode", true)
 	root.add_child(game)
 	await process_frame
 	var hud = game.hud

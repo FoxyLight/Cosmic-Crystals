@@ -14,6 +14,8 @@ const NOVA_MAX: int = 20
 var specials: Array[int] = []
 var nova_energy: int = 0
 var asteroids: Array[int] = []
+var enabled_powers: Array[int] = [BEAM_ROW, BEAM_COLUMN, BOMB, SUPERNOVA]
+var nova_enabled: bool = true
 
 
 func _init(seed_value: int = 20261029) -> void:
@@ -130,7 +132,7 @@ func play_swap(a: int, b: int) -> Dictionary:
 
 
 func can_use_nova() -> bool:
-	return nova_energy >= NOVA_MAX
+	return nova_enabled and nova_energy >= NOVA_MAX
 
 
 func use_nova(target: int) -> Dictionary:
@@ -225,15 +227,15 @@ func _find_reward(matched: Array[int], a: int, b: int) -> Dictionary:
 		var v: int = _run_length(index, false)
 		var score: int = 0
 		var kind: int = NONE
-		if h >= 5 or v >= 5:
+		if (h >= 5 or v >= 5) and enabled_powers.has(SUPERNOVA):
 			score = 3
 			kind = SUPERNOVA
-		elif h >= 3 and v >= 3:
+		elif h >= 3 and v >= 3 and enabled_powers.has(BOMB):
 			score = 2
 			kind = BOMB
-		elif h >= 4 or v >= 4:
+		elif (h >= 4 and enabled_powers.has(BEAM_ROW)) or (v >= 4 and enabled_powers.has(BEAM_COLUMN)):
 			score = 1
-			kind = BEAM_ROW if h >= 4 else BEAM_COLUMN
+			kind = BEAM_ROW if h >= 4 and enabled_powers.has(BEAM_ROW) else BEAM_COLUMN
 		if score > best_score:
 			best_score = score
 			best_kind = kind
@@ -423,7 +425,7 @@ func _fall_segment(col: int, top: int, bottom: int, before: Array[int],
 	var remaining: int = write_row - top + 1
 	while write_row >= top:
 		var dst: int = write_row * WIDTH + col
-		cells[dst] = rng.randi_range(0, KIND_COUNT - 1)
+		cells[dst] = random_kind()
 		specials[dst] = NONE
 		spawns.append({"from_row": write_row - remaining, "to": dst,
 			"kind": cells[dst], "special": NONE, "segment_top": top})

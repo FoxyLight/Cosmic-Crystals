@@ -33,6 +33,12 @@ version/name="0.1.0-spike"
 
 
 class AndroidVersionTests(unittest.TestCase):
+    def test_local_export_default_tracks_product_version(self):
+        root = Path(__file__).resolve().parents[1]
+        base = (root / "VERSION").read_text(encoding="utf-8").strip()
+        preset = (root / "export_presets.cfg").read_text(encoding="utf-8")
+        self.assertIn(f'version/name="{base}-local"', preset)
+
     def test_sequential_runs_and_reruns_are_distinct(self):
         a = calculate_version("0.2.0", 73, 1, SHA)
         b = calculate_version("0.2.0", 74, 1, SHA)
