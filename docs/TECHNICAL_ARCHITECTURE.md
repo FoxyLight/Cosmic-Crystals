@@ -80,6 +80,7 @@ CI runs:
 ```bash
 godot --headless --path . --editor --quit
 godot --headless --path . --script res://tests/test_board.gd
+godot --headless --path . --script res://tests/test_powers.gd
 godot --headless --path . --quit-after 120
 ```
 
