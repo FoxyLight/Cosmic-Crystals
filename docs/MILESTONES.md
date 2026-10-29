@@ -18,6 +18,8 @@ Each milestone is represented by a **dedicated GitHub tracking issue** with chec
 
 A milestone is **Done** only if all its exit criteria have demonstrable evidence (test run, tagged build, device/browser test notes or approved sign-off). An unchecked item is not complete merely because a plan describes it.
 
+**Latest Android test evidence (2026-10-29):** The player reports the latest gameplay smoke test **passed**. See [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md). This partially satisfies M0's physical APK playability and M1/M2's human feedback, **not** comprehensive hardware QA, browser, AAB or asteroid-blocker acceptance.
+
 ## Milestone register
 
 | ID | Milestone | Status at baseline | Depends on | Exit / acceptance evidence | GitHub |
