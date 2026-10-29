@@ -15,6 +15,7 @@
 - **Verified in PR #13 CI:** Web and Android debug APK artifacts generated, expanded event replay tests and 120-frame scene smoke test passed ([workflow](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)).
 - **Unverified:** device/browser runtime compatibility and measurements, AAB Gradle/release signing, Play distribution, physical-device input and thermal behavior.
 - **M1 in progress:** ordered turn events and basic swap/clear/drop animations are coded; manual device playtesting, last-move/interruption tests and production UI are pending.
+- **M4 visual accessibility patch (PR #14):** player feedback identified Solar Amber/white Lunar Opal confusion on Android. New warm/icy fills, dark per-kind outlines and unique geometric silhouettes are implemented with a separate headless visual regression test. Physical-device confirmation is pending; M4 remains open. See [Visual Identity](VISUAL_PALETTE.md).
 - **Missing product systems:** special pieces, asteroids, Nova Pulse, five complete levels, star map, local saving, tutorials, production audio and release flows.
 
 ## Milestone rollup
@@ -25,7 +26,7 @@
 | Animated core and resolution (M1) | [#3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) | In progress |
 | Special pieces, blockers and Nova (M2) | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) | Not started |
 | Five levels, map and saves (M3) | [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) | Not started |
-| Mobile UX, art and audio (M4) | [#8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) | Not started |
+| Mobile UX, art and audio (M4) | [#8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) | Contrast improvement in progress; full M4 still open |
 | End-to-end QA and release candidate (M5) | [#9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) | Not started |
 | Google Play release (M6) | [#10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10) | Not started |
 | Expanded content and iOS exploration (M7) | [#11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) | Deferred |

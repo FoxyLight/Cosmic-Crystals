@@ -70,11 +70,15 @@
 
 ### M4: Visual/audio/mobile UX | [Issue #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8)
 
-- [ ] Six uniquely shaped jewel-like crystals with clear selected/special states.
+**Device feedback:** Warm amber and white/ice opal were initially hard to distinguish. The procedural contrast fix is specified in [Crystal Visual Identity](VISUAL_PALETTE.md); only automated verification is available until the updated APK is playtested.
+
+- [x] Differentiate the six **prototype** crystal types by contour and dark per-kind outlines; add regression tests for warm Solar Amber vs icy Lunar Opal (PR #14).
+- [ ] Create production-quality jewel assets and distinct selected/special states.
 - [ ] Polished nebula backdrop, low-cost particle effects, feedback and constellations.
 - [ ] Responsive HUD and safe-area-aware portrait layouts.
 - [ ] Original/properly licensed music and sound with separate controls.
-- [ ] Reduced motion, visual clarity, contrast and smaller-device checks.
+- [ ] Obtain a physical Android re-test of Amber/Opal readability and document screen/device conditions.
+- [ ] Complete broader reduced-motion, visual clarity, contrast and smaller-device checks.
 
 ### M5: Cross-platform release candidate and QA | [Issue #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9)
 

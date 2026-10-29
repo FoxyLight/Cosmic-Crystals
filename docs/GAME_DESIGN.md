@@ -57,13 +57,13 @@ The Great Eclipse has silenced the galaxy. As a **Starweaver**, the player colle
 | Crystal | Visual identity | Palette |
 | --- | --- | --- |
 | Nebula Amethyst | Faceted diamond | Nebula violet `#7C4DFF` |
-| Solar Amber | Sunburst gem | Solar gold `#FFCB65` |
+| Solar Amber | Six-ray sunburst with warm nucleus | Rich orange-gold `#ED9B18`, dark-brown edge `#733907` |
 | Quantum Sapphire | Pointed hexagon | Starlight cyan / blue `#39D5FF` |
 | Plasma Ruby | Angular star | Plasma pink `#FF66BF` |
 | Aurora Emerald | Teardrop | Aurora mint `#44E3B2` |
-| Lunar Opal | Crescent / rounded moon | Silver-cyan |
+| Lunar Opal | Tall fractured ice shard (prototype silhouette) | Frosted blue-white `#D0EDFF`, navy edge `#2F5C88` |
 
-Color **and** silhouette must identify each type. Highlight, selected, special, and disabled states need distinct treatment.
+Color **and** silhouette must identify each type. Highlight, selected, special, and disabled states need distinct treatment. **Mobile feedback (2026-10-29):** the first yellow and white pieces were too similar. The procedural prototype now uses a stronger warm Solar Amber, icy blue-white Lunar Opal, six unique crystal contours, dark per-kind outlines, and hue-matched facets. See [Crystal Visual Identity](VISUAL_PALETTE.md) for exact fill/edge/facet tokens, automated assertions and remaining Android device acceptance checks. Do not treat these prototype shapes as finalized art.
 
 ## 4. Special pieces
 

@@ -5,7 +5,7 @@
 
 ## 1. Current automated coverage
 
-The repository currently runs `godot --headless --path . --editor --quit` and `godot --headless --path . --script res://tests/test_board.gd` plus a 120-frame scene smoke test in GitHub Actions.
+The repository runs Godot headless import, `tests/test_board.gd`, the new `tests/test_visuals.gd` style assertions and a 120-frame scene smoke test in GitHub Actions, plus Android debug APK and Web export jobs.
 
 **Evidence:** [original main branch run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782), plus [M0/M1 CI run with debug APK and Web artifacts](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043) on PR #13.
 
@@ -30,7 +30,15 @@ The expanded seeded board test covers 125 seeds, no starting matches, adjacent l
 
 All domain-level tests should be deterministic (fixed seed, fixed starting board, known expected events) and independent of visual tween timing.
 
-## 3. Android test matrix
+## 3. Crystal distinction / visual accessibility check
+
+Following Android playtest feedback (2026-10-29), Solar Amber and Lunar Opal need explicit readability coverage. [Crystal Visual Identity](VISUAL_PALETTE.md) records the six piece colors/outlines, distinctive sunburst versus ice-shard geometry and exact visual tokens.
+
+- **Automated:** run `godot --headless --path . --script res://tests/test_visuals.gd`; ensure palette/index invariants, warm/cool component separation, dark outlines and six unique contours pass. This is not a substitute for perception tests.
+- **Manual Android:** compare Amber and Opal at normal and dim screen brightness, during static board play and fast swapping/cascades. Check all six types are distinguishable by shape and fill, including on smaller displays.
+- **Pass condition:** testers can identify warm golden sun versus frosty blue-white shard without relying exclusively on hue. Record device, OS, brightness, result and screenshot if needed in [M4 issue #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8). **Pending physical-device confirmation.**
+
+## 4. Android test matrix
 
 Record at least:
 - **One modest Android device:** document model, Android version, display dimensions and refresh rate.
@@ -49,7 +57,7 @@ Run:
 
 **Provisional performance goal:** smooth 60 FPS where the device supports it, with no hangs/input loss and acceptable sustained play on modest hardware. Before M5 acceptance, establish recorded numerical floors for the selected test device classes; current hardware baselines are **unknown**.
 
-## 4. Browser and iOS test matrix
+## 5. Browser and iOS test matrix
 
 - Desktop Chrome and Firefox: first load, WebGL2/WASM support, aspect ratios, pointer swapping, resize and accessibility.
 - Android Chrome: touch, first load, background/resume, audio activation and memory.
@@ -58,7 +66,7 @@ Run:
 
 Browser runtime tests are **pending** despite successful CI Web export. A generated `.wasm`/HTML5 bundle does not establish browser usability.
 
-## 5. Release-level acceptance
+## 6. Release-level acceptance
 
 - All critical flows demonstrated end-to-end for five levels and one constellation.
 - No open critical or high-severity defects.
@@ -68,7 +76,7 @@ Browser runtime tests are **pending** despite successful CI Web export. A genera
 - Accessibility controls (silhouette, contrast, reduced motion, basic screen size and sound settings) verified.
 - No signing keys, credentials or unrelated user data checked into the repository.
 
-## 6. Issue hygiene / bug severity
+## 7. Issue hygiene / bug severity
 
 Use GitHub issues with a reproduction script, exact commit/build, device/OS/browser, expected vs actual, screenshot/log if appropriate, and a clear severity.
 
@@ -79,7 +87,7 @@ Use GitHub issues with a reproduction script, exact commit/build, device/OS/brow
 
 Critical/high defects must be resolved before M5 closure. Lower severity may be explicitly accepted with evidence and an owner once ownership is assigned.
 
-## 7. Evidence log template
+## 8. Evidence log template
 
 For each validation, record:
 

@@ -22,6 +22,8 @@ jobs:
         run: ./godot --headless --path . --editor --quit
       - name: Test deterministic match-3 board engine
         run: ./godot --headless --path . --script res://tests/test_board.gd
+      - name: Verify gem contrast and distinct silhouettes
+        run: ./godot --headless --path . --script res://tests/test_visuals.gd
       - name: Run the prototype scene headlessly for 120 frames
         run: ./godot --headless --path . --quit-after 120
 
