@@ -11,7 +11,7 @@
 - `tests/test_board.gd`: seeded pure-rule tests, intersection counting and stable-board checks.
 - `.github/workflows/godot-checks.yml`: downloads Godot 4.7.2, parses/imports project and runs headless tests.
 
-**Verified:** Initial GitHub Actions run completed successfully. **Not yet verified:** APK, AAB, web export, actual phone touch/UX, graphics stress test, iOS export.
+**Verified automatically:** Android debug APK and Web artifacts generated, parsing/tests/scenes pass. **Not yet verified:** actual APK install, browser runtime, touch/UX, measured graphics performance, AAB or iOS export.
 
 ## Production architecture
 
@@ -80,7 +80,7 @@ godot --headless --path . --editor --quit
 godot --headless --path . --script res://tests/test_board.gd
 ```
 
-CI parser/tests do **not** substitute for Android export or physical-device testing.
+CI parser/tests and **successful debug APK/Web exports** do **not** substitute for physical-device/browser testing, AAB signing or store acceptance.
 
 ## Platform notes
 
