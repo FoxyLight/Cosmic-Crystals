@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-29  
 **Status:** GODOT PROTOTYPE IN PROGRESS — approved for implementation, still awaiting Android/web export and physical-device validation  
-**Context:** The project aims for Android first, with web and iOS targets. A Godot 4.7.2 GDScript prototype and headless tests now exist in the repository's feature branch.
+**Context:** The project aims for Android first, with web and iOS targets. A Godot 4.7.2 GDScript prototype and headless tests now exist in the repository's main branch.
 
 ## Decision question
 
