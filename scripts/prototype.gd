@@ -3,6 +3,7 @@ extends Control
 ## 30-second drawing stress check. Specials, blockers and saves are still planned.
 
 const BoardScript = preload("res://scripts/board.gd")
+const Visuals = preload("res://scripts/crystal_visuals.gd")
 const GOAL: int = 30
 const STARTING_MOVES: int = 18
 
@@ -11,10 +12,6 @@ const CLEAR_SECONDS: float = 0.19
 const FALL_SECONDS: float = 0.27
 const RESHUFFLE_SECONDS: float = 0.28
 
-var crystal_colors: Array[Color] = [
-	Color("#7C4DFF"), Color("#FFCB65"), Color("#39D5FF"),
-	Color("#FF66BF"), Color("#44E3B2"), Color("#CDEBFF")
-]
 var board = null
 var display_cells: Array[int] = []
 var moves_left: int = STARTING_MOVES
@@ -229,30 +226,48 @@ func _draw_hud() -> void:
 
 
 func _draw_crystal(center: Vector2, radius: float, kind: int, opacity: float = 1.0) -> void:
-	if kind < 0 or kind >= crystal_colors.size():
+	if kind < 0 or kind >= Visuals.FILL_HEX.size():
 		return
-	var base: Color = crystal_colors[kind]
+
+	# Dark, GEM-SPECIFIC backing gives a visible edge even on bright screens.
+	# Outer contour and smaller inner fill keep the edge thickness proportional
+	# to the crystal, including during animated shrinking/fading.
+	var base: Color = Visuals.fill_color(kind)
+	var outline: Color = Visuals.outline_color(kind)
+	var facet: Color = Visuals.facet_color(kind)
+	var glint: Color = Visuals.glint_color(kind)
 	base.a = opacity
-	draw_circle(center, radius * 1.07, Color(base.r, base.g, base.b, 0.13 * opacity))
-	var sides: int = 5
-	match kind:
-		0: sides = 4
-		1: sides = 8
-		2: sides = 6
-		3: sides = 5
-		4: sides = 3
-		5: sides = 7
-	var polygon: PackedVector2Array = PackedVector2Array()
-	for i in range(sides):
-		var angle: float = -PI * 0.5 + TAU * float(i) / float(sides)
-		var modulation: float = 0.92 if i % 2 == 0 else 1.0
-		polygon.append(center + Vector2(cos(angle), sin(angle)) * radius * modulation)
-	draw_colored_polygon(polygon, base)
-	for j in range(sides):
-		var edge: Color = base.lightened(0.35)
-		edge.a = opacity
-		draw_line(polygon[j], polygon[(j + 1) % sides], edge, 1.4, true)
-	draw_circle(center - Vector2(radius * 0.20, radius * 0.23), radius * 0.19, Color(1, 1, 1, 0.66 * opacity))
+	outline.a = opacity
+	facet.a = opacity * 0.86
+	glint.a = opacity * 0.95
+
+	# Soft glow is intentionally weak, so pale opal never bleaches into amber.
+	draw_circle(center, radius * 1.13, Color(base.r, base.g, base.b, opacity * 0.09))
+	draw_colored_polygon(Visuals.shape_points(kind, center, radius * 1.06), outline)
+	draw_colored_polygon(Visuals.shape_points(kind, center, radius * 0.91), base)
+
+	# Small interior facets carry each kind's own hue, instead of a shared
+	# white sparkle that makes bright pieces hard to identify on phones.
+	var facets: PackedVector2Array = PackedVector2Array([
+		center + Vector2(-0.25, -0.21) * radius,
+		center + Vector2(0.00, -0.58) * radius,
+		center + Vector2(0.27, -0.20) * radius,
+		center + Vector2(-0.08, 0.20) * radius
+	])
+	draw_colored_polygon(facets, facet)
+
+	if kind == 1:
+		# Solar Amber: glowing golden nucleus inside SIX pointed solar rays.
+		draw_circle(center + Vector2(0.04, 0.13) * radius, radius * 0.25, facet)
+		draw_circle(center + Vector2(-0.06, -0.09) * radius, radius * 0.08, glint)
+	elif kind == 5:
+		# Lunar Opal: icy vertical fracture; clearly not a yellow sunburst.
+		draw_line(center + Vector2(-0.17, -0.52) * radius,
+			center + Vector2(0.16, 0.58) * radius, facet, maxf(1.0, radius * 0.075), true)
+		draw_line(center + Vector2(0.16, 0.58) * radius,
+			center + Vector2(0.36, 0.21) * radius, glint, maxf(1.0, radius * 0.045), true)
+	else:
+		draw_circle(center + Vector2(-0.12, -0.23) * radius, radius * 0.11, glint)
 
 
 func _draw_stress_effects(rect: Rect2) -> void:
@@ -263,7 +278,7 @@ func _draw_stress_effects(rect: Rect2) -> void:
 		var phase_angle: float = elapsed * (0.75 + float(i % 7) * 0.10) + index * 2.39996
 		var radial: float = (0.08 + 0.88 * float((i * 73) % 257) / 257.0) * rect.size.x * 0.46
 		var point: Vector2 = rect.get_center() + Vector2(cos(phase_angle), sin(phase_angle)) * radial
-		var color: Color = crystal_colors[i % crystal_colors.size()]
+		var color: Color = Visuals.fill_color(i % Visuals.FILL_HEX.size())
 		color.a = 0.25 + 0.40 * (0.5 + 0.5 * sin(elapsed * 2.1 + index))
 		draw_circle(point, 1.5 + float(i % 5), color)
 
