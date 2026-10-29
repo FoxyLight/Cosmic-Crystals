@@ -81,6 +81,41 @@ func _run() -> void:
 	_ok(made["nova_gain"] > 0, "Matches charge Nova")
 	_events(old, old_power, made, beam, "beam formation")
 
+	# Vertical four should create a COLUMN beam, never a row beam.
+	var vertical = _fixture(80)
+	for row in [1, 2, 4]:
+		vertical.cells[row * 8 + 3] = 4
+	vertical.cells[3 * 8 + 3] = 0
+	vertical.cells[3 * 8 + 4] = 4
+	_ok(vertical.find_matches().is_empty(), "Vertical-four fixture begins stable")
+	var column_outcome: Dictionary = vertical.play_swap(3 * 8 + 4, 3 * 8 + 3)
+	_ok(column_outcome["valid"], "Vertical four can be formed by a swap")
+	_ok(int(column_outcome["created"]) == Board.BEAM_COLUMN, "Vertical four creates column beam")
+	_ok(vertical.specials.has(Board.BEAM_COLUMN), "Column beam survives resolution")
+
+	# Straight five made by a REAL swap creates one Supernova.
+	var five = _fixture(71)
+	for col in [0, 1, 3, 4]:
+		five.cells[2 * 8 + col] = 2
+	five.cells[2 * 8 + 2] = 3
+	five.cells[3 * 8 + 2] = 2
+	_ok(five.find_matches().is_empty(), "Straight-five fixture begins stable")
+	var five_result: Dictionary = five.play_swap(3 * 8 + 2, 2 * 8 + 2)
+	_ok(five_result["valid"], "Straight-five swap is accepted")
+	_ok(int(five_result["created"]) == Board.SUPERNOVA, "Straight-five creates Supernova")
+	_ok(five.specials.has(Board.SUPERNOVA), "Supernova survives resolution")
+
+	# Actual T/L formation via center swap (rather than only helper detection).
+	var tee = _fixture(24)
+	for index in [2 * 8 + 2, 2 * 8 + 4, 1 * 8 + 3, 3 * 8 + 3, 4 * 8 + 3]:
+		tee.cells[index] = 0
+	tee.cells[2 * 8 + 3] = 3
+	_ok(tee.find_matches().is_empty(), "T-match starts without existing lines")
+	var tee_outcome: Dictionary = tee.play_swap(1 * 8 + 3, 2 * 8 + 3)
+	_ok(tee_outcome["valid"], "T-match swap is valid")
+	_ok(int(tee_outcome["created"]) == Board.BOMB, "T intersection creates Cosmic Bomb")
+	_ok(tee.specials.has(Board.BOMB), "Cosmic Bomb survives resolution")
+
 	# Reward-precedence: straight five outranks any straight four.
 	var reward_board = _fixture(73)
 	for col in range(1, 6):
