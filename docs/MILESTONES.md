@@ -63,6 +63,8 @@ The model must distinguish valid/invalid swaps and serialize resolution, prevent
 
 A player can finish five Lyra levels, retain stars and unlocked progress after restart, understand objectives and powers, and navigate every screen with readable, usable touch targets on representative phone sizes.
 
+**Android build traceability:** CI preview APKs are now uniquely numbered and include verified embedded versionCode/versionName, commit SHA and SHA-256 manifest. See [APK Versioning](ANDROID_VERSIONING.md). Optional stable debug signing must be configured privately, and release AAB signing is still an M6 gate. Do not equate versioned debug APKs with signed releases.
+
 ### M5–M6 — Distribution readiness
 
 Test both Android and web release candidates, sign and validate builds, check permissions/privacy/asset licenses and confirm applicable Google Play requirements **at submission time**. A Play submission is not the same as a public release.

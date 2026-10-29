@@ -40,6 +40,17 @@ A compact decision log. New substantial decisions should be recorded here with d
 - **Consequences:** Cloud syncing, cross-device transfer and account recovery are out of scope until explicitly prioritized.
 - **Evidence:** [Technical Architecture](TECHNICAL_ARCHITECTURE.md), [M3 #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7).
 
+## ADR-005: Automated, traceable Android debug APK versions
+
+- **Date:** 2026-10-29
+- **Status:** Accepted for debug preview builds; release AAB policy remains M6 work
+- **Decision:** Keep the SemVer base in `VERSION`, derive preview `versionCode` from GitHub Actions run number and run attempt, and derive `versionName`/artifact name from base version, run and short Git SHA. Verify **embedded APK manifest metadata** with Android `aapt` before uploading the artifact.
+- **Why:** The original test APKs all used versionCode `1` and a generic filename, making it difficult to tell builds apart and preventing normal Android version ordering.
+- **Consequences:** Artifacts include source SHA, code/name, checksum and signing mode. CI run numbers increase across newly triggered builds. Rerunning an older workflow can still have a lower code than an already-installed newer build; users must install the latest build. A versionCode change does **not** resolve different signing keys.
+- **Signing policy:** Optional repository Actions secret `COSMIC_DEBUG_KEYSTORE_BASE64` supplies a reusable **debug-only** signing identity for **main-branch builds**; otherwise CI intentionally uses disposable debug signing and declares `ephemeral-ci`. Never commit signing keys or use the debug identity for production.
+- **Revisit when:** Creating the M5/M6 signed AAB pipeline; allocate Play release version codes independently, preserving Google Play monotonicity and secure release signing.
+- **Evidence:** [Android APK Versioning](ANDROID_VERSIONING.md), [issue #23](https://github.com/FoxyLight/Cosmic-Crystals/issues/23), [PR #24](https://github.com/FoxyLight/Cosmic-Crystals/pull/24).
+
 ## Pending decisions
 
 | Decision | Default until decided | Trigger | Tracker |

@@ -118,14 +118,16 @@ Use GitHub issues with a reproduction script, exact commit/build, device/OS/brow
 
 Critical/high defects must be resolved before M5 closure. Lower severity may be explicitly accepted with evidence and an owner once ownership is assigned.
 
-## 8. Evidence log template
+**Build traceability:** For every Android playtest use the exact versioned APK and its companion `build-info.json`. The [APK Versioning Guide](ANDROID_VERSIONING.md) describes versionCode/versionName, signing compatibility and SHA-256 checks. CI validates the *embedded* Android manifest, while a physical-device test still needs to record the installed code.\n\n## 8. Evidence log template
 
 For each validation, record:
 
 | Field | Value |
 | --- | --- |
 | Date / tester | TBD |
-| Commit SHA / build ID | Example automated artifact: [PR #13 run 40939726043](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043); fill exact build SHA per manual test |
+| Commit SHA / build ID | Record exact commit and [GitHub Actions run](https://github.com/FoxyLight/Cosmic-Crystals/actions/workflows/godot-checks.yml) from downloaded `build-info.json` |
+| Android APK versionName / versionCode | Record both values from `build-info.json` and confirm with `adb shell dumpsys package org.foxylight.cosmiccrystals.prototype` or `aapt dump badging` |
+| Signing identity / checksum | `persistent-secret` or `ephemeral-ci`; verify APK SHA-256 from `SHA256SUMS.txt` |
 | Godot version | 4.7.2 target |
 | Device / Android or browser version | TBD |
 | Test case and steps | TBD |

@@ -97,6 +97,8 @@
 - [ ] Verify signed build process and app data/permission compliance.
 - [ ] Resolve critical/high issues and record QA evidence.
 
+**Build identification:** The Android debug preview pipeline now automatically stamps versionCode/versionName based on run number, attempt and git SHA, validates the APK manifest, and packages checksum/build metadata. See [Android APK Versioning](ANDROID_VERSIONING.md) and [issue #23](https://github.com/FoxyLight/Cosmic-Crystals/issues/23). Production AAB signing/versioning remains a separate acceptance gate.
+
 ### M6: Google Play release readiness | [Issue #10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10)
 
 - [ ] Confirm package identifier, release versioning, signing ownership and Play requirements.
