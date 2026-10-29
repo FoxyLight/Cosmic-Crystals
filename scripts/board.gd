@@ -1,6 +1,6 @@
 extends RefCounted
 class_name CrystalBoard
-## Pure, seeded 8x8 match-3 rules. No Godot scene/node dependencies.
+## Seeded board rules. This class has no scene, animation or input dependencies.
 
 const WIDTH: int = 8
 const HEIGHT: int = 8
@@ -18,8 +18,8 @@ func _init(seed_value: int = 20261029) -> void:
 
 
 func generate() -> void:
-	# Avoid initial matches and ensure the player always has a legal move.
-	for attempt in range(512):
+	# Never start with automatic matches or an unplayable board.
+	for _attempt in range(512):
 		cells.clear()
 		cells.resize(WIDTH * HEIGHT)
 		for i in range(cells.size()):
@@ -30,17 +30,16 @@ func generate() -> void:
 			cells[i] = choices[rng.randi_range(0, choices.size() - 1)]
 		if has_legal_move():
 			return
-	push_error("Could not generate playable board with the allotted attempts.")
+	push_error("Could not generate playable board within 512 attempts")
 
 
 func _forms_starting_run(index: int, kind: int) -> bool:
 	var row: int = int(index / WIDTH)
 	var col: int = index % WIDTH
-	if col >= 2 and cells[index - 1] == kind and cells[index - 2] == kind:
-		return true
-	if row >= 2 and cells[index - WIDTH] == kind and cells[index - WIDTH * 2] == kind:
-		return true
-	return false
+	return (
+		(col >= 2 and cells[index - 1] == kind and cells[index - 2] == kind)
+		or (row >= 2 and cells[index - WIDTH] == kind and cells[index - WIDTH * 2] == kind)
+	)
 
 
 func is_adjacent(a: int, b: int) -> bool:
@@ -48,7 +47,7 @@ func is_adjacent(a: int, b: int) -> bool:
 		return false
 	var ar: int = int(a / WIDTH)
 	var br: int = int(b / WIDTH)
-	return absi(ar - br) + absi((a % WIDTH) - (b % WIDTH)) == 1
+	return absi(ar - br) + absi(a % WIDTH - b % WIDTH) == 1
 
 
 func _swap(a: int, b: int) -> void:
@@ -58,7 +57,7 @@ func _swap(a: int, b: int) -> void:
 
 
 func find_matches() -> Array[int]:
-	# Union of all 3+ horizontal and vertical runs.
+	# A union of all horizontal and vertical runs. Intersections count only once.
 	var marked: Dictionary = {}
 	for row in range(HEIGHT):
 		var start: int = 0
@@ -82,11 +81,11 @@ func find_matches() -> Array[int]:
 				for row in range(start, finish):
 					marked[row * WIDTH + col] = true
 			start = finish
-	var result: Array[int] = []
-	for key in marked.keys():
-		result.append(int(key))
-	result.sort()
-	return result
+	var found: Array[int] = []
+	for key in marked:
+		found.append(int(key))
+	found.sort()
+	return found
 
 
 func would_match(a: int, b: int) -> bool:
@@ -110,61 +109,114 @@ func find_legal_swap() -> Vector2i:
 
 
 func has_legal_move() -> bool:
-	return find_legal_swap().x >= 0
+	return find_legal_swap().x != -1
 
 
 func play_swap(a: int, b: int) -> Dictionary:
+	# 'events' encode sequential, immutable before/after snapshots for the renderer.
+	# The entire turn is resolved synchronously; animation never changes game rules.
 	var outcome: Dictionary = {
 		"valid": false,
 		"cleared": 0,
 		"cascades": 0,
 		"score": 0,
 		"collected": {},
-		"reshuffled": false
+		"reshuffled": false,
+		"events": []
 	}
 	if not is_adjacent(a, b) or cells[a] == cells[b]:
 		return outcome
+
+	var before_swap: Array[int] = cells.duplicate()
 	_swap(a, b)
+	var after_swap: Array[int] = cells.duplicate()
+	outcome["events"].append({
+		"type": "swap",
+		"before": before_swap,
+		"after": after_swap,
+		"a": a,
+		"b": b
+	})
 	if find_matches().is_empty():
 		_swap(a, b)
+		outcome["events"].append({
+			"type": "swap_back",
+			"before": after_swap,
+			"after": before_swap,
+			"a": a,
+			"b": b
+		})
 		return outcome
 
 	outcome["valid"] = true
-	var chain: int = 0
-	while chain < MAX_CASCADES:
+	for chain in range(1, MAX_CASCADES + 1):
 		var matched: Array[int] = find_matches()
 		if matched.is_empty():
 			break
-		chain += 1
-		outcome["cascades"] = chain
-		outcome["cleared"] = int(outcome["cleared"]) + matched.size()
-		outcome["score"] = int(outcome["score"]) + matched.size() * 10 * chain
+		var before_clear: Array[int] = cells.duplicate()
 		var collected: Dictionary = outcome["collected"]
 		for index in matched:
 			var kind: int = cells[index]
 			collected[kind] = int(collected.get(kind, 0)) + 1
 			cells[index] = EMPTY
-		_apply_gravity_and_refill()
 
-	if chain == MAX_CASCADES and not find_matches().is_empty():
-		# Defensive fallback: never leave an indefinitely cascading board.
-		generate()
+		var score_delta: int = matched.size() * 10 * chain
+		outcome["cascades"] = chain
+		outcome["cleared"] = int(outcome["cleared"]) + matched.size()
+		outcome["score"] = int(outcome["score"]) + score_delta
+		outcome["events"].append({
+			"type": "clear",
+			"before": before_clear,
+			"after": cells.duplicate(),
+			"indices": matched.duplicate(),
+			"chain": chain,
+			"score_delta": score_delta
+		})
+		_apply_gravity_and_refill(outcome["events"])
+
+	# Defensive escape from a pathological chain that fails to settle.
+	if not find_matches().is_empty() or not has_legal_move():
+		var prior: Array[int] = cells.duplicate()
+		generate()  # Safe only in the current blocker-free prototype.
 		outcome["reshuffled"] = true
-	elif not has_legal_move():
-		# Prototype has no blockers/special pieces yet; a fresh legal board is safe.
-		generate()
-		outcome["reshuffled"] = true
+		outcome["events"].append({
+			"type": "reshuffle",
+			"before": prior,
+			"after": cells.duplicate()
+		})
 	return outcome
 
 
-func _apply_gravity_and_refill() -> void:
+func _apply_gravity_and_refill(events: Array) -> void:
+	var before_drop: Array[int] = cells.duplicate()
+	var moves: Array[Dictionary] = []
+	var spawns: Array[Dictionary] = []
 	for col in range(WIDTH):
 		var write_row: int = HEIGHT - 1
 		for read_row in range(HEIGHT - 1, -1, -1):
-			var kind: int = cells[read_row * WIDTH + col]
+			var from_index: int = read_row * WIDTH + col
+			var kind: int = before_drop[from_index]
 			if kind != EMPTY:
-				cells[write_row * WIDTH + col] = kind
+				var to_index: int = write_row * WIDTH + col
+				cells[to_index] = kind
+				moves.append({"from": from_index, "to": to_index, "kind": kind})
 				write_row -= 1
+		# Each new piece starts above the board, with its own offset.
+		var remaining: int = write_row + 1
 		while write_row >= 0:
-			cells[write_row * WIDTH + col] = rng.randi_range(0, KIND_COUNT - 1)
+			var to_index: int = write_row * WIDTH + col
+			var kind: int = rng.randi_range(0, KIND_COUNT - 1)
+			cells[to_index] = kind
+			spawns.append({
+				"from_row": write_row - remaining,
+				"to": to_index,
+				"kind": kind
+			})
 			write_row -= 1
+	events.append({
+		"type": "fall",
+		"before": before_drop,
+		"after": cells.duplicate(),
+		"moves": moves,
+		"spawns": spawns
+	})
