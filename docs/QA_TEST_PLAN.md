@@ -32,6 +32,15 @@ The expanded seeded board test covers 125 seeds, no starting matches, adjacent l
 
 All domain-level tests should be deterministic (fixed seed, fixed starting board, known expected events) and independent of visual tween timing.
 
+## Star Beam gameplay regression and CI parser gate
+
+The first M2 APK had a **hidden scene-script parse error** despite green GitHub Actions. [Bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17) tracks the defect and Android retest.
+
+- Automated: `tests/test_game_scene.gd` must instantiate the real gameplay scene and trigger a straight four-match through the UI controller path; the resulting CosmicBoard must retain a row Beam. Existing `tests/test_powers.gd` also verifies formation in pure rules.
+- CI: `scripts/ci/check_godot_log.sh` fails on any Godot `SCRIPT ERROR`, `Parse Error`, or `ERROR:` marker, even if the process exits zero. Guard self-tests must pass.
+- Manual Android: visually identify the cyan-ring Beam left after matching four; verify `STAR BEAM FORGED!` text, persistence through falling/refilling and full-row activation when later swapped. Repeat for vertical four/column Beam when convenient.
+- Acceptance: successful Android-device repro with a verifiable new APK, not merely a successful export job. **Pending player retest.**
+
 ## 3. Crystal distinction / visual accessibility check
 
 Following Android playtest feedback (2026-10-29), Solar Amber and Lunar Opal need explicit readability coverage. [Crystal Visual Identity](VISUAL_PALETTE.md) records the six piece colors/outlines, distinctive sunburst versus ice-shard geometry and exact visual tokens.
