@@ -7,13 +7,15 @@
 
 ## Executive summary
 
-**Status: early Godot technology spike; core matching proven headlessly, Android distribution not proven.**
+**Status: Godot M0/M1 implementation underway; headless rules tests and automated web/debug-APK exports pass, but device/browser QA and Android release distribution remain unproven.**
 
 - **Engine direction:** Godot 4.7.2 standard edition, GDScript, Compatibility renderer. Accepted for continued development, subject to M0 platform sign-off.
 - **Completed foundation:** source project, procedural board, deterministic initial boards, swap validation, horizontal/vertical matches, gravity/refill, cascades, basic objectives, and initial automated tests.
 - **CI evidence:** [main branch passing workflow](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782) imported Godot, ran `tests/test_board.gd`, and completed a 120-frame headless scene smoke test.
-- **Unverified:** actual Android APK/AAB export, browser export, physical-device performance, safe area and touch, heavy particle stress, signed Google Play delivery.
-- **Missing product systems:** polished turn animations, special pieces, asteroids, Nova Pulse, five complete levels, star map, local saving, tutorials, audio and release flows.
+- **Verified in PR #13 CI:** Web and Android debug APK artifacts generated, expanded event replay tests and 120-frame scene smoke test passed ([workflow](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)).
+- **Unverified:** device/browser runtime compatibility and measurements, AAB Gradle/release signing, Play distribution, physical-device input and thermal behavior.
+- **M1 in progress:** ordered turn events and basic swap/clear/drop animations are coded; manual device playtesting, last-move/interruption tests and production UI are pending.
+- **Missing product systems:** special pieces, asteroids, Nova Pulse, five complete levels, star map, local saving, tutorials, production audio and release flows.
 
 ## Milestone rollup
 
@@ -30,15 +32,17 @@
 
 ## Recommended next execution order
 
-1. **M0:** Establish a repeatable APK/web export and get real device/browser observations. Record the Godot go/no-go.
-2. **M1:** Refactor synchronous board resolution into ordered domain events, animate the event stream and make input locking robust.
+1. **M0:** Use the now repeatable CI APK/Web exports for actual device/browser playtests. Establish an AAB Gradle signing pipeline and record the Godot go/no-go.
+2. **M1:** Event stream and basic animations are implemented in PR #13; test interaction timing on devices and add last-move/interruption regression coverage.
 3. **M2:** Implement the Star Beam/Bomb/Supernova/Nova progression on that stable event pipeline.
 4. **M3–M4:** Build and polish the complete five-level Lyra journey.
 5. **M5–M6:** Test, sign and distribute once exit gates are met.
 
+For the exact changes and artifact instructions, see [M0/M1 implementation notes](M0_M1_IMPLEMENTATION.md).
+
 ## Open decisions and risks
 
-- Physical Android and browser compatibility are **unknown**. See [ENGINE_EVALUATION.md](ENGINE_EVALUATION.md).
+- Physical Android and browser runtime compatibility remain **unknown**, despite successful automated exports. See [ENGINE_EVALUATION.md](ENGINE_EVALUATION.md).
 - Commercial SDK needs (billing/ads/analytics) are **not decided**; validate before promising a release feature.
 - The five-level initial release is the committed **scope target**; the 20-level concept belongs to M7.
 - Performance goals are provisional until target hardware is selected. See [QA_TEST_PLAN.md](QA_TEST_PLAN.md).
