@@ -1,6 +1,6 @@
 # Development Roadmap
 
-**Baseline:** repository initialized with design documents on 2026-10-29. The Godot spike on the feature branch now passes headless CI, but device and browser exports are not yet verified. Published concept page: https://cosmic-crystals-starweaver-jneal.fxylght.chatgpt.site.
+**Baseline:** repository initialized with design documents on 2026-10-29. The Godot spike merged in PR #5 now passes headless CI, but device and browser exports are not yet verified. Published concept page: https://cosmic-crystals-starweaver-jneal.fxylght.chatgpt.site.
 
 ## Guiding priority
 
