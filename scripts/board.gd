@@ -9,6 +9,7 @@ const EMPTY: int = -1
 const MAX_CASCADES: int = 80
 
 var cells: Array[int] = []
+var kinds: Array[int] = [0, 1, 2, 3, 4, 5]
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
@@ -24,7 +25,7 @@ func generate() -> void:
 		cells.resize(WIDTH * HEIGHT)
 		for i in range(cells.size()):
 			var choices: Array[int] = []
-			for kind in range(KIND_COUNT):
+			for kind in kinds:
 				if not _forms_starting_run(i, kind):
 					choices.append(kind)
 			cells[i] = choices[rng.randi_range(0, choices.size() - 1)]
@@ -205,7 +206,7 @@ func _apply_gravity_and_refill(events: Array) -> void:
 		var remaining: int = write_row + 1
 		while write_row >= 0:
 			var to_index: int = write_row * WIDTH + col
-			var kind: int = rng.randi_range(0, KIND_COUNT - 1)
+			var kind: int = random_kind()
 			cells[to_index] = kind
 			spawns.append({
 				"from_row": write_row - remaining,
@@ -220,3 +221,7 @@ func _apply_gravity_and_refill(events: Array) -> void:
 		"moves": moves,
 		"spawns": spawns
 	})
+
+
+func random_kind() -> int:
+	return kinds[rng.randi_range(0, kinds.size() - 1)]
