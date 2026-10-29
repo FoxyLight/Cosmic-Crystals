@@ -5,7 +5,7 @@
 
 ## Version and scope
 
-- **Technology spike:** Godot 4.7.2, procedural 8×8 board, basic move loop. No platform binaries verified.
+- **Technology spike:** Godot 4.7.2, procedural 8×8 board, animated match-3 and first special-piece mechanics. Automated Android debug APK/Web exports and APK version embedding are verified; signed AAB and release acceptance remain unverified.
 - **MVP goal:** Five playable Lyra levels, distinctive special pieces and Nova Pulse, galaxy progression, local saves, accessible and polished UI/audio.
 - **Later content:** 20 levels/four constellations and iOS. Do not count future content toward first Android acceptance.
 
