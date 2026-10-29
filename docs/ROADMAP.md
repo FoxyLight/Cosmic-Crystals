@@ -47,6 +47,8 @@
 
 **Exit gate:** reliable, readable gameplay on a stable board, tested with both input modalities. No double moves, frozen cascades or wrong win/loss counts.
 
+**Gameplay playtest gate:** On 2026-10-29, the player reported **human Android playtest PASS** following the Star Beam/combo/Nova fixes, explicit replay and deadlock shuffle patch, and automatic APK versioning. See [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md). The basic Android gameplay experience now has positive feedback; systematic device metrics, browser checks, AAB and other M0/M1 tasks remain open. **Next M2 feature:** asteroid blockers, with damage/interaction/gravity/deadlock tests.
+
 ## Priority 1: Distinctive cosmic gameplay and a complete player journey
 
 **M2 reliability fix:** After the first special-piece phone playtest, the player reported missing Star Beam creation. [Bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17) identified a gameplay-scene parse error suppressed by green CI. [PR #18](https://github.com/FoxyLight/Cosmic-Crystals/pull/18) corrects the scene and adds a real-scene four-match smoke test with fail-on-Godot-errors CI. Retesting on a phone is pending; M2 stays open.
