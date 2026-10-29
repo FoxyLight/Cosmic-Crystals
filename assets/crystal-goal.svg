@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Original faceted amethyst; collection counts all six crystal types. -->
+  <path d="M32 3 55 30 32 61 9 30Z" fill="#B566FF" stroke="#D6ABFF" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M32 3 26 29 9 30Z" fill="#E0C2FF"/>
+  <path d="M32 3 55 30 26 29Z" fill="#BE80FF"/>
+  <path d="M26 29 55 30 32 61Z" fill="#8E43CF"/>
+  <path d="M9 30 26 29 32 61Z" fill="#C995FF"/>
+</svg>

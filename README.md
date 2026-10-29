@@ -6,6 +6,17 @@ An Android-first cosmic match-3 puzzle adventure for Android and web, with iOS a
 
 ## Project status
 
+**Visual pass (`0.3.1`):** the Godot gameplay screen now follows the earlier
+browser/Android cosmic direction: compact one-screen HUD, rounded navy/violet
+panels, locally bundled Outfit/DM Sans fonts, faceted gems with royal-blue and
+vibrant-green separation, clear goal icons and redesigned results. Help and
+pause are real touch/keyboard controls; diagnostics are hidden from normal
+play (desktop F9). The board rules and 30-crystal/six-rock/18-move round are
+unchanged. [Details and validation](docs/VISUAL_PASS.md). The player passed the
+previous asteroid build `0.3.0-dev.91.1+g71c389ec`; the new visual build still
+needs physical Android acceptance.
+
+
 **Latest M2 addition: asteroid blockers (product `0.3.0`).** Six fixed rocks
 with armored/cracked states take adjacent-clear and special/Nova damage,
 break, and refill with blocker-safe gravity. Each wave damages a rock once;

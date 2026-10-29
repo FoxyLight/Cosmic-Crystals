@@ -29,7 +29,7 @@ A milestone is **Done** only if all its exit criteria have demonstrable evidence
 | **M1** | Stable animated match-3 loop | **In progress** | Foundation | Ordered event-driven swaps/rollback/cascades, correct game-state transitions, deterministic edge-case tests and touch-playthrough | [#3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) |
 | **M2** | Cosmic powers and blockers | **In progress** | M1 | Star Beam, Bomb, Supernova, combinations, asteroids and Nova Pulse all working/tested | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) |
 | **M3** | Five-level Lyra vertical slice | **Not started** | M1 + M2 | Five tunable/winnable levels, galaxy map, tutorials, star rankings and versioned local saves | [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) |
-| **M4** | Art, sound, accessibility and mobile UX | **Not started** | M1; integrates with M3 | Readable cosmic art, effects, audio settings, reduced motion and phone-safe UI | [#8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) |
+| **M4** | Art, sound, accessibility and mobile UX | **In progress** | M1; integrates with M3 | Readable cosmic art, effects, audio settings, reduced motion and phone-safe UI | [#8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) |
 | **M5** | Android and web release candidate | **Not started** | M0–M4 | Device/browser matrix green, no critical/high bugs, signed release candidate and recorded QA evidence | [#9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
 | **M6** | First Google Play distribution | **Not started** | M5 | Play testing track accepted, required listing/compliance complete, release tagged, publication decision recorded | [#10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10) |
 | **M7** | Post-MVP expansion and optional iOS | **Not started / deferred** | M5; post-M6 feedback preferred | Levels 6–20, four constellations, balance/regression coverage; separate iOS feasibility gate | [#11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) |
@@ -39,6 +39,16 @@ A milestone is **Done** only if all its exit criteria have demonstrable evidence
 **After first release:** M7 is not required for a five-level MVP.
 
 ## What is in the current game
+
+**M4 presentation slice now in progress:** gameplay/results use the earlier
+web/Android styling with responsive complete HUD, matching local typography,
+faceted/color-separated gems, clear rock goals, help/pause and hidden diagnostics.
+The new 1,459-check UI suite and all existing suites pass locally. New physical
+Android visual acceptance and wider browser/accessibility/audio work remain
+open; this does not finish M4. The preceding asteroid build passed the player's
+phone smoke test (build 9101), recorded in #6. [Visual evidence and remaining
+work](VISUAL_PASS.md).
+
 
 **Latest M2 implementation:** [Asteroid Blockers](M2_ASTEROIDS.md) adds six fixed
 1/2-HP rocks, adjacency and all power/Nova interactions, one hit per wave,

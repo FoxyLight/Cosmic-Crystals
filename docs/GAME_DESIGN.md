@@ -132,6 +132,16 @@ Complete a level to unlock the next node. Three-star ranking should use per-leve
 
 ## 8. Screens
 
+**Implemented presentation scope:** gameplay and result screens now follow the
+earlier navy/violet design, with both goals above a square board, score/moves
+cards and Nova below on phones, and an adjacent HUD on wide desktops. Help
+explains powers/rocks/Nova; pause resumes without changing the board. Diagnostic
+controls are absent from the player HUD. Both victory and defeat keep a single
+intentional Play again control and show final score; defeat shows unmet goals.
+This does not implement the planned home/map/campaign/settings journey below.
+See [Visual Pass](VISUAL_PASS.md).
+
+
 - **Home:** title, concise story invitation, Play, Settings, accessible mute.
 - **Galaxy map:** current constellation, connected nodes, clearly locked/unlocked/completed states, earned stars and next available level.
 - **Gameplay:** level, goals/progress, moves, score/star thresholds, Nova Meter, board, pause.

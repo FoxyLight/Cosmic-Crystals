@@ -5,6 +5,8 @@ extends Control
 
 const BoardScript = preload("res://scripts/cosmic_board.gd")
 const Visuals = preload("res://scripts/crystal_visuals.gd")
+const Layout = preload("res://scripts/game_layout.gd")
+const Hud = preload("res://scripts/game_hud.gd")
 const GOAL: int = 30
 const STARTING_MOVES: int = 18
 const ASTEROID_LAYOUT: Dictionary = {18: 2, 21: 2, 27: 1, 36: 1, 42: 2, 45: 2}
@@ -15,6 +17,11 @@ const FALL_SECONDS: float = 0.27
 const RESHUFFLE_SECONDS: float = 0.28
 
 var board = null
+var hud = null
+var overlay: String = ""
+var board_style: StyleBoxFlat
+var tile_style: StyleBoxFlat
+var selected_style: StyleBoxFlat
 var display_cells: Array[int] = []
 var display_specials: Array[int] = []
 var display_asteroids: Array[int] = []
@@ -46,6 +53,12 @@ var stress_report: String = "Tap STRESS 30S to test effects rendering"
 
 
 func _ready() -> void:
+	board_style = _panel_style(Color("#191B32"), Color("#49405F"), 20)
+	tile_style = _panel_style(Color("#202138"), Color("#38344E"), 7)
+	selected_style = _panel_style(Color("#44365F"), Color("#CCAAFF"), 7)
+	hud = Hud.new()
+	hud.game = self
+	add_child(hud)
 	_reset_game()
 
 
@@ -63,12 +76,15 @@ func _reset_game() -> void:
 	selected = -1
 	press_index = -1
 	phase = "idle"
+	overlay = ""
 	active_event = {}
 	finished = false
 	won = false
 	feedback = "Match beside asteroids to crack them"
 	feedback_ok = true
 	flash_time = 0.0
+	if hud != null:
+		hud.refresh(_layout())
 	queue_redraw()
 
 
@@ -89,36 +105,84 @@ func _process(delta: float) -> void:
 			var mean_fps: float = stress_fps_total / float(maxi(stress_samples, 1))
 			stress_report = "Draw test: avg %.0f / min %.0f FPS" % [mean_fps, stress_min_fps if stress_samples > 0 else 0.0]
 			print("COSMIC_STRESS: %s" % stress_report)
+	if hud != null:
+		hud.refresh(_layout())
 	queue_redraw()
 
 
+func _safe_insets() -> Vector4:
+	if OS.get_name() not in ["Android", "iOS"]:
+		return Vector4.ZERO
+	var pixels: Vector2 = Vector2(DisplayServer.window_get_size())
+	if pixels.x <= 0 or pixels.y <= 0:
+		return Vector4.ZERO
+	var safe: Rect2 = Rect2(DisplayServer.get_display_safe_area())
+	if safe.size.x <= 0 or safe.size.y <= 0:
+		return Vector4.ZERO
+	var origin: Vector2 = Vector2(DisplayServer.window_get_position())
+	var ratio: Vector2 = size / pixels
+	return Vector4(maxf(0, safe.position.x - origin.x) * ratio.x,
+		maxf(0, safe.position.y - origin.y) * ratio.y,
+		maxf(0, pixels.x - (safe.end.x - origin.x)) * ratio.x,
+		maxf(0, pixels.y - (safe.end.y - origin.y)) * ratio.y)
+
+
+func _layout() -> Dictionary:
+	return Layout.calculate(size, _safe_insets())
+
+
 func _board_rect() -> Rect2:
-	# Reserve HUD + stress control space on portrait phones.
-	var available_width: float = maxf(120.0, size.x - 28.0)
-	var available_height: float = maxf(120.0, size.y - 345.0)
-	var side: float = minf(minf(available_width, available_height), 640.0)
-	var top: float = maxf(232.0, (size.y - side) * 0.52)
-	top = minf(top, maxf(110.0, size.y - side - 76.0))
-	return Rect2(Vector2((size.x - side) * 0.5, top), Vector2(side, side))
+	return _layout()["board"]
 
 
 func _nova_rect() -> Rect2:
-	return Rect2(Vector2(20.0, 178.0), Vector2(138.0, 36.0))
+	return _layout()["nova_button"]
 
 
 func _replay_rect() -> Rect2:
-	# A deliberately large touch target, centered in the final result overlay.
-	# The board no longer restarts from an incidental touch anywhere.
-	var rect: Rect2 = _board_rect()
-	var button_width: float = minf(246.0, rect.size.x - 32.0)
-	return Rect2(
-		rect.get_center() + Vector2(-button_width * 0.5, 29.0),
-		Vector2(button_width, 58.0)
-	)
+	return _layout()["replay"]
 
 
 func _stress_rect() -> Rect2:
-	return Rect2(Vector2(maxf(12.0, size.x - 158.0), 178.0), Vector2(140.0, 36.0))
+	return _replay_rect() if overlay == "tools" else Rect2(-100, -100, 0, 0)
+
+
+func _panel_style(bg: Color, edge: Color, radius: int) -> StyleBoxFlat:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = edge
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(radius)
+	return style
+
+
+func open_overlay(kind: String) -> void:
+	if phase not in ["idle", "nova_targeting"] or finished:
+		return
+	overlay = kind
+	selected = -1
+	press_index = -1
+	hud.refresh(_layout())
+
+
+func close_overlay() -> void:
+	overlay = ""
+	press_index = -1
+	hud.refresh(_layout())
+	hud.buttons["pause"].grab_focus()
+
+
+func toggle_nova() -> void:
+	if not overlay.is_empty() or finished:
+		return
+	if phase == "nova_targeting":
+		phase = "idle"
+		feedback = "Nova cancelled. Charge saved."
+	elif phase == "idle" and board.can_use_nova():
+		phase = "nova_targeting"
+		feedback = "Choose a tile for your Nova Pulse"
+	hud.refresh(_layout())
+	queue_redraw()
 
 
 func _index_at(screen_pos: Vector2) -> int:
@@ -137,23 +201,23 @@ func _center_of(index: int, rect: Rect2) -> Vector2:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, size), Color("#0B102A"))
+	draw_rect(Rect2(Vector2.ZERO, size), Color("#090D20"))
+	# Layered, restrained nebula/planet glow; no external bitmap or full-screen blur.
+	for layer in range(12, 0, -1):
+		var radius: float = minf(size.x * 0.95, 560.0) * float(layer) / 12.0
+		draw_circle(Vector2(size.x * 0.93, size.y * 0.44), radius,
+			Color(0.28, 0.20, 0.43, 0.022))
 	_draw_starfield()
-	_draw_hud()
 	if board == null:
 		return
 	var rect: Rect2 = _board_rect()
-	draw_rect(rect.grow(8.0), Color(0.18, 0.12, 0.37, 0.9))
-	draw_rect(rect.grow(3.0), Color("#29234E"))
+	draw_style_box(board_style, rect.grow(8.0))
 	var tile: float = rect.size.x / 8.0
 	for index in range(64):
 		var origin: Vector2 = rect.position + Vector2(index % 8, int(index / 8)) * tile
 		var selected_cell: bool = phase == "idle" and selected == index
-		draw_rect(Rect2(origin + Vector2(2, 2), Vector2(tile - 4.0, tile - 4.0)),
-			Color(0.13, 0.18, 0.33) if selected_cell else Color(0.08, 0.11, 0.23))
-		if selected_cell:
-			draw_rect(Rect2(origin + Vector2(2, 2), Vector2(tile - 4.0, tile - 4.0)),
-				Color("#39D5FF"), false, 2.0)
+		draw_style_box(selected_style if selected_cell else tile_style,
+			Rect2(origin + Vector2(2, 2), Vector2(tile - 4.0, tile - 4.0)))
 
 	if active_event.is_empty():
 		_draw_snapshot(display_cells, rect)
@@ -166,9 +230,6 @@ func _draw() -> void:
 		draw_rect(rect, tint)
 	if stress_active:
 		_draw_stress_effects(rect)
-	_draw_footer(rect)
-	if finished:
-		_draw_result_overlay(rect)
 
 
 func _draw_snapshot(snapshot: Array, rect: Rect2, powers: Array = []) -> void:
@@ -315,36 +376,6 @@ func _draw_starfield() -> void:
 		draw_circle(Vector2(px, py), 0.6 + float(i % 3) * 0.42, Color(0.65, 0.8, 1.0, alpha))
 
 
-func _draw_hud() -> void:
-	var font: Font = ThemeDB.fallback_font
-	var header_size: int = 29 if size.x >= 420.0 else 23
-	draw_string(font, Vector2(20, 48), "COSMIC CRYSTALS", HORIZONTAL_ALIGNMENT_LEFT, -1, header_size, Color("#DDEAFF"))
-	draw_string(font, Vector2(22, 77), "ASTEROIDS LEFT  %d  /  MATCH BESIDE OR BLAST" % _asteroids_remaining() if board != null else "A STARWEAVER'S JOURNEY", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#D1BDA3"))
-	draw_string(font, Vector2(22, 116), "CRYSTALS  %d / %d" % [collected, GOAL], HORIZONTAL_ALIGNMENT_LEFT, -1, 19, Color("#39D5FF"))
-	draw_string(font, Vector2(22, 144), "MOVES  %d     SCORE  %d" % [moves_left, score], HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color("#FFCB65"))
-	var progress_width: float = minf(size.x - 44.0, 360.0)
-	draw_rect(Rect2(Vector2(22, 159), Vector2(progress_width, 7)), Color("#282A51"))
-	draw_rect(Rect2(Vector2(22, 159), Vector2(progress_width * minf(float(collected) / float(GOAL), 1.0), 7)), Color("#39D5FF"))
-	var nova: Rect2 = _nova_rect()
-	var charged: bool = board != null and board.can_use_nova()
-	draw_rect(nova, Color("#296D83") if phase == "nova_targeting" else
-		(Color("#4A3488") if charged else Color("#202947")))
-	draw_rect(nova, Color("#B9F4FF") if charged else Color("#485879"), false, 1.2)
-	var fraction: float = float(board.nova_energy) / float(BoardScript.NOVA_MAX) if board != null else 0.0
-	draw_rect(Rect2(nova.position + Vector2(3, 31), Vector2((nova.size.x - 6.0) * fraction, 3)), Color("#89E8FF"))
-	var energy: int = board.nova_energy if board != null else 0
-	draw_string(font, nova.position + Vector2(8, 23),
-		"NOVA %d/%d" % [energy, BoardScript.NOVA_MAX],
-		HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#FFFFFF") if charged else Color("#AAB9DA"))
-	var button: Rect2 = _stress_rect()
-	draw_rect(button, Color("#3A2D6A"))
-	draw_rect(button, Color("#39D5FF"), false, 1.0)
-	draw_string(font, button.position + Vector2(8, 24), "STRESS 30S", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#DDEAFF"))
-	if stress_active:
-		draw_string(font, Vector2(22, 204), "STRESS %.0f s  •  FPS %d" % [maxf(0.0, 30.0 - stress_elapsed), Engine.get_frames_per_second()],
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#FFCB65"))
-
-
 func _draw_crystal(center: Vector2, radius: float, kind: int, opacity: float = 1.0, power: int = 0) -> void:
 	if kind < 0 or kind >= Visuals.FILL_HEX.size():
 		return
@@ -364,7 +395,13 @@ func _draw_crystal(center: Vector2, radius: float, kind: int, opacity: float = 1
 	# Soft glow is intentionally weak, so pale opal never bleaches into amber.
 	draw_circle(center, radius * 1.13, Color(base.r, base.g, base.b, opacity * 0.09))
 	draw_colored_polygon(Visuals.shape_points(kind, center, radius * 1.06), outline)
-	draw_colored_polygon(Visuals.shape_points(kind, center, radius * 0.91), base)
+	var contour: PackedVector2Array = Visuals.shape_points(kind, center, radius * 0.91)
+	draw_colored_polygon(contour, base)
+	for i in range(contour.size()):
+		var light: Color = Color(base.lerp(facet, 0.55) if i % 3 == 0 else base.darkened(0.16))
+		light.a = opacity * 0.68
+		draw_colored_polygon(PackedVector2Array([center + Vector2(-0.08, -0.08) * radius,
+			contour[i], contour[(i + 1) % contour.size()]]), light)
 
 	# Small interior facets carry each kind's own hue, instead of a shared
 	# white sparkle that makes bright pieces hard to identify on phones.
@@ -435,55 +472,29 @@ func _draw_stress_effects(rect: Rect2) -> void:
 		draw_circle(point, 1.5 + float(i % 5), color)
 
 
-func _draw_footer(rect: Rect2) -> void:
-	var font: Font = ThemeDB.fallback_font
-	var footer_y: float = minf(size.y - 32.0, rect.end.y + 37.0)
-	if finished:
-		draw_string(font, Vector2(rect.position.x, footer_y),
-			"LEVEL COMPLETE" if won else "NO MOVES LEFT",
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 19,
-			Color("#FFCB65") if won else Color("#FF8FAE"))
-	else:
-		draw_string(font, Vector2(rect.position.x, footer_y), feedback,
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 15,
-			Color("#9DE3E2") if feedback_ok else Color("#FF8FAE"))
-	if not stress_active and stress_samples > 0 and not finished:
-		draw_string(font, Vector2(rect.position.x,
-			minf(size.y - 8.0, footer_y + 24.0)), stress_report,
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#DDEAFF"))
-
-
-func _draw_result_overlay(rect: Rect2) -> void:
-	# Deliberate modal finish screen: the player must press PLAY AGAIN.
-	var font: Font = ThemeDB.fallback_font
-	draw_rect(rect, Color(0.02, 0.025, 0.08, 0.88))
-	var title: String = "CONSTELLATION RESTORED!" if won else "OUT OF MOVES"
-	var title_color: Color = Color("#FFCB65") if won else Color("#FF8FAE")
-	draw_string(font, Vector2(rect.position.x, rect.get_center().y - 60.0),
-		title, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 23, title_color)
-	draw_string(font, Vector2(rect.position.x, rect.get_center().y - 17.0),
-		"CRYSTALS %d/%d    ASTEROIDS %d" % [collected, GOAL, _asteroids_remaining()],
-		HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 17, Color("#DDEAFF"))
-	var button: Rect2 = _replay_rect()
-	draw_rect(button, Color("#284D83"))
-	draw_rect(button, Color("#85E9FF"), false, 2.5)
-	draw_string(font, button.position + Vector2(0, 38),
-		"PLAY AGAIN", HORIZONTAL_ALIGNMENT_CENTER, button.size.x, 22,
-		Color("#FFFFFF"))
-
-
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		if event.index == 0:
 			_handle_touch(event.position, event.pressed)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_handle_touch(event.position, event.pressed)
-	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_R:
-		if phase == "idle" or phase == "finished":
+	elif event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_ESCAPE:
+			if not overlay.is_empty():
+				close_overlay()
+			elif phase == "nova_targeting":
+				toggle_nova()
+			else:
+				open_overlay("pause")
+		elif event.keycode == KEY_F9:
+			open_overlay("tools")
+		elif event.keycode == KEY_R and (phase == "idle" or phase == "finished") and overlay.is_empty():
 			_reset_game()
 
 
 func _handle_touch(pointer: Vector2, pressed: bool) -> void:
+	if not overlay.is_empty():
+		return
 	if phase != "idle" and phase != "nova_targeting" and phase != "finished":
 		return
 	if phase == "finished":
@@ -509,13 +520,7 @@ func _handle_touch(pointer: Vector2, pressed: bool) -> void:
 	if press_index == -3:
 		press_index = -1
 		if _nova_rect().has_point(pointer):
-			if phase == "nova_targeting":
-				phase = "idle"
-				feedback = "Nova cancelled. Charge saved."
-			elif phase == "idle" and board.can_use_nova():
-				phase = "nova_targeting"
-				feedback = "Tap a tile: Nova blasts its row and column"
-			queue_redraw()
+			toggle_nova()
 		return
 	if press_index == -2:
 		press_index = -1

@@ -4,20 +4,28 @@
 **Player feedback:** The original Solar Amber (pale yellow) and Lunar Opal (white) looked too similar on an Android phone, especially during cascades.  
 **Source of truth:** [scripts/crystal_visuals.gd](../scripts/crystal_visuals.gd) controls colors and silhouettes; [scripts/prototype.gd](../scripts/prototype.gd) draws them.
 
+## Visual pass 0.3.1
+
+The gameplay layout now follows the earlier browser/Android direction: navy and
+violet panels, Outfit/DM Sans typography, stronger royal-blue sapphire and green
+emerald, faceted fills, square rounded board and a compact complete HUD. The
+six existing gem silhouettes and all power markers remain. See
+[visual pass](VISUAL_PASS.md) for screen/input checks and pending device review.
+
 ## Updated crystal style specification
 
 | Board ID | Crystal | Primary fill | Deep outline | Colored facet | Silhouette |
 | --- | --- | --- | --- | --- | --- |
-| 0 | Nebula Amethyst | `#824CF1` | `#371570` | `#C09BFF` | Four-point tall diamond |
-| 1 | **Solar Amber** | **`#ED9B18`** | **`#733907`** | **`#FFD26A`** | **12-vertex, six-ray golden sunburst** |
-| 2 | Quantum Sapphire | `#13B5EB` | `#075176` | `#70E6FF` | Wide six-sided sapphire |
-| 3 | Plasma Ruby | `#F849A9` | `#792354` | `#FFA0D4` | Pink five-point star |
-| 4 | Aurora Emerald | `#24CF87` | `#075B3C` | `#93FFD1` | Seven-point tapered emerald |
-| 5 | **Lunar Opal** | **`#D0EDFF`** | **`#2F5C88`** | **`#83C9F6`** | **Tall eight-point ice shard with icy fracture** |
+| 0 | Nebula Amethyst | `#B566FF` | `#371570` | `#DFC1FF` | Four-point tall diamond |
+| 1 | **Solar Amber** | **`#FFC442`** | **`#733907`** | **`#FFE19B`** | **12-vertex, six-ray golden sunburst** |
+| 2 | Quantum Sapphire | `#3D65F5` | `#172861` | `#8BACFF` | Wide six-sided sapphire |
+| 3 | Plasma Ruby | `#FF4F88` | `#792354` | `#FFA0D4` | Pink five-point star |
+| 4 | Aurora Emerald | `#24EE78` | `#075B3C` | `#93FFD1` | Seven-point tapered emerald |
+| 5 | **Lunar Opal** | **`#CAF7FF`** | **`#2F5C88`** | **`#83C9F6`** | **Tall eight-point ice shard with icy fracture** |
 
 **Why the contrast now works better in principle:** Solar Amber has a saturated orange/gold fill, dark-brown border, warm central nucleus, and six outward rays. Lunar Opal is near-white with a distinct blue tint, navy-blue border, cool cyan facets, and an elongated pointed shard silhouette. Other gems have their own outlines and unique contour vertex counts. Sparkle colors vary by crystal rather than all defaulting to bright white.
 
-The broad UI accent palette in [GAME_DESIGN.md](GAME_DESIGN.md) can still use pale gold `#FFCB65` for score text; the **Solar Amber game piece** uses the richer `#ED9B18` to preserve distinction from pale Opal.
+The broad UI accent palette in [GAME_DESIGN.md](GAME_DESIGN.md) can still use pale gold `#FFCB65` for score text; the **Solar Amber game piece** uses the richer `#FFC442` to preserve distinction from pale Opal.
 
 ## Implementation scope
 
@@ -25,7 +33,7 @@ The broad UI accent palette in [GAME_DESIGN.md](GAME_DESIGN.md) can still use pa
 - Updates the same `_draw_crystal` path used by stable boards, swap animations, clears, falling and spawns.
 - Uses solid opaque gem fills with a darker outer polygon and a lower-opacity colored facet.
 - Keeps soft glows deliberately faint so light pieces do not merge visually.
-- Centralizes tokens and shape definitions in one pure, testable GDScript class, without texture downloads or licensed art.
+- Centralizes tokens and shape definitions in one pure, testable GDScript class, with original procedural/vector art. Bundled Outfit and DM Sans fonts carry their SIL Open Font License notices in source and exports.
 
 This is a **procedural prototype-art improvement**, not a final asset pipeline or completed M4 milestone.
 
