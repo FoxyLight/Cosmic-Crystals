@@ -52,7 +52,7 @@ The source [VERSION](VERSION) is `0.2.0`. See [Android APK Versioning](docs/ANDR
 
 1. Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/).
 2. Clone the repo, import/open `project.godot` in Godot and press **F5**.
-3. Drag from one crystal to an orthogonally adjacent crystal, or tap two adjacent crystals. Four, five or T/L matches can forge special pieces; swap a special to activate it. Matches charge Nova to 20. Tap the NOVA control, then a tile to blast its row/column without using a move; tap NOVA again to cancel. Collect 30 crystals within 18 moves. Tap after finishing to restart; press **R** on desktop.
+3. Drag from one crystal to an orthogonally adjacent crystal, or tap two adjacent crystals. Four, five or T/L matches can forge special pieces; swap a special to activate it. Matches charge Nova to 20. Tap the NOVA control, then a tile to blast its row/column without using a move; tap NOVA again to cancel. Collect 30 crystals within 18 moves. After a win/loss, press the explicit **PLAY AGAIN** button; press **R** on desktop.
 
 Headless checks:
 
@@ -62,7 +62,7 @@ godot --headless --path . --script res://tests/test_board.gd
 godot --headless --path . --quit-after 120
 ```
 
-These checks are automated in [GitHub Actions](.github/workflows/godot-checks.yml). They do **not** export Android binaries or prove mobile UX.
+These checks run in [GitHub Actions](.github/workflows/godot-checks.yml), which also exports a **versioned Android debug APK** and a Web artifact. Automated exports do **not** prove physical device/browser usability.
 
 ## Documentation index
 
@@ -81,6 +81,7 @@ These checks are automated in [GitHub Actions](.github/workflows/godot-checks.ym
 | Why key technical/product choices were made | [Decisions](docs/DECISIONS.md) |
 | Acceptance and device/browser tests | [QA Test Plan](docs/QA_TEST_PLAN.md) |
 | Android APK/AAB and web export setup | [Android and Web Export](docs/ANDROID_EXPORT.md) |
+| Unique Android APK versions, artifacts and optional stable debug signing | [Android APK Versioning](docs/ANDROID_VERSIONING.md) |
 | Android release and Play process | [Release Plan](docs/RELEASE_PLAN.md) |
 | Known project risks/dependencies | [Risk Register](docs/RISKS.md) |
 | Branch, test and PR process | [Contributing](CONTRIBUTING.md) |
