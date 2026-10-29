@@ -10,7 +10,7 @@ An Android-first cosmic match-3 puzzle adventure for Android and web, with iOS a
 
 **Implemented and headlessly tested:** seeded 8×8 boards with six crystal types, valid/invalid swap logic, match detection, gravity, refill, cascades and legal move checks. The one-screen prototype has procedural crystal visuals, mouse/touch controls, a move/score HUD and a basic collection win/lose loop.
 
-**M0/M1 work merged in PR #13:** event-driven swap/clear/fall/rollback animations and 125-seed regression checks now pass headless CI. GitHub Actions has built a debug Android APK and Web export ([successful CI run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)). **Not yet verified:** installing and playing on a real phone, browser compatibility, FPS/RAM or an AAB release-signing pipeline. **Still missing:** special pieces, Nova Pulse, blockers, five designed levels, galaxy map, saves, production art/audio and store distribution.
+**M0/M1 work merged in PR #13:** event-driven swap/clear/fall/rollback animations and 125-seed regression checks now pass headless CI. GitHub Actions has built a debug Android APK and Web export ([successful CI run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)). **Not yet verified:** installing and playing on a real phone, browser compatibility, FPS/RAM or an AAB release-signing pipeline. **New M2 prototype slice (PR #16):** Star Beams, Cosmic Bombs, Supernovas, first-pass special combinations and a chargeable, cancelable, zero-move Nova Pulse are implemented with seeded headless tests. **Still missing:** asteroid blockers, full power balancing, five designed levels, galaxy map, saves, production art/audio and store distribution. This M2 slice needs a new Android phone playtest.
 
 The [separately published concept page](https://cosmic-crystals-starweaver-jneal.fxylght.chatgpt.site) references 20 levels and four constellations. Its source is not imported here, and those features are **future vision**, not claims about this repository.
 
@@ -21,7 +21,7 @@ The [separately published concept page](https://cosmic-crystals-starweaver-jneal
 | Foundation | Godot spike, rules and CI | Complete | [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5) |
 | M0 | Android APK/AAB and web export validation | In progress | [#4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4) |
 | M1 | Reliable animated match-3 turns | In progress | [#3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) |
-| M2 | Special crystals, asteroids and Nova | Not started | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) |
+| M2 | Special crystals, asteroids and Nova | In progress | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) |
 | M3 | Five-level Lyra slice, map and saves | Not started | [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) |
 | M4 | Cosmic art, audio and accessible UX | Not started | [#8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) |
 | M5 | Android/web release-candidate QA | Not started | [#9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
@@ -30,13 +30,13 @@ The [separately published concept page](https://cosmic-crystals-starweaver-jneal
 
 **Mobile visual readability:** After the first Android playtest, the pale yellow and ice-white gems were difficult to distinguish. The [visual contrast patch (PR #14)](https://github.com/FoxyLight/Cosmic-Crystals/pull/14) gives Solar Amber a saturated golden sunburst and Lunar Opal a blue-white elongated shard, plus distinct outlines and facets for all six gem types. See [Crystal Visual Identity](docs/VISUAL_PALETTE.md). The next Android APK needs human visual confirmation; this is not a claim that all M4 visuals are finished.
 
-The [M0/M1 implementation notes](docs/M0_M1_IMPLEMENTATION.md) describe the new event stream, test coverage and build artifacts. The detailed [milestone register](docs/MILESTONES.md) defines dependencies, exit gates and evidence. Tracking is implemented with **GitHub Issues as milestone trackers**, not native GitHub Milestone objects. No dates or owners have been committed.
+The [M2 Powers and Nova guide](docs/M2_SPECIALS_NOVA.md) records the implemented power interactions, Nova meter, deterministic tests and remaining blocker work. The [M0/M1 implementation notes](docs/M0_M1_IMPLEMENTATION.md) describe the new event stream, test coverage and build artifacts. The detailed [milestone register](docs/MILESTONES.md) defines dependencies, exit gates and evidence. Tracking is implemented with **GitHub Issues as milestone trackers**, not native GitHub Milestone objects. No dates or owners have been committed.
 
 ## Run the prototype
 
 1. Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/).
 2. Clone the repo, import/open `project.godot` in Godot and press **F5**.
-3. Drag from one crystal to an orthogonally adjacent crystal, or tap two adjacent crystals. Collect 30 crystals within 18 moves. Tap after finishing to restart; press **R** to restart on desktop.
+3. Drag from one crystal to an orthogonally adjacent crystal, or tap two adjacent crystals. Four, five or T/L matches can forge special pieces; swap a special to activate it. Matches charge Nova to 20. Tap the NOVA control, then a tile to blast its row/column without using a move; tap NOVA again to cancel. Collect 30 crystals within 18 moves. Tap after finishing to restart; press **R** on desktop.
 
 Headless checks:
 
@@ -55,6 +55,7 @@ These checks are automated in [GitHub Actions](.github/workflows/godot-checks.ym
 | Current achievement vs missing work | [Project Status](docs/PROJECT_STATUS.md) |
 | Milestone owners/criteria and issue links | [Milestone Register](docs/MILESTONES.md) |
 | M0/M1 animated prototype and CI build results | [Implementation Notes](docs/M0_M1_IMPLEMENTATION.md) |
+| M2 Star Beams, Bombs, Supernova and Nova targeting | [M2 Gameplay Guide](docs/M2_SPECIALS_NOVA.md) |
 | Execution order and scope | [Roadmap](docs/ROADMAP.md) |
 | Concept, gameplay and visuals | [Game Design](docs/GAME_DESIGN.md) |
 | Gem colors, silhouettes and mobile readability QA | [Crystal Visual Identity](docs/VISUAL_PALETTE.md) |
@@ -72,4 +73,4 @@ These checks are automated in [GitHub Actions](.github/workflows/godot-checks.ym
 
 This GitHub repository is the canonical source of truth. Use scoped issues and PRs, keep the [Milestone Register](docs/MILESTONES.md) and [Project Status](docs/PROJECT_STATUS.md) synchronized with real evidence, and do not mark untested product features or platform exports as complete.
 
-**Immediate focus:** use the generated APK/Web artifacts to perform **real-device/browser QA** (M0 #4), review the new animated turn flow and add last-move/interruption regression tests (M1 #3). M2 through M7 follow the milestone gates.
+**Immediate focus:** download and playtest the M2 powers/Nova APK on Android, finish remaining M0/M1 device and interruption checks, and implement asteroid blockers in M2 #6. M3–M7 follow their milestone gates.
