@@ -100,6 +100,17 @@ func _nova_rect() -> Rect2:
 	return Rect2(Vector2(20.0, 178.0), Vector2(138.0, 36.0))
 
 
+func _replay_rect() -> Rect2:
+	# A deliberately large touch target, centered in the final result overlay.
+	# The board no longer restarts from an incidental touch anywhere.
+	var rect: Rect2 = _board_rect()
+	var button_width: float = minf(246.0, rect.size.x - 32.0)
+	return Rect2(
+		rect.get_center() + Vector2(-button_width * 0.5, 29.0),
+		Vector2(button_width, 58.0)
+	)
+
+
 func _stress_rect() -> Rect2:
 	return Rect2(Vector2(maxf(12.0, size.x - 158.0), 178.0), Vector2(140.0, 36.0))
 
@@ -149,6 +160,8 @@ func _draw() -> void:
 	if stress_active:
 		_draw_stress_effects(rect)
 	_draw_footer(rect)
+	if finished:
+		_draw_result_overlay(rect)
 
 
 func _draw_snapshot(snapshot: Array, rect: Rect2, powers: Array = []) -> void:
@@ -349,14 +362,37 @@ func _draw_footer(rect: Rect2) -> void:
 	var font: Font = ThemeDB.fallback_font
 	var footer_y: float = minf(size.y - 32.0, rect.end.y + 37.0)
 	if finished:
-		var message: String = "CONSTELLATION RESTORED!" if won else "OUT OF MOVES"
-		draw_string(font, Vector2(rect.position.x, footer_y), message, HORIZONTAL_ALIGNMENT_LEFT, -1, 21, Color("#FFCB65") if won else Color("#FF8FAE"))
-		if footer_y + 24 < size.y:
-			draw_string(font, Vector2(rect.position.x, footer_y + 24.0), "Tap anywhere to replay", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#DDEAFF"))
+		draw_string(font, Vector2(rect.position.x, footer_y),
+			"LEVEL COMPLETE" if won else "NO MOVES LEFT",
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 19,
+			Color("#FFCB65") if won else Color("#FF8FAE"))
 	else:
-		draw_string(font, Vector2(rect.position.x, footer_y), feedback, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#9DE3E2") if feedback_ok else Color("#FF8FAE"))
-	if not stress_active and stress_samples > 0:
-		draw_string(font, Vector2(rect.position.x, minf(size.y - 8.0, footer_y + 24.0)), stress_report, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#DDEAFF"))
+		draw_string(font, Vector2(rect.position.x, footer_y), feedback,
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 15,
+			Color("#9DE3E2") if feedback_ok else Color("#FF8FAE"))
+	if not stress_active and stress_samples > 0 and not finished:
+		draw_string(font, Vector2(rect.position.x,
+			minf(size.y - 8.0, footer_y + 24.0)), stress_report,
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#DDEAFF"))
+
+
+func _draw_result_overlay(rect: Rect2) -> void:
+	# Deliberate modal finish screen: the player must press PLAY AGAIN.
+	var font: Font = ThemeDB.fallback_font
+	draw_rect(rect, Color(0.02, 0.025, 0.08, 0.88))
+	var title: String = "CONSTELLATION RESTORED!" if won else "OUT OF MOVES"
+	var title_color: Color = Color("#FFCB65") if won else Color("#FF8FAE")
+	draw_string(font, Vector2(rect.position.x, rect.get_center().y - 60.0),
+		title, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 23, title_color)
+	draw_string(font, Vector2(rect.position.x, rect.get_center().y - 17.0),
+		"CRYSTALS %d/%d    SCORE %d" % [collected, GOAL, score],
+		HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 17, Color("#DDEAFF"))
+	var button: Rect2 = _replay_rect()
+	draw_rect(button, Color("#284D83"))
+	draw_rect(button, Color("#85E9FF"), false, 2.5)
+	draw_string(font, button.position + Vector2(0, 38),
+		"PLAY AGAIN", HORIZONTAL_ALIGNMENT_CENTER, button.size.x, 22,
+		Color("#FFFFFF"))
 
 
 func _input(event: InputEvent) -> void:
@@ -372,6 +408,16 @@ func _input(event: InputEvent) -> void:
 
 func _handle_touch(pointer: Vector2, pressed: bool) -> void:
 	if phase != "idle" and phase != "nova_targeting" and phase != "finished":
+		return
+	if phase == "finished":
+		if pressed:
+			# Arm replay only if the initial touch is on the explicit button.
+			press_index = -4 if _replay_rect().has_point(pointer) else -1
+		else:
+			var should_replay: bool = press_index == -4 and _replay_rect().has_point(pointer)
+			press_index = -1
+			if should_replay:
+				_reset_game()
 		return
 	if pressed:
 		if _nova_rect().has_point(pointer):
@@ -398,9 +444,6 @@ func _handle_touch(pointer: Vector2, pressed: bool) -> void:
 		press_index = -1
 		if phase == "idle" and _stress_rect().has_point(pointer):
 			_toggle_stress_test()
-		return
-	if phase == "finished":
-		_reset_game()
 		return
 	var start_index: int = press_index
 	press_index = -1
