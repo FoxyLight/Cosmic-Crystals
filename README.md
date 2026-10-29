@@ -6,7 +6,7 @@ Cosmic Crystals is an Android-first match-3 puzzle adventure for Android, web an
 
 ## Development status (2026-10-29)
 
-A **Godot 4.7.2 + GDScript** gameplay technology spike is committed in `feature/godot-android-spike`. Its initial CI run passes Godot project parsing and deterministic board tests. **Android APK/AAB, web export and real-device performance are not yet verified.**
+A **Godot 4.7.2 + GDScript** gameplay technology spike has been merged into `main` in [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5). Its initial CI run passes Godot project parsing and deterministic board tests. **Android APK/AAB, web export and real-device performance are not yet verified.**
 
 This code is a small playable match-3 prototype, **not** a finished 5-level game: it supports an 8×8 seeded board, six crystal types, touch/mouse swaps, match detection, gravity/refill, cascades, a simple score/move counter and a single collection objective. Swap and fall animations, blockers, special pieces, Nova Pulse, galaxy map, saves and polished visuals are planned, not present.
 
