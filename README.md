@@ -1,120 +1,84 @@
 # Cosmic Crystals: A Starweaver's Journey
 
-**Restore the stars. Awaken the universe.**
+Restore the stars. Awaken the universe.
 
-An Android-first cosmic match-3 puzzle adventure for Android and web, with iOS a later option. As a Starweaver, players match luminous crystals, awaken **Nova Pulse**, and restore constellations extinguished by **The Great Eclipse**.
+An Android-first Godot 4.7.2 / GDScript match-3 game with a Web export. Product
+base: **0.4.0**. This repository now implements the **five-level Lyra campaign**.
+No levels 6-20, extra constellations, monetization, accounts or cloud saving.
 
-## Project status
+## The playable journey
 
-**Visual pass (`0.3.1`):** the Godot gameplay screen now follows the earlier
-browser/Android cosmic direction: compact one-screen HUD, rounded navy/violet
-panels, locally bundled Outfit/DM Sans fonts, faceted gems with royal-blue and
-vibrant-green separation, clear goal icons and redesigned results. Help and
-pause are real touch/keyboard controls; diagnostics are hidden from normal
-play (desktop F9). The board rules and 30-crystal/six-rock/18-move round are
-unchanged. [Details and validation](docs/VISUAL_PASS.md). The player passed the
-previous asteroid build `0.3.0-dev.91.1+g71c389ec`; the new visual build still
-needs physical Android acceptance.
+Home -> Lyra map -> Level -> Victory/Defeat -> Next/Replay/Map. Five connected
+nodes show locked, next, selected and completed states, with best earned stars.
+Each authored level has its own seed, mechanics, goals, moves, tutorial and
+three-star thresholds. Complete every goal before moves run out. Wins unlock
+the next star; losses never unlock anything. Ranking uses match score plus
+**25 per unused move**; a completed level always earns at least one star.
 
+| Level | Name | Moves | Required goals |
+| --- | --- | ---: | --- |
+| 1 | First Starlight | 18 | Collect 24 crystals |
+| 2 | Starweaver's Spark | 22 | Collect 36; forge a Beam |
+| 3 | Asteroid Passage | 18 | Collect 40; clear 3 rocks |
+| 4 | Cosmic Convergence | 20 | Collect 50; activate 2 powers |
+| 5 | Lyra's Awakening | 22 | Collect 60; clear 4 rocks; use Nova |
 
-**Latest M2 addition: asteroid blockers (product `0.3.0`).** Six fixed rocks
-with armored/cracked states take adjacent-clear and special/Nova damage,
-break, and refill with blocker-safe gravity. Each wave damages a rock once;
-later cascades can hit again. Win the test round by collecting 30 crystals
-**and clearing all rocks** within 18 moves. Damage feedback and remaining-rock
-HUD are included. Local Godot 4.7.2 tests pass: 862,246 blocker assertions,
-46 new real-scene assertions and every existing suite. The versioned CI APK/Web
-pipeline is preserved. **New Android blocker playtest and balance are pending;
-M2 remains open.** Full rules, evidence and phone checklist:
-[M2 Asteroid Blockers](docs/M2_ASTEROIDS.md).
+Tap two neighbors or swipe one cell to match. Four forms a Beam; a T/L forms a
+Bomb; five forms a Supernova as each mechanic is introduced. Nova appears in
+level 5: charge, tap Nova, then a tile; cancel retains charge and activation
+spends no move. Stars/scores, completions, unlocks, tutorial history and reduced
+motion are stored locally. Pause offers resume/help/restart/map; unfinished
+round discard requires confirmation. Results require an intentional button.
 
-The dated development notes below describe earlier slices; blocker status is
-superseded by this section. Campaign/map/saves remain unimplemented here.
+**Save scope:** completed progression/settings persist, not an unfinished board.
+A restarted or abandoned round starts from its authored seed. See the full
+[schema, recovery policy and Android checklist](docs/M3_LYRA_CAMPAIGN.md).
 
-**Snapshot: 2026-10-29.** Godot 4.7.2 (GDScript, Compatibility renderer) is the working engine candidate. The foundational prototype and automated rules checks are on `main`; [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5) was merged and the [Godot headless workflow passed](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782).
+## Evidence and acceptance
 
-**Implemented and headlessly tested:** seeded 8×8 boards with six crystal types, valid/invalid swap logic, match detection, gravity, refill, cascades and legal move checks. The one-screen prototype has procedural crystal visuals, mouse/touch controls, a move/score HUD and a basic collection win/lose loop.
+All ten pre-existing Godot suites are retained. Three new suites cover sessions,
+120 deterministic balance runs, save recovery and an actual touch-driven
+five-level scene journey with disk reload. Five Python version-policy tests
+cover unique CI versions, manifest verification and local-default drift.
+CI also checks that actual APK/Web packs contain the level catalog/licenses.
+Use the PR and merged-main Actions run for final artifact evidence.
 
-**M0/M1 work merged in PR #13:** event-driven swap/clear/fall/rollback animations and 125-seed regression checks now pass headless CI. GitHub Actions has built a debug Android APK and Web export ([successful CI run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)). **Android player-reported gameplay smoke passed** (2026-10-29); browser compatibility, detailed device FPS/RAM/interruption tests and release AAB signing remain unverified. **New M2 prototype slice (PR #16):** Star Beams, Cosmic Bombs, Supernovas, first-pass special combinations and a chargeable, cancelable, zero-move Nova Pulse are implemented with seeded headless tests. **Still missing:** full power balancing, five designed levels, galaxy map, saves, production art/audio and store distribution. The baseline M2 gameplay has positive Android smoke feedback; detailed combo balancing and asteroid blockers remain open.
+The player accepted **asteroid build 9101** on Android. Visual build **9601 was
+installed and verified**, but has no separate human visual pass. **The new M3
+campaign requires new human Android acceptance.** Automated reloads/exports
+do not prove physical restart behavior, FPS or full browser QA. [M3 issue #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) stays open.
 
-The [separately published concept page](https://cosmic-crystals-starweaver-jneal.fxylght.chatgpt.site) references 20 levels and four constellations. Its source is not imported here, and those features are **future vision**, not claims about this repository.
+## Run and build
 
-## Milestones and current priorities
-
-| Milestone | Objective | Status | Tracking |
-| --- | --- | --- | --- |
-| Foundation | Godot spike, rules and CI | Complete | [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5) |
-| M0 | Android APK/AAB and web export validation | In progress | [#4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4) |
-| M1 | Reliable animated match-3 turns | In progress | [#3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) |
-| M2 | Special crystals, asteroids and Nova | In progress | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) |
-| M3 | Five-level Lyra slice, map and saves | Not started | [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) |
-| M4 | Cosmic art, audio and accessible UX | Not started | [#8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) |
-| M5 | Android/web release-candidate QA | Not started | [#9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
-| M6 | Google Play test/release preparation | Not started | [#10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10) |
-| M7 | 20 levels, four constellations, optional iOS | Deferred | [#11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) |
-
-**Mobile visual readability:** After the first Android playtest, the pale yellow and ice-white gems were difficult to distinguish. The [visual contrast patch (PR #14)](https://github.com/FoxyLight/Cosmic-Crystals/pull/14) gives Solar Amber a saturated golden sunburst and Lunar Opal a blue-white elongated shard, plus distinct outlines and facets for all six gem types. See [Crystal Visual Identity](docs/VISUAL_PALETTE.md). The next Android APK needs human visual confirmation; this is not a claim that all M4 visuals are finished.
-
-The [M2 Powers and Nova guide](docs/M2_SPECIALS_NOVA.md) records the implemented power interactions, Nova meter, deterministic tests and remaining blocker work. The [M0/M1 implementation notes](docs/M0_M1_IMPLEMENTATION.md) describe the new event stream, test coverage and build artifacts. The detailed [milestone register](docs/MILESTONES.md) defines dependencies, exit gates and evidence. Tracking is implemented with **GitHub Issues as milestone trackers**, not native GitHub Milestone objects. No dates or owners have been committed.
-
-## M2 Star Beam regression fix
-
-A physical Android playtest revealed that matching four gems did not visibly produce a Star Beam. Investigation found a GDScript **parse error hidden by the previous CI workflow** in the first M2 preview, not a verified error in the four-match rules themselves. [PR #18](https://github.com/FoxyLight/Cosmic-Crystals/pull/18) corrects the syntax and adds real-scene four-match smoke coverage plus an engine-log guard so APK exports cannot silently pass with failed gameplay-script loading. Beam icons and the `STAR BEAM FORGED!` message are also clearer. A fresh Android retest is required before this defect is closed. See [M2 mechanics](docs/M2_SPECIALS_NOVA.md) and [bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17).
-
-**M2 combination audit:** [PR #20](https://github.com/FoxyLight/Cosmic-Crystals/pull/20) adds exhaustive checks for 96 ordered special-combo and edge-orientation scenarios, a real-scene test for Beam/Bomb/Supernova formation and Nova HUD controls, and fixes power icons disappearing during nearby crystal-clearing animations. Follow [issue #19](https://github.com/FoxyLight/Cosmic-Crystals/issues/19); Android confirmation is still required.
-
-## Why a board could appear to reset
-
-The single-round prototype has a short **30-crystal target and 18-move budget**. Star Beams, Bombs and Nova can reach that target quickly. Previously any touch after the win/loss state immediately restarted the game. [PR #22](https://github.com/FoxyLight/Cosmic-Crystals/pull/22) adds a visible result overlay requiring an intentional **PLAY AGAIN** tap; ordinary taps are ignored. A separate deadlock recovery that previously regenerated the grid now reshuffles the **same gem inventory**, retaining moves, score and Nova charge. See [issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21) and [QA](docs/QA_TEST_PLAN.md). Android retest of these fixes is outstanding.
-
-## Versioned Android preview APKs
-
-**From PR #24 onward**, each CI Android APK has a unique `versionCode`, a readable `versionName` containing the product version/build number/commit, and a matching versioned APK filename. The artifact includes `build-info.json` (exact SHA/version/run/signing mode) and a SHA-256 checksum. CI verifies the **version embedded in the APK manifest**; renaming a file cannot make it pass.
-
-The source [VERSION](VERSION) is `0.3.0`. See [Android APK Versioning](docs/ANDROID_VERSIONING.md) for the full policy, downloads, wireless ADB installation and optional private persistent debug keystore. **Version numbers alone do not fix a changed signing certificate**, and future signed Google Play AABs remain a separate release process.
-
-**Android gameplay smoke (2026-10-29):** The player reports that the human playtest **passes** after the latest gameplay fixes and versioned build workflow. This is a positive practical checkpoint, while full device metrics, interruption tests, browser QA, Google Play signing and asteroid blockers are unfinished. See the [Android Playtest Report](docs/ANDROID_PLAYTEST_2026_10_29.md). The next development focus is **asteroid blockers** (M2 #6).
-
-## Run the prototype
-
-1. Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/).
-2. Clone the repo, import/open `project.godot` in Godot and press **F5**.
-3. Drag from one crystal to an orthogonally adjacent crystal, or tap two adjacent crystals. Four, five or T/L matches can forge special pieces; swap a special to activate it. Matches charge Nova to 20. Tap the NOVA control, then a tile to blast its row/column without using a move; tap NOVA again to cancel. Collect 30 crystals and destroy all six asteroids within 18 moves. After a win/loss, press the explicit **PLAY AGAIN** button; press **R** on desktop.
-
-Headless checks:
+Open `project.godot` in **Godot 4.7.2 standard**, Compatibility renderer, and F5.
+Import once before running scene tests because fonts/SVGs require imports:
 
 ```bash
 godot --headless --path . --editor --quit
-godot --headless --path . --script res://tests/test_board.gd
-godot --headless --path . --quit-after 120
+godot --headless --path . --script res://tests/test_campaign.gd
+godot --headless --path . --script res://tests/test_progress_store.gd
+godot --headless --path . --script res://tests/test_campaign_scene.gd
+python3 -m unittest discover -s tests -p test_android_version.py -v
 ```
 
-These checks run in [GitHub Actions](.github/workflows/godot-checks.yml), which also exports a **versioned Android debug APK** and a Web artifact. Automated exports do **not** prove physical device/browser usability.
+The workflow runs **all 13 Godot suites** through the strict error-log guard,
+then produces versioned Android debug APK and Web artifacts. [APK versioning](docs/ANDROID_VERSIONING.md)
+explains metadata, checksum, manifest checks and signing identity. Local editor
+defaults are `0.4.0-local` / code 2, **not a distributable versioned build**.
+CI stamps the unique code/name. Never commit keys/credentials.
 
-## Documentation index
+F9 opens desktop effects diagnostics. UI controls support mouse/touch and
+keyboard focus; puzzle play uses pointer gestures. Reduced motion is a persistent
+Home setting. Audio/full settings remain M4 work.
 
-| What you need | Reference |
-| --- | --- |
-| Current achievement vs missing work | [Project Status](docs/PROJECT_STATUS.md) |
-| Milestone owners/criteria and issue links | [Milestone Register](docs/MILESTONES.md) |
-| M0/M1 animated prototype and CI build results | [Implementation Notes](docs/M0_M1_IMPLEMENTATION.md) |
-| M2 Star Beams, Bombs, Supernova and Nova targeting | [M2 Gameplay Guide](docs/M2_SPECIALS_NOVA.md) |
-| Execution order and scope | [Roadmap](docs/ROADMAP.md) |
-| Concept, gameplay and visuals | [Game Design](docs/GAME_DESIGN.md) |
-| Gem colors, silhouettes and mobile readability QA | [Crystal Visual Identity](docs/VISUAL_PALETTE.md) |
-| Implementation and domain architecture | [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md) |
-| Coding-agent instructions | [Build Prompt](docs/BUILD_PROMPT.md) |
-| Godot engine decision/evidence gate | [Engine Evaluation](docs/ENGINE_EVALUATION.md) |
-| Why key technical/product choices were made | [Decisions](docs/DECISIONS.md) |
-| Acceptance and device/browser tests | [QA Test Plan](docs/QA_TEST_PLAN.md) |
-| Android APK/AAB and web export setup | [Android and Web Export](docs/ANDROID_EXPORT.md) |
-| Unique Android APK versions, artifacts and optional stable debug signing | [Android APK Versioning](docs/ANDROID_VERSIONING.md) |
-| Android release and Play process | [Release Plan](docs/RELEASE_PLAN.md) |
-| Known project risks/dependencies | [Risk Register](docs/RISKS.md) |
-| Branch, test and PR process | [Contributing](CONTRIBUTING.md) |
+## Documentation
 
-## Working agreement
+- [M3 Lyra campaign and acceptance checklist](docs/M3_LYRA_CAMPAIGN.md)
+- [Game design](docs/GAME_DESIGN.md), [architecture](docs/TECHNICAL_ARCHITECTURE.md)
+- [Status](docs/PROJECT_STATUS.md), [roadmap](docs/ROADMAP.md), [milestones](docs/MILESTONES.md)
+- [QA plan](docs/QA_TEST_PLAN.md), [Android versioning](docs/ANDROID_VERSIONING.md)
+- [Powers/Nova](docs/M2_SPECIALS_NOVA.md), [asteroids](docs/M2_ASTEROIDS.md)
+- [Visual pass](docs/VISUAL_PASS.md), [palette](docs/VISUAL_PALETTE.md), [contributing](CONTRIBUTING.md)
 
-This GitHub repository is the canonical source of truth. Use scoped issues and PRs, keep the [Milestone Register](docs/MILESTONES.md) and [Project Status](docs/PROJECT_STATUS.md) synchronized with real evidence, and do not mark untested product features or platform exports as complete.
-
-**Immediate focus:** download and playtest the M2 powers/Nova APK on Android, finish remaining M0/M1 device and interruption checks, and playtest the new asteroid slice in M2 #6. M3–M7 follow their milestone gates.
+The separately hosted web concept has its own earlier source/progress and
+advertises 20 levels. It is not this Godot campaign and is not updated by this PR.

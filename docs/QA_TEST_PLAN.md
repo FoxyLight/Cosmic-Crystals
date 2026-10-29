@@ -1,15 +1,28 @@
 # QA, Test and Device Validation Plan
 
-**Status:** Test strategy and acceptance gates, not a report of tests already run.  
+**Status:** Test strategy and acceptance gates, not a report of tests already run.
 **Snapshot:** 2026-10-29
 
-## Latest physical Android gameplay smoke: PASS (player-reported)
+## Earlier physical Android gameplay smoke: PASS (player-reported)
 
 **2026-10-29:** The player confirmed **“Human playtest passes”** after receiving the newest versioned debug APK instructions. This establishes a **positive overall physical Android gameplay smoke test**, not a separate verified pass for each rare power combination, every deadlock scenario, or hardware performance requirement.
 
 The immediately preceding requested scope covered four/five-match special creation, combos, Nova Pulse, unexpected board resets, PLAY AGAIN and reshuffle behavior. Actual installed build/version was not read back through ADB; the **recommended** version was `0.2.0-dev.82.1+gb5e1737d`, from [main workflow #40958771036](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40958771036). Full evidence boundaries and outstanding fields: [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md).
 
 **Still outstanding:** device/Android version, FPS/RAM/thermals/touch latency, interruption/resume, safe areas, exhaustive manual combo coverage, web browser testing, signed AAB and final M0 engine sign-off. Do not conflate this limited smoke-test pass with release acceptance.
+
+## M3 current acceptance gate
+
+Product base 0.4.0 implements five Lyra stages, sessions/goals/ratings, map/next/
+replay and local records/settings. Ten old suites remain; new suites cover
+sessions (10,325 checks), saves (86) and touch-driven five-level scene/reload
+(966). Five version-policy tests pass. CI inspects catalog/licenses in actual
+exports and retains strict Godot log guards/embedded APK metadata checks.
+
+Asteroid build 9101 passed the player. Visual 9601 was installed/read back but
+has no separate human pass. **M3 needs a new Android test**, including all five
+levels and app close/reopen with the same earned records. [Checklist/evidence](M3_LYRA_CAMPAIGN.md).
+This supersedes pre-M3 "not implemented" statuses in historical sections below.
 
 ## 1. Current automated coverage
 
@@ -54,9 +67,9 @@ The expanded seeded board test covers 125 seeds, no starting matches, adjacent l
 | Special pieces | 4/5/T/L creation precedence; combined triggers; no double-count | First M2 rules coded and tested; phone balancing pending |
 | Blockers | Adjacent matches vs special and Nova damage; durability rules | Implemented and automated; physical Android acceptance pending |
 | Nova Pulse | Charge, cancel, row/column, zero-move activation, reset | M2 rules + touch targeting implemented; manual cancellation/charge feel QA open |
-| Progression | 5-level unlocks, stars, replay, terminal screens and save load | Not implemented |
-| Persistence | Version migration, malformed/truncated save, app restart | Not implemented |
-| Interruptions | Restart, pause, background while animation resolves | Not implemented |
+| Progression | Five-level unlocks, stars, replay and save load | Implemented/model + actual scene journey/reload tested; human gate pending |
+| Persistence | Schema, malformed/truncated save, restart | Safe writes, backup/future recovery and automated disk reload tested |
+| Interruptions | Restart, pause, background while effects resolve | Transition guards/queued Back tested; full background/device matrix pending |
 
 **M2:** The new `tests/test_powers.gd` suite validates first-pass Star Beam, Supernova, Cosmic Bomb and special+special effects; tests chargeable Nova cost/target and no overlap double-counting. See [M2 gameplay guide](M2_SPECIALS_NOVA.md). Human phone checks remain open.
 

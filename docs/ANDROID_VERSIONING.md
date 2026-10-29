@@ -1,20 +1,20 @@
 # Android APK Versioning and Debug Signing
 
-**Effective:** from the first merged versioned build onward (2026-10-29)  
-**Owner/source of truth:** [VERSION](../VERSION), [version generator](../scripts/ci/version_android.py), [Godot checks workflow](../.github/workflows/godot-checks.yml).  
+**Effective:** from the first merged versioned build onward (2026-10-29)
+**Owner/source of truth:** [VERSION](../VERSION), [version generator](../scripts/ci/version_android.py), [Godot checks workflow](../.github/workflows/godot-checks.yml).
 **Scope:** Android **debug APK previews** in GitHub Actions, not an AAB production signing pipeline.
 
 ## Version numbering rules
 
-- `VERSION` is the product's source-controlled SemVer base, currently **`0.2.0`**. Bump it intentionally for a meaningful product iteration, not every CI run.
+- `VERSION` is the product's source-controlled SemVer base, currently **`0.4.0`** (M3 Lyra). Bump it intentionally for a meaningful product iteration, not every CI run.
 - Each GitHub Actions workflow run receives a unique `GITHUB_RUN_NUMBER`. The run attempt increments when that same run is rerun.
-- Android `versionCode = run_number × 100 + run_attempt` (attempts 1–99). Codes increase across **new** workflow runs; rerunning an older workflow can produce an older code than a newer already-installed build. Do not install an older version expecting an upgrade. The generator rejects zero/invalid inputs and a code exceeding **2,100,000,000** (Play limit). 
-- Android `versionName = <VERSION>-dev.<run_number>.<run_attempt>+g<first8GitSHA>`, for example `0.2.0-dev.74.1+gabc12345`.
-- Actual APK filename: `cosmic-crystals-v0.2.0-dev.74.1-gabc12345-debug.apk`.
-- GitHub Actions artifact name: `cosmic-crystals-android-v0.2.0-dev.74.1-gabc12345`.
+- Android `versionCode = run_number × 100 + run_attempt` (attempts 1–99). Codes increase across **new** workflow runs; rerunning an older workflow can produce an older code than a newer already-installed build. Do not install an older version expecting an upgrade. The generator rejects zero/invalid inputs and a code exceeding **2,100,000,000** (Play limit).
+- Android `versionName = <VERSION>-dev.<run_number>.<run_attempt>+g<first8GitSHA>`, for example `0.4.0-dev.74.1+gabc12345`.
+- Actual APK filename: `cosmic-crystals-v0.4.0-dev.74.1-gabc12345-debug.apk`.
+- GitHub Actions artifact name: `cosmic-crystals-android-v0.4.0-dev.74.1-gabc12345`.
 - The export uses the **same** `package/unique_name` as before: `org.foxylight.cosmiccrystals.prototype`.
 
-The CI generator edits Android `version/code` and `version/name` **in the ephemeral checkout**, not in the repository with each commit. The committed `export_presets.cfg` has `versionCode=2` and `versionName=0.2.0-local` for manual editor builds; those baseline values are **not** unique across local exports. To create a uniquely numbered local APK, deliberately set a code above the device's installed version and verify it.
+The CI generator edits Android `version/code` and `version/name` **in the ephemeral checkout**, not in the repository with each commit. The committed `export_presets.cfg` has `versionCode=2` and `versionName=0.4.0-local` for manual editor builds; those baseline values are **not** unique across local exports. To create a uniquely numbered local APK, deliberately set a code above the device's installed version and verify it.
 
 ## What GitHub Actions guarantees
 
@@ -37,7 +37,7 @@ The check job also runs `python3 -m unittest discover -s tests -p test_android_v
 3. With wireless ADB connected, run `adb devices -l` and then install the **actual versioned filename**:
 
 ```bash
-adb install -r cosmic-crystals-v0.2.0-dev.74.1-gabc12345-debug.apk
+adb install -r cosmic-crystals-v0.4.0-dev.74.1-gabc12345-debug.apk
 ```
 
 The above filename is **illustrative**, not a link to a particular real build. Copy the filename from your downloaded ZIP.
@@ -51,7 +51,7 @@ adb shell dumpsys package org.foxylight.cosmiccrystals.prototype | grep versionC
 On a computer with Android build tools, inspect the downloaded APK itself:
 
 ```bash
-aapt dump badging cosmic-crystals-v0.2.0-dev.74.1-gabc12345-debug.apk | grep '^package:'
+aapt dump badging cosmic-crystals-v0.4.0-dev.74.1-gabc12345-debug.apk | grep '^package:'
 ```
 
 To verify the downloaded APK has not changed, run `sha256sum -c SHA256SUMS.txt` in the extracted directory.
@@ -85,3 +85,7 @@ Once this optional secret is configured, future **main** build metadata reports 
 ## Future release AAB policy
 
 The current pipeline is **debug-only**, with no Google Play submission, production keystore or release AAB. Before an AAB release, establish a separate signed Gradle export job, release-version SemVer policy and Android `versionCode` allocation higher than any version **already uploaded** to Play. Never reuse a versionCode for two different Play uploads of the same package, never put release keys in Git, and independently check release AAB package/version/signature before uploading. Reference [Release Plan](RELEASE_PLAN.md) and [M6 issue #10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10).
+
+## M3 save safety
+
+Campaign progress is private user storage. A signature-mismatch uninstall deletes it. Prefer the existing persistent-debug-secret support before future progress-bearing upgrades, or back up before deliberately reinstalling. This change does not create or commit signing credentials. A source-policy test now rejects local version/name drift from VERSION.
