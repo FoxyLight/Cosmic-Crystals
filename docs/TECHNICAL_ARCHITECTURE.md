@@ -4,6 +4,18 @@
 
 ## Working Godot prototype
 
+**Presentation pass:** `scripts/game_layout.gd` provides shared viewport/safe-area
+geometry for HUD controls, rendering and hit targets. The base canvas is 400x760
+with aspect expansion; desktop uses a side column and phones use a vertical
+one-screen composition. `scripts/game_hud.gd` owns native Label/Button panels,
+font variations, meters, modal focus and result/help/pause rendering. The
+controller still plays the same immutable rule events. Pointer events reach
+board `_unhandled_input` only after GUI controls have consumed their own input,
+preventing double Nova toggles. The headless import runs before gameplay tests
+so font/SVG dependencies are imported; every command retains the strict log
+error guard. [Presentation contract and test evidence](VISUAL_PASS.md).
+
+
 **M2 asteroid extension:** `CosmicBoard.asteroids` is a separate 64-entry 0–2
 durability array; blocked cells have no gem or special. All events carry
 `asteroids_before/after`. A clear wave unions direct/adjacent hits, emits

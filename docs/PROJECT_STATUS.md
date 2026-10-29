@@ -17,6 +17,21 @@ parallel infrastructure tasks. M3 progression has not started.
 
 ## Executive summary
 
+**Latest presentation slice (`0.3.1`):** [Visual Pass](VISUAL_PASS.md) brings the
+Godot gameplay/results screen in line with the earlier web/Android design.
+Responsive geometry, safe-area conversion, native HUD labels/buttons, updated
+facets/colors, help/pause and hidden diagnostics are implemented. All ten
+GDScript suites and four Android version-policy tests pass locally, including
+1,459 new geometry/actual-control/mouse/touch/focus checks. Desktop Compatibility
+renders were inspected at 320x568, 376x746 and 1280x800. New Android visual
+acceptance remains pending; no FPS/browser/device result is inferred.
+
+**Asteroid Android checkpoint:** after ADB installation and version read-back,
+the player said **Playtest passes** for `0.3.0-dev.91.1+g71c389ec` (code 9101).
+This accepts that blocker slice at phone-smoke level; M2 balance/broader QA and
+the new visual pass remain open. [Tracking evidence](https://github.com/FoxyLight/Cosmic-Crystals/issues/6).
+
+
 **New M2 slice, product `0.3.0`:** asteroid occupancy/durability, adjacent and
 power/Nova damage, one-hit-per-wave deduplication, segmented gravity/refill,
 inventory-preserving blocked deadlocks and impact/crack/destruction rendering

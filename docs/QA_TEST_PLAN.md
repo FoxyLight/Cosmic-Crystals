@@ -13,6 +13,17 @@ The immediately preceding requested scope covered four/five-match special creati
 
 ## 1. Current automated coverage
 
+**Presentation regression:** `tests/test_game_layout.gd` adds 1,459 checks for
+nine viewport geometries with three safe-area configurations each, square board,
+nonoverlapping panels, complete dialog bounds, actual control bounds, full help
+text, real mouse/touch dispatch, no double Nova toggles, pause/resume board
+preservation, modal focus and intentional replay. All nine previous GDScript
+suites plus four Android version-policy tests still pass. The desktop
+Compatibility renderer was visually checked at phone and desktop sizes. This
+is not physical Android or exported-browser acceptance; use the checklist in
+[Visual Pass](VISUAL_PASS.md) for that new build.
+
+
 **Asteroid regression addition:** `tests/test_asteroids.gd` passes **862,246
 assertions** across fixed fixtures, 16 ordered power pairs with blockers and
 125 seeds × 12 paired turns with full three-layer event replay.

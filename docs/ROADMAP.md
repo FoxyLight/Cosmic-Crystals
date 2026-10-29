@@ -85,6 +85,14 @@ outcomes are automated. New Android blocker acceptance and balance remain open.
 
 ### M4: Visual/audio/mobile UX | [Issue #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8)
 
+**Presentation implementation (`0.3.1`):** gameplay and results now follow the
+earlier browser/Android look, with responsive/safe-area geometry, native readable
+HUD, goal art, local fonts, improved facets, blue/green separation and help/pause.
+The 1,459-check UI suite passes; physical Android visual and exported-browser
+acceptance remain open. This is a bounded M4 slice before M3, not a campaign or
+complete accessibility/audio milestone. See [Visual Pass](VISUAL_PASS.md).
+
+
 **Device feedback:** Warm amber and white/ice opal were initially hard to distinguish. The procedural contrast fix is specified in [Crystal Visual Identity](VISUAL_PALETTE.md); only automated verification is available until the updated APK is playtested.
 
 - [x] Differentiate the six **prototype** crystal types by contour and dark per-kind outlines; add regression tests for warm Solar Amber vs icy Lunar Opal (PR #14).

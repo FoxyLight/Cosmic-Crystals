@@ -31,10 +31,10 @@ jobs:
             echo "::error::CI guard accepted a simulated failed scene-script load"
             exit 1
           fi
-      - name: Instantiate gameplay scene and verify a real four-match Star Beam
-        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_game_scene.gd
       - name: Import and parse Godot project headlessly
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --editor --quit
+      - name: Instantiate gameplay scene and verify a real four-match Star Beam
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_game_scene.gd
       - name: Test deterministic match-3 board engine
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_board.gd
       - name: Verify gem contrast and distinct silhouettes
@@ -51,6 +51,8 @@ jobs:
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_asteroids.gd
       - name: Verify asteroid rendering events, input locking and final-move results
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_asteroid_scene.gd
+      - name: Verify responsive geometry, actual HUD controls, dialogs and touch input
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_game_layout.gd
       - name: Run the prototype scene headlessly for 120 frames
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --quit-after 120
 
