@@ -1,28 +1,47 @@
 extends Control
-## Playable Android-first engine spike with touch/mouse input and procedural art.
-## Deliberately no blockers, specials, save data, or native integrations yet.
+## Animated Android-first match-3 prototype, with a clearly labeled synthetic
+## 30-second drawing stress check. Specials, blockers and saves are still planned.
 
 const BoardScript = preload("res://scripts/board.gd")
 const GOAL: int = 30
 const STARTING_MOVES: int = 18
+
+const SWAP_SECONDS: float = 0.17
+const CLEAR_SECONDS: float = 0.19
+const FALL_SECONDS: float = 0.27
+const RESHUFFLE_SECONDS: float = 0.28
 
 var crystal_colors: Array[Color] = [
 	Color("#7C4DFF"), Color("#FFCB65"), Color("#39D5FF"),
 	Color("#FF66BF"), Color("#44E3B2"), Color("#CDEBFF")
 ]
 var board = null
+var display_cells: Array[int] = []
 var moves_left: int = STARTING_MOVES
 var collected: int = 0
 var score: int = 0
 var selected: int = -1
 var press_index: int = -1
-var input_locked: bool = false
+var press_position: Vector2 = Vector2.ZERO
+
+var phase: String = "idle"
+var active_event: Dictionary = {}
+var event_elapsed: float = 0.0
+var event_duration: float = 0.01
 var finished: bool = false
 var won: bool = false
 var feedback: String = "Swap adjacent crystals to rekindle the stars"
 var feedback_ok: bool = true
 var flash_time: float = 0.0
 var elapsed: float = 0.0
+
+# Synthetic 2D stress draw, not a claim about production particles or device FPS.
+var stress_active: bool = false
+var stress_elapsed: float = 0.0
+var stress_samples: int = 0
+var stress_fps_total: float = 0.0
+var stress_min_fps: float = 100000.0
+var stress_report: String = "Tap STRESS 30S to test effects rendering"
 
 
 func _ready() -> void:
@@ -31,12 +50,14 @@ func _ready() -> void:
 
 func _reset_game() -> void:
 	board = BoardScript.new(20261029 + int(Time.get_ticks_msec() % 100000))
+	display_cells = board.cells.duplicate()
 	moves_left = STARTING_MOVES
 	collected = 0
 	score = 0
 	selected = -1
 	press_index = -1
-	input_locked = false
+	phase = "idle"
+	active_event = {}
 	finished = false
 	won = false
 	feedback = "Drag or tap two neighboring crystals"
@@ -48,16 +69,35 @@ func _reset_game() -> void:
 func _process(delta: float) -> void:
 	elapsed += delta
 	flash_time = maxf(0.0, flash_time - delta)
+	if not active_event.is_empty():
+		event_elapsed = minf(event_elapsed + delta, event_duration)
+	if stress_active:
+		stress_elapsed += delta
+		if Engine.get_frames_per_second() > 0:
+			var fps: float = float(Engine.get_frames_per_second())
+			stress_samples += 1
+			stress_fps_total += fps
+			stress_min_fps = minf(stress_min_fps, fps)
+		if stress_elapsed >= 30.0:
+			stress_active = false
+			var mean_fps: float = stress_fps_total / float(maxi(stress_samples, 1))
+			stress_report = "Draw test: avg %.0f / min %.0f FPS" % [mean_fps, stress_min_fps if stress_samples > 0 else 0.0]
+			print("COSMIC_STRESS: %s" % stress_report)
 	queue_redraw()
 
 
 func _board_rect() -> Rect2:
-	var side: float = minf(maxf(100.0, size.x - 32.0), maxf(100.0, size.y - 250.0))
-	side = minf(side, 640.0)
-	var top: float = maxf(115.0, (size.y - side) * 0.44)
-	if top + side + 55.0 > size.y:
-		top = maxf(92.0, size.y - side - 55.0)
+	# Reserve HUD + stress control space on portrait phones.
+	var available_width: float = maxf(120.0, size.x - 28.0)
+	var available_height: float = maxf(120.0, size.y - 310.0)
+	var side: float = minf(minf(available_width, available_height), 640.0)
+	var top: float = maxf(205.0, (size.y - side) * 0.52)
+	top = minf(top, maxf(110.0, size.y - side - 76.0))
 	return Rect2(Vector2((size.x - side) * 0.5, top), Vector2(side, side))
+
+
+func _stress_rect() -> Rect2:
+	return Rect2(Vector2(maxf(12.0, size.x - 158.0), 178.0), Vector2(140.0, 36.0))
 
 
 func _index_at(screen_pos: Vector2) -> int:
@@ -70,6 +110,11 @@ func _index_at(screen_pos: Vector2) -> int:
 	return row * 8 + col
 
 
+func _center_of(index: int, rect: Rect2) -> Vector2:
+	var tile: float = rect.size.x / 8.0
+	return rect.position + Vector2(float(index % 8) + 0.5, float(int(index / 8)) + 0.5) * tile
+
+
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color("#0B102A"))
 	_draw_starfield()
@@ -80,30 +125,87 @@ func _draw() -> void:
 	draw_rect(rect.grow(8.0), Color(0.18, 0.12, 0.37, 0.9))
 	draw_rect(rect.grow(3.0), Color("#29234E"))
 	var tile: float = rect.size.x / 8.0
-	for row in range(8):
-		for col in range(8):
-			var index: int = row * 8 + col
-			var origin: Vector2 = rect.position + Vector2(col, row) * tile
-			var chosen: bool = selected == index
+	for index in range(64):
+		var origin: Vector2 = rect.position + Vector2(index % 8, int(index / 8)) * tile
+		var selected_cell: bool = phase == "idle" and selected == index
+		draw_rect(Rect2(origin + Vector2(2, 2), Vector2(tile - 4.0, tile - 4.0)),
+			Color(0.13, 0.18, 0.33) if selected_cell else Color(0.08, 0.11, 0.23))
+		if selected_cell:
 			draw_rect(Rect2(origin + Vector2(2, 2), Vector2(tile - 4.0, tile - 4.0)),
-				Color(0.13, 0.18, 0.33, 1.0) if chosen else Color(0.08, 0.11, 0.23, 1.0))
-			if chosen:
-				draw_rect(Rect2(origin + Vector2(2, 2), Vector2(tile - 4.0, tile - 4.0)),
-					Color("#39D5FF"), false, 2.0)
-			var kind: int = int(board.cells[index])
-			if kind >= 0:
-				_draw_crystal(origin + Vector2.ONE * tile * 0.5, tile * 0.34, kind)
+				Color("#39D5FF"), false, 2.0)
+
+	if active_event.is_empty():
+		_draw_snapshot(display_cells, rect)
+	else:
+		_draw_animated_event(rect)
+
 	if flash_time > 0.0:
-		var tint: Color = Color(0.20, 0.90, 0.86, flash_time * 0.23) if feedback_ok else Color(1, 0.25, 0.40, flash_time * 0.27)
+		var tint: Color = Color(0.20, 0.90, 0.86, flash_time * 0.20) if feedback_ok else Color(1, 0.25, 0.40, flash_time * 0.23)
 		draw_rect(rect, tint)
+	if stress_active:
+		_draw_stress_effects(rect)
 	_draw_footer(rect)
+
+
+func _draw_snapshot(snapshot: Array, rect: Rect2) -> void:
+	for index in range(snapshot.size()):
+		var kind: int = int(snapshot[index])
+		if kind >= 0:
+			_draw_crystal(_center_of(index, rect), rect.size.x / 8.0 * 0.34, kind)
+
+
+func _draw_animated_event(rect: Rect2) -> void:
+	var t: float = clampf(event_elapsed / event_duration, 0.0, 1.0)
+	var eased: float = t * t * (3.0 - 2.0 * t)
+	var kind: String = str(active_event["type"])
+	var before: Array = active_event["before"]
+	var radius: float = rect.size.x / 8.0 * 0.34
+	match kind:
+		"swap", "swap_back":
+			var a: int = int(active_event["a"])
+			var b: int = int(active_event["b"])
+			for index in range(before.size()):
+				if index != a and index != b and int(before[index]) >= 0:
+					_draw_crystal(_center_of(index, rect), radius, int(before[index]))
+			_draw_crystal(_center_of(a, rect).lerp(_center_of(b, rect), eased), radius, int(before[a]))
+			_draw_crystal(_center_of(b, rect).lerp(_center_of(a, rect), eased), radius, int(before[b]))
+		"clear":
+			var marked: Dictionary = {}
+			for index in active_event["indices"]:
+				marked[int(index)] = true
+			for index in range(before.size()):
+				if int(before[index]) < 0:
+					continue
+				if marked.has(index):
+					_draw_crystal(_center_of(index, rect), radius * (1.0 - t * 0.46), int(before[index]), 1.0 - t)
+				else:
+					_draw_crystal(_center_of(index, rect), radius, int(before[index]))
+		"fall":
+			for move in active_event["moves"]:
+				var from_index: int = int(move["from"])
+				var to_index: int = int(move["to"])
+				_draw_crystal(_center_of(from_index, rect).lerp(_center_of(to_index, rect), eased),
+					radius, int(move["kind"]))
+			for spawn in active_event["spawns"]:
+				var to_index: int = int(spawn["to"])
+				var start_row: int = int(spawn["from_row"])
+				var start: Vector2 = _center_of(to_index, rect)
+				start.y = rect.position.y + (float(start_row) + 0.5) * (rect.size.x / 8.0)
+				_draw_crystal(start.lerp(_center_of(to_index, rect), eased), radius, int(spawn["kind"]))
+		"reshuffle":
+			if t < 0.5:
+				_draw_snapshot(before, rect)
+			else:
+				_draw_snapshot(active_event["after"], rect)
+		_:
+			_draw_snapshot(active_event["after"], rect)
 
 
 func _draw_starfield() -> void:
 	for i in range(85):
 		var px: float = fposmod(float(i * 173 + 29), maxf(size.x, 1.0))
 		var py: float = fposmod(float(i * 241 + 71), maxf(size.y, 1.0))
-		var alpha: float = (0.17 + 0.30 * (0.5 + 0.5 * sin(elapsed * 0.7 + float(i)))) 
+		var alpha: float = 0.17 + 0.30 * (0.5 + 0.5 * sin(elapsed * 0.7 + float(i)))
 		draw_circle(Vector2(px, py), 0.6 + float(i % 3) * 0.42, Color(0.65, 0.8, 1.0, alpha))
 
 
@@ -111,17 +213,27 @@ func _draw_hud() -> void:
 	var font: Font = ThemeDB.fallback_font
 	var header_size: int = 29 if size.x >= 420.0 else 23
 	draw_string(font, Vector2(20, 48), "COSMIC CRYSTALS", HORIZONTAL_ALIGNMENT_LEFT, -1, header_size, Color("#DDEAFF"))
-	draw_string(font, Vector2(22, 77), "A STARWEAVER'S JOURNEY  /  GODOT ENGINE SPIKE", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#97A4CA"))
+	draw_string(font, Vector2(22, 77), "A STARWEAVER'S JOURNEY  /  ENGINE SPIKE", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#97A4CA"))
 	draw_string(font, Vector2(22, 116), "CRYSTALS  %d / %d" % [collected, GOAL], HORIZONTAL_ALIGNMENT_LEFT, -1, 19, Color("#39D5FF"))
 	draw_string(font, Vector2(22, 144), "MOVES  %d     SCORE  %d" % [moves_left, score], HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color("#FFCB65"))
 	var progress_width: float = minf(size.x - 44.0, 360.0)
 	draw_rect(Rect2(Vector2(22, 159), Vector2(progress_width, 7)), Color("#282A51"))
 	draw_rect(Rect2(Vector2(22, 159), Vector2(progress_width * minf(float(collected) / float(GOAL), 1.0), 7)), Color("#39D5FF"))
+	var button: Rect2 = _stress_rect()
+	draw_rect(button, Color("#3A2D6A"))
+	draw_rect(button, Color("#39D5FF"), false, 1.0)
+	draw_string(font, button.position + Vector2(8, 24), "STRESS 30S", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#DDEAFF"))
+	if stress_active:
+		draw_string(font, Vector2(22, 204), "STRESS %.0f s  •  FPS %d" % [maxf(0.0, 30.0 - stress_elapsed), Engine.get_frames_per_second()],
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#FFCB65"))
 
 
-func _draw_crystal(center: Vector2, radius: float, kind: int) -> void:
+func _draw_crystal(center: Vector2, radius: float, kind: int, opacity: float = 1.0) -> void:
+	if kind < 0 or kind >= crystal_colors.size():
+		return
 	var base: Color = crystal_colors[kind]
-	draw_circle(center, radius * 1.07, Color(base.r, base.g, base.b, 0.13))
+	base.a = opacity
+	draw_circle(center, radius * 1.07, Color(base.r, base.g, base.b, 0.13 * opacity))
 	var sides: int = 5
 	match kind:
 		0: sides = 4
@@ -137,71 +249,165 @@ func _draw_crystal(center: Vector2, radius: float, kind: int) -> void:
 		polygon.append(center + Vector2(cos(angle), sin(angle)) * radius * modulation)
 	draw_colored_polygon(polygon, base)
 	for j in range(sides):
-		draw_line(polygon[j], polygon[(j + 1) % sides], base.lightened(0.35), 1.4, true)
-	draw_circle(center - Vector2(radius * 0.20, radius * 0.23), radius * 0.19, Color(1, 1, 1, 0.66))
-	draw_line(center - Vector2(radius * 0.33, radius * 0.37), center + Vector2(radius * 0.38, radius * 0.29), Color(1, 1, 1, 0.16), 1.0, true)
+		var edge: Color = base.lightened(0.35)
+		edge.a = opacity
+		draw_line(polygon[j], polygon[(j + 1) % sides], edge, 1.4, true)
+	draw_circle(center - Vector2(radius * 0.20, radius * 0.23), radius * 0.19, Color(1, 1, 1, 0.66 * opacity))
+
+
+func _draw_stress_effects(rect: Rect2) -> void:
+	# Synthetic visual workload to compare drawing FPS on different devices.
+	# These effects do not represent finished particle art or GPU benchmarks.
+	for i in range(260):
+		var index: float = float(i)
+		var phase_angle: float = elapsed * (0.75 + float(i % 7) * 0.10) + index * 2.39996
+		var radial: float = (0.08 + 0.88 * float((i * 73) % 257) / 257.0) * rect.size.x * 0.46
+		var point: Vector2 = rect.get_center() + Vector2(cos(phase_angle), sin(phase_angle)) * radial
+		var color: Color = crystal_colors[i % crystal_colors.size()]
+		color.a = 0.25 + 0.40 * (0.5 + 0.5 * sin(elapsed * 2.1 + index))
+		draw_circle(point, 1.5 + float(i % 5), color)
 
 
 func _draw_footer(rect: Rect2) -> void:
 	var font: Font = ThemeDB.fallback_font
-	var footer_y: float = minf(size.y - 28.0, rect.end.y + 36.0)
+	var footer_y: float = minf(size.y - 32.0, rect.end.y + 37.0)
 	if finished:
 		var message: String = "CONSTELLATION RESTORED!" if won else "OUT OF MOVES"
 		draw_string(font, Vector2(rect.position.x, footer_y), message, HORIZONTAL_ALIGNMENT_LEFT, -1, 21, Color("#FFCB65") if won else Color("#FF8FAE"))
-		draw_string(font, Vector2(rect.position.x, footer_y + 25.0), "Tap anywhere to try again", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color("#DDEAFF"))
+		if footer_y + 24 < size.y:
+			draw_string(font, Vector2(rect.position.x, footer_y + 24.0), "Tap anywhere to replay", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#DDEAFF"))
 	else:
 		draw_string(font, Vector2(rect.position.x, footer_y), feedback, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#9DE3E2") if feedback_ok else Color("#FF8FAE"))
+	if not stress_active and stress_samples > 0:
+		draw_string(font, Vector2(rect.position.x, minf(size.y - 8.0, footer_y + 24.0)), stress_report, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#DDEAFF"))
 
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
-		_handle_touch(event.position, event.pressed)
+		if event.index == 0:
+			_handle_touch(event.position, event.pressed)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_handle_touch(event.position, event.pressed)
 	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_R:
-		if not input_locked:
+		if phase == "idle" or phase == "finished":
 			_reset_game()
 
 
 func _handle_touch(pointer: Vector2, pressed: bool) -> void:
-	if input_locked:
-		return
-	if finished:
-		if not pressed:
-			_reset_game()
+	if phase != "idle" and phase != "finished":
 		return
 	if pressed:
+		if phase == "idle" and _stress_rect().has_point(pointer):
+			press_index = -2
+			return
 		press_index = _index_at(pointer)
+		press_position = pointer
 		return
-	var release_index: int = _index_at(pointer)
+	if press_index == -2:
+		press_index = -1
+		if phase == "idle" and _stress_rect().has_point(pointer):
+			_toggle_stress_test()
+		return
+	if phase == "finished":
+		_reset_game()
+		return
 	var start_index: int = press_index
 	press_index = -1
-	if start_index < 0 or release_index < 0:
+	if start_index < 0:
 		return
-	if start_index != release_index and board.is_adjacent(start_index, release_index):
-		selected = -1
-		_take_turn(start_index, release_index)
-	elif start_index == release_index:
-		if selected >= 0 and selected != release_index and board.is_adjacent(selected, release_index):
+	var release_index: int = _index_at(pointer)
+	var drag: Vector2 = pointer - press_position
+	var threshold: float = _board_rect().size.x / 8.0 * 0.28
+	if drag.length() >= threshold:
+		# Long/fast swipes still pick exactly one orthogonal neighboring cell.
+		var col: int = start_index % 8
+		var row: int = int(start_index / 8)
+		var target: int = -1
+		if absf(drag.x) > absf(drag.y):
+			if drag.x > 0.0 and col < 7:
+				target = start_index + 1
+			elif drag.x < 0.0 and col > 0:
+				target = start_index - 1
+		else:
+			if drag.y > 0.0 and row < 7:
+				target = start_index + 8
+			elif drag.y < 0.0 and row > 0:
+				target = start_index - 8
+		if target >= 0:
+			selected = -1
+			_take_turn(start_index, target)
+		return
+	if release_index == start_index:
+		if selected >= 0 and selected != start_index and board.is_adjacent(selected, start_index):
 			var first: int = selected
 			selected = -1
-			_take_turn(first, release_index)
+			_take_turn(first, start_index)
 		else:
-			selected = release_index
+			selected = start_index
 			queue_redraw()
 
 
+func _toggle_stress_test() -> void:
+	if stress_active:
+		stress_active = false
+		stress_report = "Stress test stopped before 30s"
+	else:
+		stress_active = true
+		stress_elapsed = 0.0
+		stress_samples = 0
+		stress_fps_total = 0.0
+		stress_min_fps = 100000.0
+		stress_report = "Synthetic draw test running"
+	queue_redraw()
+
+
+func _event_duration(kind: String) -> float:
+	match kind:
+		"swap", "swap_back":
+			return SWAP_SECONDS
+		"clear":
+			return CLEAR_SECONDS
+		"fall":
+			return FALL_SECONDS
+		"reshuffle":
+			return RESHUFFLE_SECONDS
+	return 0.05
+
+
+func _animate_event(event: Dictionary) -> void:
+	active_event = event
+	event_elapsed = 0.0
+	event_duration = _event_duration(str(event["type"]))
+	display_cells = event["before"].duplicate()
+	queue_redraw()
+	while event_elapsed < event_duration:
+		await get_tree().process_frame
+	display_cells = event["after"].duplicate()
+	active_event = {}
+	queue_redraw()
+
+
 func _take_turn(a: int, b: int) -> void:
-	input_locked = true
-	var result: Dictionary = board.play_swap(a, b)
-	if bool(result["valid"]):
+	# Exactly one resolution coroutine per player action.
+	if phase != "idle":
+		return
+	phase = "resolving"
+	selected = -1
+	press_index = -1
+	var outcome: Dictionary = board.play_swap(a, b)
+	for event in outcome["events"]:
+		await _animate_event(event)
+	# The model's final state, score and goals are authoritative.
+	display_cells = board.cells.duplicate()
+	if bool(outcome["valid"]):
 		moves_left -= 1
-		collected += int(result["cleared"])
-		score += int(result["score"])
+		collected += int(outcome["cleared"])
+		score += int(outcome["score"])
 		feedback_ok = true
-		feedback = "CASCADE x%d  +%d points" % [int(result["cascades"]), int(result["score"])]
-		if bool(result["reshuffled"]):
+		feedback = "CASCADE x%d  +%d points" % [int(outcome["cascades"]), int(outcome["score"])]
+		if bool(outcome["reshuffled"]):
 			feedback = "Stars realigned. New moves available!"
+		# Last-move completion is a win, evaluated after all cascades settle.
 		if collected >= GOAL:
 			finished = true
 			won = true
@@ -211,7 +417,6 @@ func _take_turn(a: int, b: int) -> void:
 	else:
 		feedback_ok = false
 		feedback = "That swap doesn't make a match"
-	flash_time = 0.55
+	flash_time = 0.45
+	phase = "finished" if finished else "idle"
 	queue_redraw()
-	await get_tree().create_timer(0.22).timeout
-	input_locked = false
