@@ -36,6 +36,8 @@ The [M2 Powers and Nova guide](docs/M2_SPECIALS_NOVA.md) records the implemented
 
 A physical Android playtest revealed that matching four gems did not visibly produce a Star Beam. Investigation found a GDScript **parse error hidden by the previous CI workflow** in the first M2 preview, not a verified error in the four-match rules themselves. [PR #18](https://github.com/FoxyLight/Cosmic-Crystals/pull/18) corrects the syntax and adds real-scene four-match smoke coverage plus an engine-log guard so APK exports cannot silently pass with failed gameplay-script loading. Beam icons and the `STAR BEAM FORGED!` message are also clearer. A fresh Android retest is required before this defect is closed. See [M2 mechanics](docs/M2_SPECIALS_NOVA.md) and [bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17).
 
+**M2 combination audit:** [PR #20](https://github.com/FoxyLight/Cosmic-Crystals/pull/20) adds exhaustive checks for 96 ordered special-combo and edge-orientation scenarios, a real-scene test for Beam/Bomb/Supernova formation and Nova HUD controls, and fixes power icons disappearing during nearby crystal-clearing animations. Follow [issue #19](https://github.com/FoxyLight/Cosmic-Crystals/issues/19); Android confirmation is still required.
+
 ## Run the prototype
 
 1. Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/).
