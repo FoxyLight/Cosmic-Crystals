@@ -1,0 +1,28 @@
+; Engine configuration for the Android-first Cosmic Crystals technology spike.
+; Godot 4.7.2 stable, GDScript, Compatibility renderer for web support.
+
+config_version=5
+
+[application]
+
+config/name="Cosmic Crystals"
+run/main_scene="res://scenes/Prototype.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/stretch/mode="canvas_items"
+window/handheld/orientation=1
+
+[input_devices]
+
+pointing/emulate_mouse_from_touch=false
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
+environment/defaults/default_clear_color=Color(0.043, 0.063, 0.165, 1)
