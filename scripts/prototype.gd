@@ -237,8 +237,8 @@ func _draw_hud() -> void:
 	draw_rect(nova, Color("#296D83") if phase == "nova_targeting" else
 		(Color("#4A3488") if charged else Color("#202947")))
 	draw_rect(nova, Color("#B9F4FF") if charged else Color("#485879"), false, 1.2)
-\tvar fraction: float = float(board.nova_energy) / float(BoardScript.NOVA_MAX) if board != null else 0.0
-\tdraw_rect(Rect2(nova.position + Vector2(3, 31), Vector2((nova.size.x - 6.0) * fraction, 3)), Color("#89E8FF"))
+	var fraction: float = float(board.nova_energy) / float(BoardScript.NOVA_MAX) if board != null else 0.0
+	draw_rect(Rect2(nova.position + Vector2(3, 31), Vector2((nova.size.x - 6.0) * fraction, 3)), Color("#89E8FF"))
 	var energy: int = board.nova_energy if board != null else 0
 	draw_string(font, nova.position + Vector2(8, 23),
 		"NOVA %d/%d" % [energy, BoardScript.NOVA_MAX],
