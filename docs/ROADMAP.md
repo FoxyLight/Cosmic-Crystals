@@ -47,7 +47,7 @@
 
 **Exit gate:** reliable, readable gameplay on a stable board, tested with both input modalities. No double moves, frozen cascades or wrong win/loss counts.
 
-**Gameplay playtest gate:** On 2026-10-29, the player reported **human Android playtest PASS** following the Star Beam/combo/Nova fixes, explicit replay and deadlock shuffle patch, and automatic APK versioning. See [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md). The basic Android gameplay experience now has positive feedback; systematic device metrics, browser checks, AAB and other M0/M1 tasks remain open. **Next M2 feature:** asteroid blockers, with damage/interaction/gravity/deadlock tests.
+**Gameplay playtest gate:** On 2026-10-29, the player reported **human Android playtest PASS** following the Star Beam/combo/Nova fixes, explicit replay and deadlock shuffle patch, and automatic APK versioning. See [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md). The basic Android gameplay experience now has positive feedback; systematic device metrics, browser checks, AAB and other M0/M1 tasks remain open. **New M2 slice:** asteroid blockers and damage/interaction/gravity/deadlock tests are implemented; new Android acceptance is pending.
 
 ## Priority 1: Distinctive cosmic gameplay and a complete player journey
 
@@ -57,13 +57,17 @@
 
 ### M2: Cosmic mechanics | [Issue #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6)
 
-**Partial playable implementation:** Godot PR #16 adds tested specials, combo unions and targetable Nova. See [M2 Gameplay Guide](M2_SPECIALS_NOVA.md). Android feel/balance and blockers remain open.
+**Playable M2 mechanics:** specials, combo unions, targetable Nova and the
+[asteroid slice](M2_ASTEROIDS.md) are implemented. Fixed HP, one hit per wave,
+power damage, segmented refill, blocked deadlocks and real-scene final-move
+outcomes are automated. New Android blocker acceptance and balance remain open.
 
 - [x] Straight four-match Star Beam, horizontal/vertical orientations and line clear.
 - [x] Straight five-match Supernova, T/L Cosmic Bomb and deterministic five > T/L > four precedence.
 - [x] Implement first-pass Beam+Beam, Beam+Bomb, Bomb+Bomb and Supernova combos with no double-counting.
 - [ ] Android playtest and tune special combinations and long-chain behavior.
-- [ ] Asteroid blockers and correct adjacent/special-effect damage.
+- [x] Asteroid blockers, adjacent/special/Nova damage, segmented physics and deterministic tests.
+- [ ] Physical Android acceptance of the new asteroid slice; tune the six-rock test round.
 - [x] Add 20-charge Nova meter, cancelable targeting, row+column blast and zero-move activation.
 - [ ] Balance specials and Nova energy on physical Android, and add edge-case chain tests.
 

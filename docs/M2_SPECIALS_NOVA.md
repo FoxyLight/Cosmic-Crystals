@@ -8,6 +8,18 @@
 
 ## What is implemented
 
+**Latest slice: [M2 Asteroid Blockers](M2_ASTEROIDS.md)** adds a third parallel
+64-cell durability array, one hit per simultaneous wave, adjacency/direct power
+damage, fixed-region gravity and inventory-preserving recovery. All existing
+power rules remain. Beams/Nova pass through rocks, Bombs hit their area, and
+Supernova-cleared crystals damage adjacent rocks; double Supernova hits all
+rocks once. Damage adds no crystal score/energy. `asteroid_hit` events retain
+both durability snapshots for ordered impact/crack/destruction animation. The
+18-move prototype now requires 30 crystals and all six rocks. New headless and
+scene tests pass; the earlier Android baseline pass does not cover this slice.
+The history below documents earlier pre-blocker work. New Android testing and
+balance remain open in #6; M3 campaign/saves are out of scope.
+
 This incremental extension inherits the previous [CrystalBoard](../scripts/board.gd) matching/generation behavior, leaving the proven M1 rules/tests intact. It adds a second **64-cell special-type array** alongside the six crystal kinds:
 
 | Type ID | Name | Created by | Activated by | Effect |
@@ -94,13 +106,13 @@ The [playable-scene integration test](../tests/test_power_scene.gd) checks that 
 
 The prototype is still a single short round: **30 cleared crystals within 18 moves**. M2 specials and Nova can meet that goal much faster than regular swaps. In the original prototype, entering `finished` followed by **any touch release** immediately triggered `_reset_game()`, discarding the board, moves, score and Nova energy. This is not an intended power-up side effect. [PR #22](https://github.com/FoxyLight/Cosmic-Crystals/pull/22) makes round replay explicit with a **PLAY AGAIN** button on a completion overlay.
 
-Separately, `CosmicBoard` used `super.generate()` to replace all gems on a deadlock. It now permutes the **existing 64-gem inventory** deterministically, preserving the color counts and earned power statuses, and emits a tagged `reshuffle` event. This is different from replay: it should leave the score, remaining moves, objective count and Nova charge untouched. The regression and Android acceptance checklist are in [QA](QA_TEST_PLAN.md) and [issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21).
+Separately, `CosmicBoard` used `super.generate()` to replace all gems on a deadlock. It now permutes the **existing movable-gem inventory** deterministically, preserving the color counts and earned power statuses, and emits a tagged `reshuffle` event. This is different from replay: it should leave the score, remaining moves, objective count and Nova charge untouched. The regression and Android acceptance checklist are in [QA](QA_TEST_PLAN.md) and [issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21).
 
 This fix does not change the temporary 30-gem target, eliminate legitimate reshuffles, or add saved campaign progress. Human Android testing is outstanding.
 
 ## Next unresolved work
 
-- **Asteroid blockers** and their adjacent-match, special-area and Nova damage. A blocker cannot safely be added as just a gem kind; model blocker durability/occupancy separately and test gravity and deadlock behavior.
+- Physical Android acceptance of the implemented asteroid rules, readability and region refill in [M2 Asteroids](M2_ASTEROIDS.md).
 - Human testing of all power combinations on a physical Android device; adjust HUD/target areas, animations and balance based on evidence.
 - More stress/property tests for long power-trigger chains, limiting cascade iterations without deleting previously earned specials, and last-move outcomes.
 - Data-driven Nova energy and per-level rules; additional polished effects and accessibility controls.

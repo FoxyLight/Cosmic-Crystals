@@ -6,11 +6,25 @@ An Android-first cosmic match-3 puzzle adventure for Android and web, with iOS a
 
 ## Project status
 
+**Latest M2 addition: asteroid blockers (product `0.3.0`).** Six fixed rocks
+with armored/cracked states take adjacent-clear and special/Nova damage,
+break, and refill with blocker-safe gravity. Each wave damages a rock once;
+later cascades can hit again. Win the test round by collecting 30 crystals
+**and clearing all rocks** within 18 moves. Damage feedback and remaining-rock
+HUD are included. Local Godot 4.7.2 tests pass: 862,246 blocker assertions,
+46 new real-scene assertions and every existing suite. The versioned CI APK/Web
+pipeline is preserved. **New Android blocker playtest and balance are pending;
+M2 remains open.** Full rules, evidence and phone checklist:
+[M2 Asteroid Blockers](docs/M2_ASTEROIDS.md).
+
+The dated development notes below describe earlier slices; blocker status is
+superseded by this section. Campaign/map/saves remain unimplemented here.
+
 **Snapshot: 2026-10-29.** Godot 4.7.2 (GDScript, Compatibility renderer) is the working engine candidate. The foundational prototype and automated rules checks are on `main`; [PR #5](https://github.com/FoxyLight/Cosmic-Crystals/pull/5) was merged and the [Godot headless workflow passed](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782).
 
 **Implemented and headlessly tested:** seeded 8×8 boards with six crystal types, valid/invalid swap logic, match detection, gravity, refill, cascades and legal move checks. The one-screen prototype has procedural crystal visuals, mouse/touch controls, a move/score HUD and a basic collection win/lose loop.
 
-**M0/M1 work merged in PR #13:** event-driven swap/clear/fall/rollback animations and 125-seed regression checks now pass headless CI. GitHub Actions has built a debug Android APK and Web export ([successful CI run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)). **Android player-reported gameplay smoke passed** (2026-10-29); browser compatibility, detailed device FPS/RAM/interruption tests and release AAB signing remain unverified. **New M2 prototype slice (PR #16):** Star Beams, Cosmic Bombs, Supernovas, first-pass special combinations and a chargeable, cancelable, zero-move Nova Pulse are implemented with seeded headless tests. **Still missing:** asteroid blockers, full power balancing, five designed levels, galaxy map, saves, production art/audio and store distribution. The baseline M2 gameplay has positive Android smoke feedback; detailed combo balancing and asteroid blockers remain open.
+**M0/M1 work merged in PR #13:** event-driven swap/clear/fall/rollback animations and 125-seed regression checks now pass headless CI. GitHub Actions has built a debug Android APK and Web export ([successful CI run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043)). **Android player-reported gameplay smoke passed** (2026-10-29); browser compatibility, detailed device FPS/RAM/interruption tests and release AAB signing remain unverified. **New M2 prototype slice (PR #16):** Star Beams, Cosmic Bombs, Supernovas, first-pass special combinations and a chargeable, cancelable, zero-move Nova Pulse are implemented with seeded headless tests. **Still missing:** full power balancing, five designed levels, galaxy map, saves, production art/audio and store distribution. The baseline M2 gameplay has positive Android smoke feedback; detailed combo balancing and asteroid blockers remain open.
 
 The [separately published concept page](https://cosmic-crystals-starweaver-jneal.fxylght.chatgpt.site) references 20 levels and four constellations. Its source is not imported here, and those features are **future vision**, not claims about this repository.
 
@@ -46,7 +60,7 @@ The single-round prototype has a short **30-crystal target and 18-move budget**.
 
 **From PR #24 onward**, each CI Android APK has a unique `versionCode`, a readable `versionName` containing the product version/build number/commit, and a matching versioned APK filename. The artifact includes `build-info.json` (exact SHA/version/run/signing mode) and a SHA-256 checksum. CI verifies the **version embedded in the APK manifest**; renaming a file cannot make it pass.
 
-The source [VERSION](VERSION) is `0.2.0`. See [Android APK Versioning](docs/ANDROID_VERSIONING.md) for the full policy, downloads, wireless ADB installation and optional private persistent debug keystore. **Version numbers alone do not fix a changed signing certificate**, and future signed Google Play AABs remain a separate release process.
+The source [VERSION](VERSION) is `0.3.0`. See [Android APK Versioning](docs/ANDROID_VERSIONING.md) for the full policy, downloads, wireless ADB installation and optional private persistent debug keystore. **Version numbers alone do not fix a changed signing certificate**, and future signed Google Play AABs remain a separate release process.
 
 **Android gameplay smoke (2026-10-29):** The player reports that the human playtest **passes** after the latest gameplay fixes and versioned build workflow. This is a positive practical checkpoint, while full device metrics, interruption tests, browser QA, Google Play signing and asteroid blockers are unfinished. See the [Android Playtest Report](docs/ANDROID_PLAYTEST_2026_10_29.md). The next development focus is **asteroid blockers** (M2 #6).
 
@@ -54,7 +68,7 @@ The source [VERSION](VERSION) is `0.2.0`. See [Android APK Versioning](docs/ANDR
 
 1. Install [Godot 4.7.2 standard edition](https://godotengine.org/download/archive/4.7.2-stable/).
 2. Clone the repo, import/open `project.godot` in Godot and press **F5**.
-3. Drag from one crystal to an orthogonally adjacent crystal, or tap two adjacent crystals. Four, five or T/L matches can forge special pieces; swap a special to activate it. Matches charge Nova to 20. Tap the NOVA control, then a tile to blast its row/column without using a move; tap NOVA again to cancel. Collect 30 crystals within 18 moves. After a win/loss, press the explicit **PLAY AGAIN** button; press **R** on desktop.
+3. Drag from one crystal to an orthogonally adjacent crystal, or tap two adjacent crystals. Four, five or T/L matches can forge special pieces; swap a special to activate it. Matches charge Nova to 20. Tap the NOVA control, then a tile to blast its row/column without using a move; tap NOVA again to cancel. Collect 30 crystals and destroy all six asteroids within 18 moves. After a win/loss, press the explicit **PLAY AGAIN** button; press **R** on desktop.
 
 Headless checks:
 
@@ -92,4 +106,4 @@ These checks run in [GitHub Actions](.github/workflows/godot-checks.yml), which 
 
 This GitHub repository is the canonical source of truth. Use scoped issues and PRs, keep the [Milestone Register](docs/MILESTONES.md) and [Project Status](docs/PROJECT_STATUS.md) synchronized with real evidence, and do not mark untested product features or platform exports as complete.
 
-**Immediate focus:** download and playtest the M2 powers/Nova APK on Android, finish remaining M0/M1 device and interruption checks, and implement asteroid blockers in M2 #6. M3–M7 follow their milestone gates.
+**Immediate focus:** download and playtest the M2 powers/Nova APK on Android, finish remaining M0/M1 device and interruption checks, and playtest the new asteroid slice in M2 #6. M3–M7 follow their milestone gates.

@@ -4,6 +4,19 @@
 
 ## Working Godot prototype
 
+**M2 asteroid extension:** `CosmicBoard.asteroids` is a separate 64-entry 0–2
+durability array; blocked cells have no gem or special. All events carry
+`asteroids_before/after`. A clear wave unions direct/adjacent hits, emits
+`asteroid_hit` after crystal clear/reward and before fall, then resolves cascades.
+Fixed rocks divide columns into independently refilled regions (`segment_top`
+on spawns); destruction reconnects regions. The shuffle permutes only movable
+gem/power pairs, preserving rock positions/HP and exact inventory. The renderer
+uses event snapshots for hits/cracks/destruction and locks input until playback
+ends. Both crystal and rock goals are checked after resolution. See
+[M2 Asteroids](M2_ASTEROIDS.md) for damage semantics, bounded recovery limitations,
+862,246 rules assertions and 46 real-scene assertions. All original suites and
+strict CI error-log validation remain active; physical Android QA is pending.
+
 - `project.godot`: Compatibility renderer and portrait-oriented baseline.
 - `scenes/Prototype.tscn`: one-screen test scene.
 - `scripts/board.gd`: stable seeded 8×8 generation/matching and M1 turn/event behavior.
@@ -65,7 +78,7 @@ A tile must be collected/damaged only once per match resolution step; intersecti
 
 ### Domain data
 
-The **event log** now includes separate gem and special snapshots, including falling power locations. M2 implemented a separate special-type array and Nova charge. Next introduce blocker durability, multi-goal objectives, level move budgets and versioned progression. Prefer typed GDScript classes and Resources/validated JSON for level data.
+The **event log** now includes separate gem and special snapshots, including falling power locations. M2 implemented a separate special-type array and Nova charge. Blocker durability and the two prototype goals are now implemented; next introduce configurable multi-goal levels, move budgets and versioned progression. Prefer typed GDScript classes and Resources/validated JSON for level data.
 
 Keep progress storage under Godot `user://`, version save schemas, and persist only completed, stable progress. Do not save a half-resolved turn.
 
@@ -73,7 +86,10 @@ Keep progress storage under Godot `user://`, version save schemas, and persist o
 
 The result phase must never interpret an ordinary board tap as “restart”. A visible overlay provides a dedicated PLAY AGAIN rectangle that requires both press and release inside it. The HUD, score, Nova charge and final board remain available until deliberate replay. Domain deadlock recovery now permutes the current gem and special inventories instead of calling `super.generate()`. It preserves color counts, produces a match-free board with a legal swap, emits an ordered `reshuffle` event, and leaves objective counters unaffected. See [QA](QA_TEST_PLAN.md) and [issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21).
 
-The current grid still lacks blockers, so this inventory shuffle is **not** a blocker-aware algorithm. Future blocker work must update this guarantee rather than silently replacing pieces. The 30-crystal single-round goal remains provisional for M3 level design.
+The inventory shuffle now excludes fixed blockers and preserves durability. It
+restores the original board and reports failure if its bounded search cannot
+recover an unsupported layout. No full-board regeneration is used. The
+30-crystal plus six-rock round remains provisional for M3 level design.
 
 ### Input and visuals
 
@@ -81,7 +97,7 @@ The prototype supports drag/swipe and tap-two-adjacent input through `_input`, s
 
 ### Tests and quality gates
 
-Headless tests cover M1 generation, invalid swaps, intersections/cascades/event continuity, plus M2 power formation, swap activation, combinations, Nova Pulse and gem/special event replay. Still required: blockers, last-move victory, long trigger-chain stress, pause/restart and save migrations.
+Headless tests cover M1 generation, invalid swaps, intersections/cascades/event continuity, plus M2 power formation, swap activation, combinations, Nova Pulse and gem/special event replay. Blockers, last-move outcomes and seeded replay stress are now covered in the asteroid suites. Pause/restart and save migrations remain later work.
 
 CI runs:
 

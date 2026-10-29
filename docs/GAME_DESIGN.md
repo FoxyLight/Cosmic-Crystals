@@ -78,7 +78,7 @@ Design decision for implementation: prioritize straight-five detection over T/L 
 
 **Combination behavior** is a balancing item. Initially implement and test at least Beam+Beam, Bomb+Bomb, and Beam+Bomb, then define Supernova combinations explicitly before shipping. Never silently treat an unsupported special combination as a normal swap.
 
-**Implementation status (M2 prototype, 2026-10-29):** The first playable Star Beam, Cosmic Bomb, Supernova and Nova Pulse rules are now in [CosmicBoard](../scripts/cosmic_board.gd) and documented with first-pass combo behavior in [M2 Gameplay Guide](M2_SPECIALS_NOVA.md). This prototype supports swap activation without a 3-match, one initial special creation per move, and chain-triggered blast unions. Exact balancing, asteroid blockers and human Android acceptance remain outstanding; see M2 issue #6.
+**Implementation status (M2 prototype, 2026-10-29):** The first playable Star Beam, Cosmic Bomb, Supernova and Nova Pulse rules are now in [CosmicBoard](../scripts/cosmic_board.gd) and documented with first-pass combo behavior in [M2 Gameplay Guide](M2_SPECIALS_NOVA.md). This prototype supports swap activation without a 3-match, one initial special creation per move, and chain-triggered blast unions. Exact balancing and Android acceptance of the new asteroid slice remain outstanding; see M2 issue #6.
 
 ## 5. Signature power: Nova Pulse
 
@@ -94,6 +94,18 @@ Design decision for implementation: prioritize straight-five detection over T/L 
 Balance goal: powerful enough to rescue a tough board, but infrequent enough that planning matters.
 
 ## 6. Objectives and blockers
+
+**Implemented M2 prototype rules:** a separate fixed durability layer supports
+armored (2 HP) and cracked (1 HP) rocks. Swaps/matches exclude rocks. A rock
+takes one damage per resolution wave from a direct blast or orthogonally
+adjacent cleared crystal, including special-cleared crystals. Simultaneous
+effects/chain powers are unioned; later cascades can damage again. Beams/Nova
+pass through rocks. Supernova color clears damage rocks by crystal adjacency;
+double Supernova hits all cells. At zero HP the rock disappears before gravity.
+Only crystals award score/collection/Nova energy. The prototype now requires
+30 crystals **and all six rocks**, within the existing 18 moves. This is an
+untuned mechanics test, not a five-level campaign. See [asteroid rules and
+acceptance checklist](M2_ASTEROIDS.md); physical Android acceptance is pending.
 
 **MVP objectives**
 
@@ -157,7 +169,7 @@ Accounts, backend, monetization, cloud saves, daily events, leaderboards, Gravit
 - Exact move counts, collection targets, star scores, and Nova charge rate.
 - Special + special interaction matrix.
 - Whether Nova charge persists between levels (proposed: no).
-- How asteroid adjacency damage behaves for intersecting clears.
+- Asteroid damage is one per wave, including intersections; tune durability/layouts on Android.
 - How many new special pieces cascades may create (proposed: only match-created specials from player swaps at first).
 - Animation timing on low-end mobile devices.
 
