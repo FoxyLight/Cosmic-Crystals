@@ -50,7 +50,7 @@ Record at least:
 Run:
 
 1. Fresh install and launch; collect cold-start time and visible errors.
-2. Repeated drag/swipe and tap-two moves, invalid swaps, fast successive gestures.
+2. Repeated drag/swipe and tap-two moves, invalid swaps, fast successive gestures. **M2:** make row/column Beams, Cosmic Bombs and Supernovas; swap powers and check chain scores; charge Nova, select a target, cancel it without cost and verify the row/column clears without using a move.
 3. Check HUD and board at portrait size and on short/small screens.
 4. Suspend/resume (Home, lock screen, notification/call interruption), audio focus, process termination and restore.
 5. 30-second heavy cascade / future particle-effects scenario, with recorded FPS, RAM and heat observations.
