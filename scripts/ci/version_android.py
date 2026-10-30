@@ -58,11 +58,14 @@ def calculate_version(base: str, run_number: int, run_attempt: int, git_sha: str
 
 
 def patch_android_preset(text: str, version_code: int, version_name: str) -> tuple[str, str]:
-    # Explicit Android section only: don't edit a web preset or a future
-    # second platform's version fields.
-    heading = "[preset.1.options]"
-    if text.count(heading) != 1 or 'platform="Android"' not in text:
-        raise ValueError("Expected one Android preset with [preset.1.options]")
+    # Locate the Android preset rather than assuming a platform-specific index.
+    blocks = re.findall(r'(?ms)^\[preset\.(\d+)\]\n(.*?)(?=^\[preset\.\d+\]|\Z)', text)
+    android = [index for index, block in blocks if 'platform="Android"' in block]
+    if len(android) != 1:
+        raise ValueError("Expected exactly one Android export preset")
+    heading = f"[preset.{android[0]}.options]"
+    if text.count(heading) != 1:
+        raise ValueError("Missing Android preset options")
     before, options = text.split(heading, 1)
     if "\n[preset." in options:
         options, after = options.split("\n[preset.", 1)
