@@ -11,6 +11,7 @@ var status: Label
 var preview: Label
 var active_touch_index: int = -1
 var active_touch_key: String = ""
+var active_toggle_key: String = ""
 
 
 func _ready() -> void:
@@ -76,12 +77,24 @@ func _input(event: InputEvent) -> void:
 					_move_touch_slider(event.position)
 					get_viewport().set_input_as_handled()
 					return
+			for key in toggles:
+				if toggles[key].get_global_rect().has_point(event.position):
+					active_touch_index = event.index
+					active_toggle_key = key
+					get_viewport().set_input_as_handled()
+					return
 		elif event.index == active_touch_index:
-			_move_touch_slider(event.position)
+			if not active_touch_key.is_empty():
+				_move_touch_slider(event.position)
+			elif not active_toggle_key.is_empty():
+				var toggle: CheckButton = toggles[active_toggle_key]
+				if toggle.get_global_rect().has_point(event.position):
+					toggle.button_pressed = not toggle.button_pressed
 			cancel_touch_drag()
 			get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag and event.index == active_touch_index:
-		_move_touch_slider(event.position)
+		if not active_touch_key.is_empty():
+			_move_touch_slider(event.position)
 		get_viewport().set_input_as_handled()
 
 
@@ -98,6 +111,7 @@ func _move_touch_slider(pointer: Vector2) -> void:
 func cancel_touch_drag() -> void:
 	active_touch_index = -1
 	active_touch_key = ""
+	active_toggle_key = ""
 
 
 func _label(text: String, font_size: int) -> Label:
