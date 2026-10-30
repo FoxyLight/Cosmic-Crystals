@@ -9,9 +9,9 @@
 - `VERSION` is the product's source-controlled SemVer base, currently **`0.5.1`** (Beam movement-direction fix). Bump it intentionally for a meaningful product iteration, not every CI run.
 - Each GitHub Actions workflow run receives a unique `GITHUB_RUN_NUMBER`. The run attempt increments when that same run is rerun.
 - Android `versionCode = run_number × 100 + run_attempt` (attempts 1–99). Codes increase across **new** workflow runs; rerunning an older workflow can produce an older code than a newer already-installed build. Do not install an older version expecting an upgrade. The generator rejects zero/invalid inputs and a code exceeding **2,100,000,000** (Play limit).
-- Android `versionName = <VERSION>-dev.<run_number>.<run_attempt>+g<first8GitSHA>`, for example `0.5.0-dev.74.1+gabc12345`.
-- Actual APK filename: `cosmic-crystals-v0.5.0-dev.74.1-gabc12345-debug.apk`.
-- GitHub Actions artifact name: `cosmic-crystals-android-v0.5.0-dev.74.1-gabc12345`.
+- Android `versionName = <VERSION>-dev.<run_number>.<run_attempt>+g<first8GitSHA>`, for example `0.5.1-dev.110.1+g7864c820`.
+- Actual APK filename: `cosmic-crystals-v0.5.1-dev.110.1-g7864c820-debug.apk`.
+- GitHub Actions artifact name: `cosmic-crystals-android-v0.5.1-dev.110.1-g7864c820`.
 - The export uses the **same** `package/unique_name` as before: `org.foxylight.cosmiccrystals.prototype`.
 
 The CI generator edits Android `version/code` and `version/name` **in the ephemeral checkout**, not in the repository with each commit. The committed `export_presets.cfg` has `versionCode=2` and `versionName=0.5.1-local` for manual editor builds; those baseline values are **not** unique across local exports. To create a uniquely numbered local APK, deliberately set a code above the device's installed version and verify it.
@@ -37,10 +37,10 @@ The check job also runs `python3 -m unittest discover -s tests -p test_android_v
 3. Compare the actual installed/downloaded signing certificate first. Only if compatible, with wireless ADB connected, run `adb devices -l` and then install the **actual versioned filename**:
 
 ```bash
-adb install -r cosmic-crystals-v0.5.0-dev.74.1-gabc12345-debug.apk
+adb install -r cosmic-crystals-v0.5.1-dev.110.1-g7864c820-debug.apk
 ```
 
-The above filename is **illustrative**, not a link to a particular real build. Copy the filename from your downloaded ZIP.
+The example above matches the **verified main run #110** filename, but install it only after comparing package/version/signature with the actual phone and using the exact file from the downloaded ZIP. A newer run may have superseded it.
 
 To inspect the installed version:
 
@@ -51,7 +51,7 @@ adb shell dumpsys package org.foxylight.cosmiccrystals.prototype | grep versionC
 On a computer with Android build tools, inspect the downloaded APK itself:
 
 ```bash
-aapt dump badging cosmic-crystals-v0.5.0-dev.74.1-gabc12345-debug.apk | grep '^package:'
+aapt dump badging cosmic-crystals-v0.5.1-dev.110.1-g7864c820-debug.apk | grep '^package:'
 ```
 
 To verify the downloaded APK has not changed, run `sha256sum -c SHA256SUMS.txt` in the extracted directory.
@@ -74,9 +74,9 @@ python scripts/ci/setup_debug_signing.py --private-dir "$env:USERPROFILE\.codex\
 
 The script reuses an existing key, uploads through stdin, prints only the public certificate, and refuses paths inside the checkout. Initial owner setup was performed in an ACL-restricted directory. On another machine secure that directory's permissions before copying the backup. Re-run main CI and verify the exact pin. Never generate a replacement key merely because a secret was lost: restore the existing key from private backup first. GitHub secrets cannot be read back as a recovery strategy. If all private copies are lost, previous signatures cannot be recreated; explicit backup/migration is necessary.
 
-### Existing player save is protected
+### Legacy-key save safety (historical caveat and current rule)
 
-Build 9801 used an ephemeral key; its private key is unavailable. New stable signing cannot update it automatically. No M4 development command uninstalls/clears the player app. Close the game normally and, while connected/authorized for ADB, take a new read-only backup:
+Build 9801 used an ephemeral key; its private key is unavailable. New stable signing cannot update **that installation** automatically. The owner subsequently confirmed the legacy app had already been uninstalled and build 10601 was freshly installed on the Pixel 7a; no old save was recovered. Any *other* legacy-key installation must still be preserved: close it normally and, while connected/authorized for ADB, take a read-only backup:
 
 ```powershell
 python scripts/android_save_backup.py --adb "PATH_TO_ADB" --serial "EXACT_PHONE_SERIAL" --output "PRIVATE_BACKUP_DIR\lyra-progress-before-m4.json"
@@ -87,7 +87,7 @@ The script uses debug `run-as`, validates schema/record array sizes, saves exact
 CI's emulator upgrade test uses two separately exported APKs with the same loaded key and an incremented probe code. It installs the first on a disposable emulator, writes a schema-1 earned save, updates with `install -r`, and compares exact bytes. The second probe APK is never published. This validates compatible Android update mechanics, not old-key compatibility or human gameplay. Every distributed APK still uses unique run-based versioning.
 
 
-### Verified M4 delivery checkpoint
+### Verified M4 delivery checkpoints
 
 [Main run 106](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41069911792)
 verified the stable certificate pin and same-key two-export upgrade/save test.
@@ -95,5 +95,4 @@ Build 10601 was independently verified after download and installed fresh on the
 Pixel 7a; versionName/code were read back. The owner confirmed they had already
 uninstalled the prior copy; no prior app was removed or old save recovered by
 M4. The subsequent private-password hardening preserves that same certificate,
-so it is eligible for an in-place update, not another uninstall. Exact latest
-acceptance artifact and follow-up validation are recorded in #8.
+so it is eligible for an in-place update, not another uninstall. Subsequently the phone was updated **10801 → 11001** with the same signer after a private verified read-only save backup; GitHub issue #8 reports the resulting save was **byte-for-byte unchanged** and the installed version was read back. [Main run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) passed both Android-only jobs and verified `0.5.1-dev.110.1+g7864c820` (code 11001, checksum `a2d15f5efe9f26958e8c1ab77ea43e1ff5ac899793bc946cfa62eef37e7a7249`, signing `persistent-secret`, signer pin matched). [APK artifact](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426/artifacts/12988237867). **This is installation/save retention evidence, not a new M4 human gameplay or audio quality acceptance.**
