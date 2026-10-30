@@ -1,4 +1,4 @@
-name: Godot prototype checks
+name: Android game checks
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Test Android APK version policy
-        run: python3 -m unittest discover -s tests -p test_android_version.py -v
+        run: python3 -m unittest discover -s tests -p "test_android*.py" -v
       - name: Download Godot 4.7.2 stable
         run: |
           curl --fail --location --retry 3 \
@@ -59,48 +59,15 @@ jobs:
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_progress_store.gd
       - name: Play all five levels through scene touch controls, results, map and reload
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_campaign_scene.gd
+      - name: Test Android audio, comfort settings, interruption, dispatch and safe touch targets
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_android_polish.gd
+      - name: Record reproducible headless navigation and effects benchmark
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/benchmark_android.gd
       - name: Run the prototype scene headlessly for 120 frames
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --quit-after 120
 
-  web-export:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Download Godot 4.7.2 stable
-        run: |
-          curl --fail --location --retry 3 \
-            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip" \
-            --output godot.zip
-          unzip -q godot.zip
-          chmod +x Godot_v4.7.2-stable_linux.x86_64
-          mv Godot_v4.7.2-stable_linux.x86_64 godot
-      - name: Install matching web export templates
-        run: |
-          curl --fail --location --retry 3 \
-            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz" \
-            --output godot-templates.tpz
-          unzip -q godot-templates.tpz -d extracted
-          mkdir -p "$HOME/.local/share/godot/export_templates/4.7.2.stable"
-          cp extracted/templates/* "$HOME/.local/share/godot/export_templates/4.7.2.stable/"
-      - name: Export HTML5 site
-        run: |
-          mkdir -p build/web
-          bash scripts/ci/check_godot_log.sh ./godot --headless --path . --editor --quit
-          bash scripts/ci/check_godot_log.sh ./godot --headless --path . --export-release Web build/web/index.html
-          test -s build/web/index.html
-          test -s build/web/index.wasm
-          test -s build/web/index.pck
-          python3 scripts/ci/check_campaign_assets.py build/web/index.pck
-          du -h build/web/*
-      - name: Upload web preview artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: cosmic-crystals-web
-          path: build/web/
-          if-no-files-found: error
-          retention-days: 7
-
   android-debug-export:
+    needs: check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -150,8 +117,10 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           COSMIC_DEBUG_KEYSTORE_BASE64: ${{ secrets.COSMIC_DEBUG_KEYSTORE_BASE64 }}
+          COSMIC_DEBUG_CERT_SHA256: ${{ secrets.COSMIC_DEBUG_CERT_SHA256 }}
         run: |
           if [[ -n "$COSMIC_DEBUG_KEYSTORE_BASE64" ]]; then
+            test -n "$COSMIC_DEBUG_CERT_SHA256" || { echo "::error::Stable debug key needs a certificate pin"; exit 1; }
             mkdir -p "$HOME/.android"
             printf '%s' "$COSMIC_DEBUG_KEYSTORE_BASE64" | base64 --decode > "$HOME/.android/debug.keystore"
             chmod 600 "$HOME/.android/debug.keystore"
@@ -163,6 +132,7 @@ jobs:
       - name: Sign, export and verify versioned Android debug APK
         env:
           APK_PATH: ${{ steps.version.outputs.apk_path }}
+          EXPECTED_DEBUG_CERT: ${{ github.event_name == 'push' && secrets.COSMIC_DEBUG_CERT_SHA256 || '' }}
         run: |
           mkdir -p "$HOME/.android" build/android
           if [[ "${COSMIC_SIGNING_MODE:-ephemeral-ci}" != "persistent-secret" ]]; then
@@ -182,9 +152,37 @@ jobs:
             --apk "$APK_PATH" \
             --aapt "$ANDROID_HOME/build-tools/35.0.0/aapt" \
             --signing-mode "$COSMIC_SIGNING_MODE"
+          python3 scripts/ci/verify_signing.py --apksigner "$ANDROID_HOME/build-tools/35.0.0/apksigner" \
+            --apk "$APK_PATH" --metadata build/android/build-info.json --expected "$EXPECTED_DEBUG_CERT"
           cat build/android/build-info.json
           python3 scripts/ci/check_campaign_assets.py "$APK_PATH"
           du -h "$APK_PATH"
+      - name: Export consecutive same-key update probe (never published)
+        env:
+          GODOT_ANDROID_KEYSTORE_DEBUG_PATH: /home/runner/.android/debug.keystore
+          GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
+          GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
+        run: |
+          mkdir -p build/upgrade-probe
+          python3 -c 'import json; from pathlib import Path; from scripts.ci.version_android import patch_android_preset; i=json.loads(Path("build/android/build-info.json").read_text()); p=Path("export_presets.cfg"); p.write_text(patch_android_preset(p.read_text(), i["version_code"]+1, i["version_name"]+".upgrade-probe")[0])'
+          bash scripts/ci/check_godot_log.sh ./godot --headless --path . --export-debug Android build/upgrade-probe/update.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify build/upgrade-probe/update.apk
+      - name: Enable isolated emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify real Android in-place update retains the save (isolated emulator)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: python3 scripts/ci/check_upgrade.py --first "${{ steps.version.outputs.apk_path }}" --second build/upgrade-probe/update.apk --metadata build/android/build-info.json
+      - name: Remove private CI keystore
+        if: always()
+        run: rm -f "$HOME/.android/debug.keystore"
       - name: Upload versioned Android debug APK and metadata
         uses: actions/upload-artifact@v4
         with:

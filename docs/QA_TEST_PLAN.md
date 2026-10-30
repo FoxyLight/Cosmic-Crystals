@@ -1,187 +1,26 @@
-# QA, Test and Device Validation Plan
+# Android QA and Acceptance Plan
 
-**Status:** Test strategy and acceptance gates, not a report of tests already run.
-**Snapshot:** 2026-10-29
+Current plan: 2026-10-30, Android-only 0.5.0. This supersedes the [historical pre-M4 QA matrix](history/PRE_M4_QA_TEST_PLAN.md). No Web/browser/iOS acceptance applies. Desktop/headless execution is an Android development environment only.
 
-## Earlier physical Android gameplay smoke: PASS (player-reported)
+## Automated gate
 
-**2026-10-29:** The player confirmed **“Human playtest passes”** after receiving the newest versioned debug APK instructions. This establishes a **positive overall physical Android gameplay smoke test**, not a separate verified pass for each rare power combination, every deadlock scenario, or hardware performance requirement.
+Retain all 13 M3 Godot suites (rules, powers/combinations, asteroids, visuals, replay/shuffle, layout, sessions, saves and actual five-level touch progression). Add `test_android_polish.gd`: additive old-save preferences, volume/mute/reduced-motion, audio assets/crossfade/no restart/layering limits, focus+pause ordering, settings input interception and target/cutout geometry. Headless audio is deliberately silent: contract tests do not claim a speaker/audio-driver test.
 
-The immediately preceding requested scope covered four/five-match special creation, combos, Nova Pulse, unexpected board resets, PLAY AGAIN and reshuffle behavior. Actual installed build/version was not read back through ADB; the **recommended** version was `0.2.0-dev.82.1+gb5e1737d`, from [main workflow #40958771036](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40958771036). Full evidence boundaries and outstanding fields: [Android Playtest Report](ANDROID_PLAYTEST_2026_10_29.md).
+Nine Python tests cover Android versions/preset selection, source drift, signature parsing, Android-only workflow and all 22 PCM assets (headers, duration, headroom and loop seam). APK checks require all imported audio samples, provenance, font notices and authored catalog. Actual `aapt` and `apksigner` validate manifest and signing certificate; main stable-key APK must match the configured pin.
 
-**Still outstanding:** device/Android version, FPS/RAM/thermals/touch latency, interruption/resume, safe areas, exhaustive manual combo coverage, web browser testing, signed AAB and final M0 engine sign-off. Do not conflate this limited smoke-test pass with release acceptance.
+Use the **strict Godot parser/runtime-log guard** on every import/test/export. Exit zero with SCRIPT ERROR/ERROR is still failure. CI also runs a CPU settlement benchmark and two separately exported same-key versions on an isolated Android emulator, verifying exact saved bytes after `adb install -r`. That is not proof of updating the player's differently signed build 9801.
 
-## M3 human Android campaign acceptance: PASS (player-reported)
+## New human Android M4 checklist
 
-**2026-10-29:** After the request to play all five Lyra levels and confirm that map unlocks, star ratings, new UI and saved progress survive an Android close/reopen, the player replied **“Human android play test passes.”** This records overall acceptance of the requested M3 test scope, backed by 13 passing Godot suites, five Android-version tests, campaign scene/reload tests and a previous Chromium persistence smoke test.
+Record exact versionName/code, source SHA, public certificate fingerprint, signing mode, device/Android version and display/font scaling. Preserve the old installation unless an explicit backup/migration approval has been given.
 
-See the [M3 Android Playtest Report](ANDROID_M3_PLAYTEST_2026_10_29.md). The last independently ADB-read-back installed campaign version was `0.4.0-dev.98.1+ge14ef9e9` / **9801**; the player did not supply a new app version or device model in the pass message. Do not manufacture per-level timing/score values, screenshots, FPS/RAM/thermals or full hardware evidence.
+1. Fresh/compatible launch, Home/map/all five levels; all goals and special/rock markers readable. Check compact phone and tablet portrait, system navigation/cutouts; no clipping or accidental activation.
+2. Master/music/SFX at 0/50/100, mute/unmute; navigate/restart without unnecessary track restarts. Match/cascade/Beam/Bomb/Supernova/Nova/rock hit+break/victory/defeat/star/unlock/menu cues audible and restrained. Heavy chains do not become excessively loud.
+3. Close/reopen with changed audio, motion and reading-text settings; keep earned stars, best scores, completed levels and unlocks. A worse replay/loss cannot remove records.
+4. Background/foreground, screen lock, phone call/media interruption: no unexpected background audio; return to intentional pause with no stuck touch/cascade. Hardware audio-focus behavior needs this test.
+5. Reduced motion suppresses star twinkle, splash/rings/shards, screen flashes and slow award/fade effects; same seeded actions score identically. Muted play still has complete visual/text feedback.
+6. Larger reading text plus Android font/display scaling at supported settings. Field guide, goals, map, results/settings must stay readable. This is not a claim of full TalkBack/nonvisual board support.
+7. Exercise swipe/two taps, fast repeats, Nova cancel, confirmation/cancel, Back during effects, defeat/retry and final-level replay/map. Exactly five stages.
+8. Run normal/reduced-motion sessions, repeated navigation and heavy chains with audio for at least 10 minutes. Record actual FPS, p95 frame time, RAM/PSS, startup/load and thermals; compare phone classes. `performance-last.json` captures a rolling observed report on Android backgrounding, not a synthetic benchmark score.
 
-This closes the **M3 human campaign acceptance gate**, not the M0/M1/M2/M4 platform, long-session, balancing, production audio/accessibility or Google Play gates. Protect player saves before another ephemeral-signed CI APK update.
-
-## M3 current acceptance gate
-
-Product base 0.4.0 implements five Lyra stages, sessions/goals/ratings, map/next/
-replay and local records/settings. Ten old suites remain; new suites cover
-sessions (10,325 checks), saves (86) and touch-driven five-level scene/reload
-(966). Five version-policy tests pass. CI inspects catalog/licenses in actual
-exports and retains strict Godot log guards/embedded APK metadata checks.
-
-Asteroid build 9101 passed the player. The newer M3 APK 9801 was installed/read back, and the player subsequently reported **M3 Android playtest PASS** against the requested five-level journey/restart scope. [Evidence](ANDROID_M3_PLAYTEST_2026_10_29.md). Detailed device/OS metrics and exhaustive visual/accessibility validation are still open.
-This supersedes pre-M3 "not implemented" statuses in historical sections below.
-
-## 1. Current automated coverage
-
-**Presentation regression:** `tests/test_game_layout.gd` adds 1,471 checks for
-nine viewport geometries with three safe-area configurations each, square board,
-nonoverlapping panels, complete dialog bounds, actual control bounds, full help
-text, real mouse/touch dispatch, no double Nova toggles, pause/resume board
-preservation, modal focus and intentional replay. All nine previous GDScript
-suites plus four Android version-policy tests still pass. The desktop
-Compatibility renderer was visually checked at phone and desktop sizes. This
-is not physical Android or exported-browser acceptance; use the checklist in
-[Visual Pass](VISUAL_PASS.md) for that new build.
-
-
-**Asteroid regression addition:** `tests/test_asteroids.gd` passes **862,246
-assertions** across fixed fixtures, 16 ordered power pairs with blockers and
-125 seeds × 12 paired turns with full three-layer event replay.
-`tests/test_asteroid_scene.gd` passes **46 assertions**, including hit-before-fall,
-input locking, invalid/valid move costs, last-move victory/loss and rock-targeted
-zero-move Nova. The same scene script ran under the desktop Compatibility
-renderer without engine errors. All seven earlier suites still pass. Both new
-scripts run in CI under the strict error-log guard. Android version-policy and
-manifest checks are unchanged. This proves no Android readability/performance
-claim. [Full rules, limitations and phone checklist](M2_ASTEROIDS.md).
-
-The repository runs Godot headless import, `tests/test_board.gd`, the new `tests/test_visuals.gd` style assertions and a 120-frame scene smoke test in GitHub Actions, plus Android debug APK and Web export jobs.
-
-**Evidence:** [original main branch run](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40935869782), plus [M0/M1 CI run with debug APK and Web artifacts](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40939726043) on PR #13.
-
-The expanded seeded board test covers 125 seeds, no starting matches, adjacent legal swaps, illegal nonadjacent/adjacent swaps, match intersections, stable cascades, unique clears, event-snapshot replay, crystal counts and scores. This is **not** a full Android compatibility, performance, save-state, or cross-platform acceptance test.
-
-## 2. Rules-level regression matrix
-
-| Area | Required test case | Status |
-| --- | --- | --- |
-| Initial generation | No pre-existing match; at least one move over many seeds | Initial automated coverage |
-| Input validation | Adjacent legal and illegal swaps, wrapping across row boundaries, same-tile taps | Automated swap/edge checks; manual gesture testing open |
-| Matching | Horizontal/vertical 3+, intersection union and simultaneous multi-group | Intersection/seeded checks; expand simultaneous cases |
-| Resolution | Gravity stability, refill, chain reactions, event playback invariants | Expanded automated replay/invariant checks |
-| Move budget | Illegal swap spends 0; legal spends 1; last-move win overrides loss | Real-scene regression including both crystal/rock goals passes |
-| Deadlocks | No legal move reshuffles without deleting blockers/specials | Exact movable inventory, fixed HP and isolated power recovery tested |
-| Special pieces | 4/5/T/L creation precedence; combined triggers; no double-count | First M2 rules coded and tested; phone balancing pending |
-| Blockers | Adjacent matches vs special and Nova damage; durability rules | Automated; 0.3.0 asteroid build 9101 passed user Android gameplay smoke |
-| Nova Pulse | Charge, cancel, row/column, zero-move activation, reset | M2 rules + touch targeting implemented; manual cancellation/charge feel QA open |
-| Progression | Five-level unlocks, stars, replay and save load | Model/scene/disk tests pass; overall M3 Android playtest accepted by user on 2026-10-29 |
-| Persistence | Schema, malformed/truncated save, restart | Safe writes, backup/future recovery and automated disk reload tested |
-| Interruptions | Restart, pause, background while effects resolve | Transition guards/queued Back tested; full background/device matrix pending |
-
-**M2:** The new `tests/test_powers.gd` suite validates first-pass Star Beam, Supernova, Cosmic Bomb and special+special effects; tests chargeable Nova cost/target and no overlap double-counting. See [M2 gameplay guide](M2_SPECIALS_NOVA.md). Human phone checks remain open.
-
-All domain-level tests should be deterministic (fixed seed, fixed starting board, known expected events) and independent of visual tween timing.
-
-## Complete M2 combo compatibility audit
-
-Following [issue #19](https://github.com/FoxyLight/Cosmic-Crystals/issues/19), the automated matrix in `tests/test_power_matrix.gd` verifies 96 ordered special-pair/position/orientation scenarios across both Beams, Cosmic Bomb and Supernova, including independent first-blast footprint, power activation counts, exact unique clearing, scoring and gem/special preservation through gravity. Nova's cross-chain with three different specials is also checked. `tests/test_power_scene.gd` exercises special formation and NOVA targeting/cancel through the real gameplay scene.
-
-One confirmed on-screen behavior was corrected: **unaffected power icons disappeared temporarily during other matches' clearing animations**; all non-cleared gems now render their special overlays throughout clearing.
-
-**Manual test still required:** On Android, create and activate each power and at least Beam+Beam, Beam+Bomb, Bomb+Bomb and Supernova+another-special. Verify the colored power icon remains visible even while nearby gems clear, Nova cancel retains charge, all blasts visibly reach the right tiles, and no double-collection or stuck animations occurs. Record the device and build in #19 / #6.
-
-## Accidental reset and deadlock recovery regression (2026-10-29)
-
-**Player report:** “Why does the board keep resetting?” [Issue #21](https://github.com/FoxyLight/Cosmic-Crystals/issues/21) identifies two deterministic causes.
-
-- **Unintended replay:** The short prototype target is **30 crystals within 18 moves**. Special combinations may clear 30 in only a few turns. Previously `phase == "finished"` restarted the entire game on *any screen touch release*. A visible modal now shows **CONSTELLATION RESTORED!** or **OUT OF MOVES**, the final crystal/score counters, and a dedicated **PLAY AGAIN** control. The player must press and release inside its large target.
-- **Deadlock reshuffle:** When a settled board had no available swap, the M2 resolver previously called `super.generate()`, replacing all gem kinds with a new random inventory. Recovery now reshuffles **existing** crystals in a seeded Fisher-Yates pass, accepting only match-free boards with a legal move. No score, moves or Nova energy are touched. A labeled `reshuffle` event allows visible feedback.
-- **Automated:** `tests/test_replay_and_shuffle.gd` reproduces a true no-match/no-legal-swap 8×8 fixture, verifies exact gem-color counts, deterministic reshuffle and special preservation, and checks that real scene taps outside PLAY AGAIN do not reset. A deliberate button press/release does.
-- **Manual Android:** Reach the goal using a special. Confirm a completion overlay remains visible after taps/swipes anywhere except PLAY AGAIN. Tap PLAY AGAIN intentionally to reset. Separately, verify a “Stars realigned” deadlock recovery changes gem positions but **not** their counts, move counter, score or Nova charge.
-- **Pass/fail:** Full board restart must never occur as a side effect of a random touch. Controlled display and input QA remain pending; CI cannot prove a user's device behaves correctly.
-
-## Star Beam gameplay regression and CI parser gate
-
-The first M2 APK had a **hidden scene-script parse error** despite green GitHub Actions. [Bug #17](https://github.com/FoxyLight/Cosmic-Crystals/issues/17) tracks the defect and Android retest.
-
-- Automated: `tests/test_game_scene.gd` must instantiate the real gameplay scene and trigger a straight four-match through the UI controller path; the resulting CosmicBoard must retain a row Beam. Existing `tests/test_powers.gd` also verifies formation in pure rules.
-- CI: `scripts/ci/check_godot_log.sh` fails on any Godot `SCRIPT ERROR`, `Parse Error`, or `ERROR:` marker, even if the process exits zero. Guard self-tests must pass.
-- Manual Android: visually identify the cyan-ring Beam left after matching four; verify `STAR BEAM FORGED!` text, persistence through falling/refilling and full-row activation when later swapped. Repeat for vertical four/column Beam when convenient.
-- Acceptance: successful Android-device repro with a verifiable new APK, not merely a successful export job. **Pending player retest.**
-
-## 3. Crystal distinction / visual accessibility check
-
-Following Android playtest feedback (2026-10-29), Solar Amber and Lunar Opal need explicit readability coverage. [Crystal Visual Identity](VISUAL_PALETTE.md) records the six piece colors/outlines, distinctive sunburst versus ice-shard geometry and exact visual tokens.
-
-- **Automated:** run `godot --headless --path . --script res://tests/test_visuals.gd`; ensure palette/index invariants, warm/cool component separation, dark outlines and six unique contours pass. This is not a substitute for perception tests.
-- **Manual Android:** compare Amber and Opal at normal and dim screen brightness, during static board play and fast swapping/cascades. Check all six types are distinguishable by shape and fill, including on smaller displays.
-- **Pass condition:** testers can identify warm golden sun versus frosty blue-white shard without relying exclusively on hue. Record device, OS, brightness, result and screenshot if needed in [M4 issue #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8). **Pending physical-device confirmation.**
-
-## 4. Android test matrix
-
-Record at least:
-- **One modest Android device:** document model, Android version, display dimensions and refresh rate.
-- **One recent Android device:** same information; include a device with a display cutout if possible.
-- **Android export identifiers:** debug/release, application ID, Godot version and Git commit SHA.
-
-Run:
-
-1. Fresh install and launch; collect cold-start time and visible errors.
-2. Repeated drag/swipe and tap-two moves, invalid swaps, fast successive gestures. **M2:** make row/column Beams, Cosmic Bombs and Supernovas; swap powers and check chain scores; charge Nova, select a target, cancel it without cost and verify the row/column clears without using a move.
-3. Check HUD and board at portrait size and on short/small screens.
-4. Suspend/resume (Home, lock screen, notification/call interruption), audio focus, process termination and restore.
-5. 30-second heavy cascade / future particle-effects scenario, with recorded FPS, RAM and heat observations.
-6. Verify retry, back navigation, mute, reduced motion, settings and saved progress when those systems exist.
-7. Produce and install a debug APK; verify signed AAB generation separately. Do not claim Google Play acceptance until validated in a Play test track.
-
-**Provisional performance goal:** smooth 60 FPS where the device supports it, with no hangs/input loss and acceptable sustained play on modest hardware. Before M5 acceptance, establish recorded numerical floors for the selected test device classes; current hardware baselines are **unknown**.
-
-**M2 on-phone result log:** record whether the Nova button is reachable, powers are distinguishable over each gem silhouette, blast effects remain understandable during cascades, and matches/charge/move cost track actual behavior. These checks are **not** counted as passed by CI.
-
-## 5. Browser and iOS test matrix
-
-- Desktop Chrome and Firefox: first load, WebGL2/WASM support, aspect ratios, pointer swapping, resize and accessibility.
-- Android Chrome: touch, first load, background/resume, audio activation and memory.
-- iOS Safari (if available): touch, startup, orientation, WebGL support and limitations. A browser test does **not** prove iOS native export.
-- Use a server (not `file://`) for Godot HTML5 distribution, and record the specific export settings/build.
-
-Browser runtime tests are **pending** despite successful CI Web export. A generated `.wasm`/HTML5 bundle does not establish browser usability.
-
-## 6. Release-level acceptance
-
-- All critical flows demonstrated end-to-end for five levels and one constellation.
-- No open critical or high-severity defects.
-- No unverified production claims about APK/AAB, web, saved progress or app-store distribution.
-- All required platform builds have exact file/build version and test environment recorded.
-- New gameplay and persistence features have deterministic or reproducible automated tests.
-- Accessibility controls (silhouette, contrast, reduced motion, basic screen size and sound settings) verified.
-- No signing keys, credentials or unrelated user data checked into the repository.
-
-## 7. Issue hygiene / bug severity
-
-Use GitHub issues with a reproduction script, exact commit/build, device/OS/browser, expected vs actual, screenshot/log if appropriate, and a clear severity.
-
-- **Critical:** crash/data loss/security defect, hard blocker across target devices.
-- **High:** unwinnable or corrupted gameplay, common gestures fail, release blocker.
-- **Medium:** noncritical visual, balance or device-specific interaction defect with a workaround.
-- **Low:** cosmetic issues with minimal impact.
-
-Critical/high defects must be resolved before M5 closure. Lower severity may be explicitly accepted with evidence and an owner once ownership is assigned.
-
-**Build traceability:** For every Android playtest use the exact versioned APK and its companion `build-info.json`. The [APK Versioning Guide](ANDROID_VERSIONING.md) describes versionCode/versionName, signing compatibility and SHA-256 checks. CI validates the *embedded* Android manifest, while a physical-device test still needs to record the installed code.\n\n## 8. Evidence log template
-
-For each validation, record:
-
-| Field | Value |
-| --- | --- |
-| Date / tester | TBD |
-| Commit SHA / build ID | Record exact commit and [GitHub Actions run](https://github.com/FoxyLight/Cosmic-Crystals/actions/workflows/godot-checks.yml) from downloaded `build-info.json` |
-| Android APK versionName / versionCode | Record both values from `build-info.json` and confirm with `adb shell dumpsys package org.foxylight.cosmiccrystals.prototype` or `aapt dump badging` |
-| Signing identity / checksum | `persistent-secret` or `ephemeral-ci`; verify APK SHA-256 from `SHA256SUMS.txt` |
-| Godot version | 4.7.2 target |
-| Device / Android or browser version | TBD |
-| Test case and steps | TBD |
-| Expected / actual | TBD |
-| FPS / RAM / size / startup (where applicable) | Not yet measured |
-| Pass / fail / blocker / issue link | TBD |
-
-Save measurements in the relevant GitHub milestone issue or linked QA artifact. Do not convert this template into a fictitious successful test report.
+M3's player pass is recorded in [its report](ANDROID_M3_PLAYTEST_2026_10_29.md). M4 remains open until a new pass. Full device/performance and production accessibility acceptance cannot be inferred from CI.

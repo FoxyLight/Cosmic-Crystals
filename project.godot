@@ -1,5 +1,5 @@
-; Engine configuration for the Android-first Cosmic Crystals technology spike.
-; Godot 4.7.2 stable, GDScript, Compatibility renderer for web support.
+; Engine configuration for the Android-only Cosmic Crystals game.
+; Godot 4.7.2 stable, GDScript, Compatibility renderer for Android device coverage.
 
 config_version=5
 

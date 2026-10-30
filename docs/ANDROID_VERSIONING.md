@@ -6,15 +6,15 @@
 
 ## Version numbering rules
 
-- `VERSION` is the product's source-controlled SemVer base, currently **`0.4.0`** (M3 Lyra). Bump it intentionally for a meaningful product iteration, not every CI run.
+- `VERSION` is the product's source-controlled SemVer base, currently **`0.5.0`** (M4 Android polish). Bump it intentionally for a meaningful product iteration, not every CI run.
 - Each GitHub Actions workflow run receives a unique `GITHUB_RUN_NUMBER`. The run attempt increments when that same run is rerun.
 - Android `versionCode = run_number × 100 + run_attempt` (attempts 1–99). Codes increase across **new** workflow runs; rerunning an older workflow can produce an older code than a newer already-installed build. Do not install an older version expecting an upgrade. The generator rejects zero/invalid inputs and a code exceeding **2,100,000,000** (Play limit).
-- Android `versionName = <VERSION>-dev.<run_number>.<run_attempt>+g<first8GitSHA>`, for example `0.4.0-dev.74.1+gabc12345`.
-- Actual APK filename: `cosmic-crystals-v0.4.0-dev.74.1-gabc12345-debug.apk`.
-- GitHub Actions artifact name: `cosmic-crystals-android-v0.4.0-dev.74.1-gabc12345`.
+- Android `versionName = <VERSION>-dev.<run_number>.<run_attempt>+g<first8GitSHA>`, for example `0.5.0-dev.74.1+gabc12345`.
+- Actual APK filename: `cosmic-crystals-v0.5.0-dev.74.1-gabc12345-debug.apk`.
+- GitHub Actions artifact name: `cosmic-crystals-android-v0.5.0-dev.74.1-gabc12345`.
 - The export uses the **same** `package/unique_name` as before: `org.foxylight.cosmiccrystals.prototype`.
 
-The CI generator edits Android `version/code` and `version/name` **in the ephemeral checkout**, not in the repository with each commit. The committed `export_presets.cfg` has `versionCode=2` and `versionName=0.4.0-local` for manual editor builds; those baseline values are **not** unique across local exports. To create a uniquely numbered local APK, deliberately set a code above the device's installed version and verify it.
+The CI generator edits Android `version/code` and `version/name` **in the ephemeral checkout**, not in the repository with each commit. The committed `export_presets.cfg` has `versionCode=2` and `versionName=0.5.0-local` for manual editor builds; those baseline values are **not** unique across local exports. To create a uniquely numbered local APK, deliberately set a code above the device's installed version and verify it.
 
 ## What GitHub Actions guarantees
 
@@ -34,10 +34,10 @@ The check job also runs `python3 -m unittest discover -s tests -p test_android_v
 
 1. Open the latest successful **main-branch** run under [GitHub Actions](https://github.com/FoxyLight/Cosmic-Crystals/actions/workflows/godot-checks.yml). In **Artifacts**, download the ZIP with the `cosmic-crystals-android-v...` name, then extract it.
 2. Read `build-info.json` to confirm exactly which commit, `versionCode` and signing mode you received.
-3. With wireless ADB connected, run `adb devices -l` and then install the **actual versioned filename**:
+3. Compare the actual installed/downloaded signing certificate first. Only if compatible, with wireless ADB connected, run `adb devices -l` and then install the **actual versioned filename**:
 
 ```bash
-adb install -r cosmic-crystals-v0.4.0-dev.74.1-gabc12345-debug.apk
+adb install -r cosmic-crystals-v0.5.0-dev.74.1-gabc12345-debug.apk
 ```
 
 The above filename is **illustrative**, not a link to a particular real build. Copy the filename from your downloaded ZIP.
@@ -51,41 +51,37 @@ adb shell dumpsys package org.foxylight.cosmiccrystals.prototype | grep versionC
 On a computer with Android build tools, inspect the downloaded APK itself:
 
 ```bash
-aapt dump badging cosmic-crystals-v0.4.0-dev.74.1-gabc12345-debug.apk | grep '^package:'
+aapt dump badging cosmic-crystals-v0.5.0-dev.74.1-gabc12345-debug.apk | grep '^package:'
 ```
 
 To verify the downloaded APK has not changed, run `sha256sum -c SHA256SUMS.txt` in the extracted directory.
 
 **Important:** A higher versionCode alone does **not** let Android upgrade an APK signed with a different certificate. If you see `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, read the signing section below. Don't interpret that error as a failure of version numbering.
 
-## Optional stable DEBUG signing for future seamless upgrades
+## M4 stable debug signing, maintenance and recovery
 
-Previously every CI run generated a fresh random debug signing key. This means `adb install -r` can reject a later build even with an increasing versionCode, requiring an uninstall that may delete local data.
+Owner setup on 2026-10-30 created private Actions secrets `COSMIC_DEBUG_KEYSTORE_BASE64` and `COSMIC_DEBUG_CERT_SHA256`. This is configuration evidence only until a main APK passes the actual cryptographic verification/pin check. Main builds use `persistent-secret`; PRs use explicit `ephemeral-ci` and never access the key. Metadata includes `signing_certificate_sha256`, `stable_signing_verified` and emulator upgrade results. Read these fields rather than assuming a stable label means compatible with an old app.
 
-The workflow now supports a **private GitHub Actions secret** named `COSMIC_DEBUG_KEYSTORE_BASE64`. If it is configured, **main-branch push builds only** will use the same signing keystore on subsequent runs; PR builds continue to use ephemeral signing. The secret is **not configured by this source change** and must be added securely by a repository maintainer.
+Public certificate pin: `bb524f7e0b31b29118043206b481505d940cf0ea635f0fc68b978e88fe1a62b2`. Private keystore and local public-pin file reside outside the checkout at `%USERPROFILE%\.codex\private\cosmic-crystals-debug`, with inheritance removed and access limited to the owner/SYSTEM. Keep an encrypted offline backup of this directory in an owner-controlled secure location. Do not put it in Git, APK artifacts, chat or public logs. Debug alias/password are the conventional `androiddebugkey` / `android`; the private file itself is the security boundary. This is NEVER a production/upload signing key.
 
-To create a reusable **debug-only** signing keystore locally (do not commit it):
+To recreate the two secret entries from the SAME existing private key:
 
-```bash
-keytool -genkeypair -noprompt -keystore cosmic-debug.keystore \
-  -storepass android -keypass android -alias androiddebugkey -keyalg RSA \
-  -keysize 2048 -validity 10000 -dname "CN=Cosmic Crystals CI Debug,OU=Development,O=FoxyLight,C=US"
+```powershell
+gh auth login
+# Ensure JDK keytool is on PATH.
+python scripts/ci/setup_debug_signing.py --private-dir "$env:USERPROFILE\.codex\private\cosmic-crystals-debug"
 ```
 
-Then encode the **file contents** as one line and configure a *repository-level* GitHub Actions secret named `COSMIC_DEBUG_KEYSTORE_BASE64` under **Settings → Secrets and variables → Actions**. Example on Linux or macOS with the GitHub CLI (configured with access to the repository):
+The script reuses an existing key, uploads through stdin, prints only the public certificate, and refuses paths inside the checkout. Initial owner setup was performed in an ACL-restricted directory. On another machine secure that directory's permissions before copying the backup. Re-run main CI and verify the exact pin. Never generate a replacement key merely because a secret was lost: restore the existing key from private backup first. GitHub secrets cannot be read back as a recovery strategy. If all private copies are lost, previous signatures cannot be recreated; explicit backup/migration is necessary.
 
-```bash
-base64 < cosmic-debug.keystore | tr -d '\n' | gh secret set COSMIC_DEBUG_KEYSTORE_BASE64 --repo FoxyLight/Cosmic-Crystals
+### Existing player save is protected
+
+Build 9801 used an ephemeral key; its private key is unavailable. New stable signing cannot update it automatically. No M4 development command uninstalls/clears the player app. Close the game normally and, while connected/authorized for ADB, take a new read-only backup:
+
+```powershell
+python scripts/android_save_backup.py --adb "PATH_TO_ADB" --serial "EXACT_PHONE_SERIAL" --output "PRIVATE_BACKUP_DIR\lyra-progress-before-m4.json"
 ```
 
-Protect the original keystore, do not expose its base64 in chat/PR logs, and do not store it inside Git. The workflow validates the expected alias `androiddebugkey` and known **debug** password `android`. A debug certificate is **not** a production signing identity.
+The script uses debug `run-as`, validates schema/record array sizes, saves exact bytes/checksum and refuses overwrite; it never installs/restores/deletes. Inspect records, validate with `ProgressStore.normalize`, and keep two private backup copies. If run-as is unavailable or the file cannot be validated, keep the old installation and stop. Restore onto a disposable emulator first if needed. Any real-phone uninstall/one-time migration requires new explicit approval, then exact-byte restore verification and a manual launch/relaunch check. The old M2 disposable-app approval is not permission to erase earned M3 saves.
 
-Once this optional secret is configured, future **main** build metadata reports `"signing_mode": "persistent-secret"`. Without it, the job still passes but reports `"signing_mode": "ephemeral-ci"`. The transition from an older ephemeral-signed APK to the new persistent-signed one generally requires a **one-time uninstall** (which can erase local app data); subsequent upgrades signed by the same secret can use `adb install -r`, provided the versionCode is higher.
-
-## Future release AAB policy
-
-The current pipeline is **debug-only**, with no Google Play submission, production keystore or release AAB. Before an AAB release, establish a separate signed Gradle export job, release-version SemVer policy and Android `versionCode` allocation higher than any version **already uploaded** to Play. Never reuse a versionCode for two different Play uploads of the same package, never put release keys in Git, and independently check release AAB package/version/signature before uploading. Reference [Release Plan](RELEASE_PLAN.md) and [M6 issue #10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10).
-
-## M3 save safety
-
-Campaign progress is private user storage. A signature-mismatch uninstall deletes it. Prefer the existing persistent-debug-secret support before future progress-bearing upgrades, or back up before deliberately reinstalling. This change does not create or commit signing credentials. A source-policy test now rejects local version/name drift from VERSION.
+CI's emulator upgrade test uses two separately exported APKs with the same loaded key and an incremented probe code. It installs the first on a disposable emulator, writes a schema-1 earned save, updates with `install -r`, and compares exact bytes. The second probe APK is never published. This validates compatible Android update mechanics, not old-key compatibility or human gameplay. Every distributed APK still uses unique run-based versioning.

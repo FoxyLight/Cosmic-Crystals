@@ -28,6 +28,7 @@ func _ready() -> void:
 	_label("home_body", "Five little stars.\nA constellation waiting for your light.", 15, false, "home")
 	_label("home_progress", "", 12, false, "home")
 	_button("journey", "Begin your journey", func(): game.go_map(true), "home")
+	_button("settings", "Settings", func(): game.open_settings(), "home")
 	_label("map_title", "The Lyra constellation", 27, true, "map")
 	_label("map_progress", "", 12, false, "map")
 	_button("home", "Home", func(): game.show_home(), "map")
@@ -39,6 +40,7 @@ func _ready() -> void:
 	_label("level_name", "", 21, true, "map")
 	_label("level_goals", "", 12, false, "map")
 	_label("level_tip", "", 12, false, "map")
+	labels["level_goals"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	labels["level_tip"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_button("play", "Play level", func(): game.start_level(game.map_selection), "map")
 	_label("notice", "", 11, false, "both")
@@ -49,7 +51,7 @@ func _ready() -> void:
 	motion.add_theme_font_override("font", game.hud.body_face)
 	motion.add_theme_font_size_override("font_size", 13)
 	motion.add_theme_color_override("font_color", Color("#C0BBD4"))
-	motion.toggled.connect(func(value: bool): game.progress.set_reduced_motion(value))
+	motion.toggled.connect(func(value: bool): game.set_preference("reduced_motion", value))
 	add_child(motion)
 	groups[motion] = "home"
 	for key in ["home_title", "home_body", "home_progress"]:
@@ -93,7 +95,7 @@ func _button(key: String, text: String, action: Callable, group: String) -> void
 	node.add_theme_stylebox_override("hover", game.hud._style(Color("#9C78D6"), Color("#DDC4FF"), 12))
 	node.add_theme_stylebox_override("pressed", game.hud._style(Color("#523971"), Color("#DDC4FF"), 12))
 	node.add_theme_stylebox_override("focus", game.hud._style(Color.TRANSPARENT, Color("#CAF7FF"), 12))
-	node.pressed.connect(action)
+	node.pressed.connect(func(): game.ui_cue(); action.call())
 	add_child(node)
 	buttons[key] = node
 	groups[node] = group
@@ -140,7 +142,8 @@ func refresh(layout: Dictionary) -> void:
 		_rect(labels["home_progress"], Rect2(x, middle + 150, width, 24))
 		labels["home_progress"].text = "%d / 15 stars · %d / 5 restored" % [game.progress.total_stars(), game.progress.data["completed"].count(true)]
 		buttons["journey"].text = "Revisit the stars" if game.progress.all_completed() else ("Continue your journey" if game.progress.data["highest_unlocked"] > 1 else "Begin your journey")
-		_rect(motion, Rect2(x + 60, area.end.y - 52, width - 120, 44))
+		_rect(motion, Rect2(x, area.end.y - 56, width - 110, 48))
+		_rect(buttons["settings"], Rect2(x + width - 104, area.end.y - 56, 104, 48))
 		motion.set_pressed_no_signal(game.reduced_motion())
 	else:
 		_rect(buttons["home"], Rect2(x + width - 76, top, 76, 48))
@@ -148,12 +151,13 @@ func refresh(layout: Dictionary) -> void:
 		_rect(labels["map_progress"], Rect2(x, top + 103, width, 22))
 		labels["map_progress"].text = "Lyra restored · %d / 15 stars" % game.progress.total_stars() if game.progress.all_completed() else "%d / 15 stars · Choose a star to awaken" % game.progress.total_stars()
 		var play: Rect2 = Rect2(x, area.end.y - 62, width, 50)
-		var preview_rect: Rect2 = Rect2(x, play.position.y - 156, width, 144)
+		var enlarged: bool = game.progress.data["settings"].get("large_text", false)
+		var preview_rect: Rect2 = Rect2(x, play.position.y - (188 if enlarged else 156), width, 176 if enlarged else 144)
 		_rect(preview, preview_rect)
 		_rect(buttons["play"], play)
 		_rect(labels["level_name"], Rect2(preview_rect.position + Vector2(14, 8), Vector2(width - 28, 30)))
-		_rect(labels["level_goals"], Rect2(preview_rect.position + Vector2(14, 42), Vector2(width - 28, 26)))
-		_rect(labels["level_tip"], Rect2(preview_rect.position + Vector2(14, 75), Vector2(width - 28, 62)))
+		_rect(labels["level_goals"], Rect2(preview_rect.position + Vector2(14, 42), Vector2(width - 28, 38 if enlarged else 26)))
+		_rect(labels["level_tip"], Rect2(preview_rect.position + Vector2(14, 86 if enlarged else 75), Vector2(width - 28, 82 if enlarged else 62)))
 		var level: Dictionary = Levels.get_level(game.map_selection)
 		labels["level_name"].text = "%d · %s" % [level["id"], level["name"]]
 		var targets: PackedStringArray = []
@@ -196,6 +200,12 @@ func refresh(layout: Dictionary) -> void:
 		_rect(labels["notice"], Rect2(x, play.position.y - 38, width, 36))
 	if last_screen != game.screen:
 		buttons["journey" if game.screen == "home" else "play"].grab_focus()
+	if game.progress.data["settings"].get("large_text", false):
+		labels["level_tip"].add_theme_font_size_override("font_size", 15)
+		labels["level_goals"].add_theme_font_size_override("font_size", 14)
+	else:
+		labels["level_tip"].add_theme_font_size_override("font_size", 12)
+		labels["level_goals"].add_theme_font_size_override("font_size", 12)
 	last_screen = game.screen
 	queue_redraw()
 

@@ -1,3 +1,5 @@
+> Scope update 2026-10-30: Android is the only supported target. Web/browser/iOS/desktop-distribution requirements below are historical and superseded by ADR-006 and the current Android QA/release plan. Preserve Android device/performance/release-signing risks.
+
 # Engine Evaluation: Android-first Cosmic Crystals
 
 **Date:** 2026-10-29  

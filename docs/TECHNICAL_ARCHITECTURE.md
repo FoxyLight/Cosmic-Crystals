@@ -1,7 +1,6 @@
 # Technical Architecture
 
-Godot 4.7.2 standard, GDScript, Compatibility renderer. Android first; shared
-Web export. Release AAB/iOS/store work is separate from debug previews.
+Godot 4.7.2 standard, GDScript, Compatibility renderer. Android-only product and export. Desktop/headless execution is development only; Web/HTML5 and iOS are out of scope. Production AAB/store work remains separate.
 
 ## Implemented layers
 
@@ -14,7 +13,7 @@ Web export. Release AAB/iOS/store work is separate from debug previews.
 | `scripts/game_session.gd` | Level board/counters, pending-turn token, commit boundary, objectives/result/rating |
 | `scripts/progress_store.gd` | Schema-1 records, unlocks, tutorials/settings, safe writes/backup/recovery |
 | `scripts/prototype.gd` | Campaign controller and existing animated board view; historical filename retained |
-| `scripts/game_layout.gd` | Shared safe-area geometry; phone stack / desktop side HUD |
+| `scripts/game_layout.gd` | Shared safe-area geometry; portrait phone stack / wide Android tablet layout |
 | `scripts/game_hud.gd` | Native goals/stats/modals, focus, confirmations, results/earned stars |
 | `scripts/campaign_view.gd` | Home, five-node map, selected-level preview, state display/settings |
 
@@ -58,8 +57,7 @@ Replay independently maximizes best score/stars.
 
 Writes validate, flush and verify `.tmp`, back up only a valid prior primary,
 and rename the temporary over the primary. Loading tries supported primary,
-backup, then defaults with a notice. Future schemas remain read-only. Browser
-storage unavailable -> a visible session-only warning. [Full policy](M3_LYRA_CAMPAIGN.md).
+backup, then defaults with a notice. Future schemas remain read-only. Android private user storage is the sole supported save backend. [Full policy](M3_LYRA_CAMPAIGN.md).
 
 ## Presentation and quality gates
 
@@ -71,7 +69,18 @@ Ten pre-M3 suites stay active through explicit legacy-practice fixtures. Three
 new suites cover authored sessions, 120 balance runs, recovery and actual scene
 touch play through all five levels/reload. CI imports assets first and retains
 the strict Godot log guard. Version/manifest/checksum/signing checks remain;
-new checks inspect the exported catalog/licenses in actual APK/Web packages.
+new checks inspect the exported catalog/licenses in actual Android APK packages.
 
 [QA](QA_TEST_PLAN.md) and [M3 acceptance](M3_LYRA_CAMPAIGN.md) distinguish code
 execution/exports from new human acceptance and platform measurements.
+
+
+## M4 Android presentation/services
+
+`game_audio.gd`: 22 cached original PCM resources, six SFX voices with per-cue cooldown and drop-on-cap layering, two 0.8-second crossfading music voices. Context refresh never restarts an unchanged track. Focus and application-pause blockers are independent; mute/zero master prevents new effects, music resumes its saved position. Headless uses silent contract dispatch to avoid audio-device dependence; native speaker acceptance is separate.
+
+`settings_view.gd`: blocking Android-safe sheet from Home/pause, 48-unit sliders/toggles/buttons, master/music/SFX, mute, reduced motion and larger reading text. `progress_store.gd` schema remains 1 with additive validated defaults: old campaign records are unchanged. No partial board is serialized.
+
+`performance_monitor.gd`: at most 600 observed frame samples, mean/p95, engine FPS/static memory, session loads, turns/event counts. Android writes `user://performance-last.json` on backgrounding. This is observed runtime data, not a claim of physical-device testing. UI refresh is state-keyed, layout is cached by size/insets, clear membership cached per event; decorative board redraw is capped at 15 Hz while active animations retain frame updates. Reduced-motion idle redraw stops. No board scoring/RNG changes.
+
+CI is Android-only: strict Godot logs, all old tests plus M4, unique versioning/actual signature+pin checks, audio/catalog/license packing and isolated-emulator same-key update proof. Private main debug key is excluded from PRs and deleted from runner after use. See ANDROID_VERSIONING.md. No installation or migration of the user's old different-certificate game is automatic.

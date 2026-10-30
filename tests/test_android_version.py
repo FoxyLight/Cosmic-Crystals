@@ -38,6 +38,9 @@ class AndroidVersionTests(unittest.TestCase):
         base = (root / "VERSION").read_text(encoding="utf-8").strip()
         preset = (root / "export_presets.cfg").read_text(encoding="utf-8")
         self.assertIn(f'version/name="{base}-local"', preset)
+        actual, package = patch_android_preset(preset, 99901, "0.5.0-test")
+        self.assertIn("version/code=99901", actual)
+        self.assertEqual(package, "org.foxylight.cosmiccrystals.prototype")
 
     def test_sequential_runs_and_reruns_are_distinct(self):
         a = calculate_version("0.2.0", 73, 1, SHA)

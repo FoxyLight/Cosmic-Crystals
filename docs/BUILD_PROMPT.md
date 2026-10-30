@@ -1,3 +1,5 @@
+> Scope update 2026-10-30: Android is the only supported target. Web/browser/iOS/desktop-distribution requirements below are historical and superseded by ADR-006 and the current Android QA/release plan. Preserve Android device/performance/release-signing risks.
+
 # AI Development Prompt: Cosmic Crystals
 
 Use this prompt with an AI coding agent that has access to this repository.

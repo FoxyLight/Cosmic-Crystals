@@ -8,6 +8,7 @@ REQUIRED = (
     "data/lyra_levels.json",
     "assets/fonts/DM-Sans-OFL.txt",
     "assets/fonts/Outfit-OFL.txt",
+    "assets/audio/PROVENANCE.txt",
 )
 
 
@@ -16,17 +17,14 @@ def main(path: Path) -> None:
         with zipfile.ZipFile(path) as archive:
             for name in REQUIRED:
                 assert f"assets/{name}" in archive.namelist(), f"Missing Android asset: {name}"
+            for name in ("select swap invalid match cascade beam bomb supernova nova rock_hit rock_break victory defeat star unlock menu confirm music_home music_map music_game music_win music_lose").split():
+                # Godot packs audio as imported sample resources with remap files.
+                assert any(("/" + name + ".wav-") in item and item.endswith(".sample") for item in archive.namelist()), f"Missing audio: {name}"
             data = json.loads(archive.read("assets/data/lyra_levels.json"))
             assert data["schema_version"] == 1
             assert [level["id"] for level in data["levels"]] == [1, 2, 3, 4, 5]
-    elif path.suffix == ".pck":
-        # Godot's unencrypted PCK directory contains resource path strings.
-        # Runtime/contents are separately exercised in scene/browser tests.
-        packed = path.read_bytes()
-        for name in REQUIRED:
-            assert name.encode("utf-8") in packed, f"Missing Web pack path: {name}"
     else:
-        raise ValueError("Expected an APK or Web PCK")
+        raise ValueError("Expected an Android APK")
     print("Verified exported Lyra catalog and both font-license assets")
 
 

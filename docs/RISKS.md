@@ -1,3 +1,5 @@
+> Scope update 2026-10-30: Android is the only supported target. Web/browser/iOS/desktop-distribution requirements below are historical and superseded by ADR-006 and the current Android QA/release plan. Preserve Android device/performance/release-signing risks.
+
 # Project Risks and Dependencies
 
 **Snapshot date:** 2026-10-29. Qualitative impact is an initial planning assessment, not a measured probability or financial forecast. Reassess risks at each milestone gate.

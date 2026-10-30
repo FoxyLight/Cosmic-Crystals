@@ -1,7 +1,6 @@
 extends Control
-## Animated Android-first match-3 prototype, with a clearly labeled synthetic
-## 30-second drawing stress check. M2 adds specials and Nova Pulse.
-## M2 asteroids share the immutable event stream; progression remains M3.
+## Android campaign presentation: immutable turns, audio, comfort and diagnostics.
+## Board rules and saved progression are independent of presentation timing.
 
 const BoardScript = preload("res://scripts/cosmic_board.gd")
 const Visuals = preload("res://scripts/crystal_visuals.gd")
@@ -10,6 +9,9 @@ const Hud = preload("res://scripts/game_hud.gd")
 const Session = preload("res://scripts/game_session.gd")
 const Levels = preload("res://scripts/level_catalog.gd")
 const Progress = preload("res://scripts/progress_store.gd")
+const Audio = preload("res://scripts/game_audio.gd")
+const Settings = preload("res://scripts/settings_view.gd")
+const Metrics = preload("res://scripts/performance_monitor.gd")
 const CampaignView = preload("res://scripts/campaign_view.gd")
 # Legacy regression fixtures opt in; the actual app opens on Home.
 var practice_mode: bool = false
@@ -21,6 +23,20 @@ var screen: String = "game"
 var current_level_id: int = 0
 var map_selection: int = 1
 var pause_after_turn: bool = false
+var audio
+var settings_view
+var settings_open: bool = false
+var app_backgrounded: bool = false
+var metrics = Metrics.new()
+var view_stamp: Array = []
+var draw_elapsed: float = 0
+var result_elapsed: float = 0
+var awarded_stars: int = 0
+var presentation_fade: float = 1
+var nova_origin: int = -1
+var marked_cells: Dictionary = {}
+var layout_cache: Dictionary = {}
+var layout_key: Array = []
 
 const SWAP_SECONDS: float = 0.17
 const CLEAR_SECONDS: float = 0.19
@@ -83,17 +99,25 @@ func _ready() -> void:
 	progress = Progress.new(save_path)
 	if not practice_mode:
 		progress.load_progress()
+	audio = Audio.new()
+	add_child(audio)
+	audio.configure(progress.data["settings"])
 	hud = Hud.new()
 	hud.game = self
 	add_child(hud)
 	campaign_view = CampaignView.new()
 	campaign_view.game = self
 	add_child(campaign_view)
+	settings_view = Settings.new()
+	settings_view.game = self
+	add_child(settings_view)
+	if not practice_mode: screen = "home"
 	_reset_game()
 	if not practice_mode:
 		screen = "home"
 		map_selection = int(progress.data["highest_unlocked"])
 	_refresh_views()
+	metrics.startup_ms = Time.get_ticks_msec()
 
 
 func _reset_game() -> void:
@@ -110,11 +134,17 @@ func _reset_game() -> void:
 
 func _prepare_view() -> void:
 	pause_after_turn = false
+	settings_open = false
+	if settings_view != null: settings_view.visible = false
+	result_elapsed = 0
+	awarded_stars = 0
+	presentation_fade = 1.0 if reduced_motion() else 0.0
 	display_cells = board.cells.duplicate()
 	display_specials = board.specials.duplicate()
 	display_asteroids = board.asteroids.duplicate()
 	selected = -1
 	press_index = -1
+	nova_origin = -1
 	phase = "idle"
 	overlay = ""
 	active_event = {}
@@ -133,7 +163,9 @@ func start_level(id: int) -> bool:
 		return false
 	current_level_id = id
 	map_selection = id
+	var load_start: int = Time.get_ticks_usec()
 	session.load_level(definition)
+	metrics.loading_ms = float(Time.get_ticks_usec() - load_start) / 1000
 	screen = "game"
 	_prepare_view()
 	return true
@@ -152,6 +184,7 @@ func go_map(confirmed: bool = false) -> bool:
 		open_overlay("leave")
 		return false
 	screen = "map"
+	presentation_fade = 1.0 if reduced_motion() else 0.0
 	overlay = ""
 	selected = -1
 	press_index = -1
@@ -163,6 +196,7 @@ func show_home() -> void:
 	if phase == "resolving":
 		return
 	screen = "home"
+	presentation_fade = 1.0 if reduced_motion() else 0.0
 	overlay = ""
 	press_index = -1
 	_refresh_views()
@@ -179,7 +213,24 @@ func reduced_motion() -> bool:
 
 
 func _notification(what: int) -> void:
+	if audio == null: return
+	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
+		app_backgrounded = true
+		audio.suspend("paused" if what == NOTIFICATION_APPLICATION_PAUSED else "focus", true)
+		press_index = -1
+		selected = -1
+		progress.save_progress()
+		if OS.get_name() == "Android": write_performance_report()
+		if screen == "game" and not finished:
+			if phase == "resolving": pause_after_turn = true
+			else: open_overlay("pause")
+	elif what in [NOTIFICATION_APPLICATION_RESUMED, NOTIFICATION_APPLICATION_FOCUS_IN]:
+		audio.suspend("paused" if what == NOTIFICATION_APPLICATION_RESUMED else "focus", false)
+		app_backgrounded = not audio.blockers.is_empty()
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if settings_open:
+			close_settings()
+			return
 		if phase == "resolving":
 			pause_after_turn = true
 		elif screen == "map":
@@ -194,6 +245,16 @@ func _notification(what: int) -> void:
 
 
 func _refresh_views() -> void:
+	if progress == null: return
+	var stamp: Array = [size, screen, overlay, phase, finished, won, score, moves_left, collected,
+		board.nova_energy, feedback, current_level_id, map_selection, hash(progress.data), progress.notice,
+		settings_open, _safe_insets(), stress_report]
+	if stamp == view_stamp: return
+	view_stamp = stamp
+	if audio != null: audio.set_context(("win" if won else "lose") if finished and screen == "game" else screen)
+	if settings_view != null:
+		settings_view.visible = settings_open
+		if settings_open: settings_view.refresh(_layout()["safe"])
 	if hud != null:
 		hud.visible = screen == "game"
 		if hud.visible:
@@ -205,7 +266,19 @@ func _refresh_views() -> void:
 
 
 func _process(delta: float) -> void:
+	if app_backgrounded: return
+	metrics.sample(delta)
 	elapsed += delta
+	result_elapsed += delta
+	presentation_fade = minf(1, presentation_fade + delta / .25)
+	if campaign_view != null: campaign_view.modulate.a = 1 if reduced_motion() else .7 + .3 * presentation_fade
+	if finished and won and screen == "game" and hud != null:
+		for i in range(3):
+			var reveal: float = 1 if reduced_motion() else clampf((result_elapsed - .2 * i) / .2, 0, 1)
+			hud.icons["rating%d" % i].self_modulate.a = reveal
+			if i < session.stars() and awarded_stars <= i and reveal >= 1:
+				audio.cue("star", 1 + .05 * i)
+				awarded_stars = i + 1
 	flash_time = maxf(0.0, flash_time - delta)
 	if not active_event.is_empty():
 		event_elapsed = minf(event_elapsed + delta, event_duration)
@@ -222,11 +295,14 @@ func _process(delta: float) -> void:
 			stress_report = "Draw test: avg %.0f / min %.0f FPS" % [mean_fps, stress_min_fps if stress_samples > 0 else 0.0]
 			print("COSMIC_STRESS: %s" % stress_report)
 	_refresh_views()
-	queue_redraw()
+	draw_elapsed += delta
+	if not active_event.is_empty() or stress_active or flash_time > 0 or (not reduced_motion() and draw_elapsed >= .066):
+		queue_redraw()
+		draw_elapsed = 0
 
 
 func _safe_insets() -> Vector4:
-	if OS.get_name() not in ["Android", "iOS"]:
+	if OS.get_name() != "Android":
 		return Vector4.ZERO
 	var pixels: Vector2 = Vector2(DisplayServer.window_get_size())
 	if pixels.x <= 0 or pixels.y <= 0:
@@ -243,7 +319,11 @@ func _safe_insets() -> Vector4:
 
 
 func _layout() -> Dictionary:
-	return Layout.calculate(size, _safe_insets(), not practice_mode)
+	var key: Array = [size, _safe_insets(), not practice_mode]
+	if key != layout_key:
+		layout_key = key
+		layout_cache = Layout.calculate(size, key[1], not practice_mode)
+	return layout_cache
 
 
 func _board_rect() -> Rect2:
@@ -340,6 +420,7 @@ func _draw() -> void:
 		_draw_snapshot(display_cells, rect)
 	else:
 		_draw_animated_event(rect)
+		_draw_power_effects(rect)
 	_draw_asteroids(rect)
 
 	if flash_time > 0.0 and not reduced_motion():
@@ -382,7 +463,7 @@ func _draw_animated_event(rect: Rect2) -> void:
 				if int(before[index]) < 0:
 					continue
 				if marked.has(index):
-					_draw_crystal(_center_of(index, rect), radius * (1.0 - t * 0.46), int(before[index]), 1.0 - t, int(before_powers[index]))
+					_draw_crystal(_center_of(index, rect), radius if reduced_motion() else radius * (1.0 - t * 0.46), int(before[index]), 1.0 - t, int(before_powers[index]))
 				else:
 					# Unaffected special crystals must remain visibly marked
 					# while another group clears (not only on settled frames).
@@ -409,6 +490,7 @@ func _draw_animated_event(rect: Rect2) -> void:
 			_draw_snapshot(active_event["after"], rect, active_event["specials_after"])
 			var target: int = int(active_event["index"])
 			var pulse_color: Color = Color("#FFE8A9", (1.0 - t) * 0.9)
+			if reduced_motion(): return
 			draw_arc(_center_of(target, rect), radius * (0.9 + t * 0.55),
 				0.0, TAU, 24, pulse_color, 2.5, true)
 		"reshuffle":
@@ -434,7 +516,7 @@ func _draw_asteroids(rect: Rect2) -> void:
 		var center: Vector2 = _center_of(index, rect)
 		var opacity: float = 1.0
 		var scale_factor: float = 1.0
-		if hitting and active_event["indices"].has(index):
+		if hitting and active_event["indices"].has(index) and not reduced_motion():
 			center.x += sin(t * TAU * 2.0) * radius * 0.09 * (1.0 - t)
 			if active_event["destroyed"].has(index):
 				opacity = 1.0 - t
@@ -590,6 +672,9 @@ func _draw_stress_effects(rect: Rect2) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if settings_open:
+		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE: close_settings()
+		return
 	if event is InputEventScreenTouch:
 		if event.index == 0:
 			_handle_touch(event.position, event.pressed)
@@ -614,7 +699,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _handle_touch(pointer: Vector2, pressed: bool) -> void:
-	if screen != "game" or not overlay.is_empty():
+	if screen != "game" or not overlay.is_empty() or settings_open or app_backgrounded:
 		return
 	if phase != "idle" and phase != "nova_targeting" and phase != "finished":
 		return
@@ -694,6 +779,7 @@ func _handle_touch(pointer: Vector2, pressed: bool) -> void:
 			_take_turn(first, start_index)
 		else:
 			selected = start_index
+			audio.cue("select")
 			queue_redraw()
 
 
@@ -727,6 +813,10 @@ func _event_duration(kind: String) -> float:
 
 
 func _animate_event(event: Dictionary) -> void:
+	audio.dispatch_event(event)
+	metrics.events[event["type"]] = int(metrics.events.get(event["type"], 0)) + 1
+	marked_cells.clear()
+	for index in event.get("indices", []): marked_cells[int(index)] = true
 	active_event = event
 	event_elapsed = 0.0
 	event_duration = _event_duration(str(event["type"]))
@@ -747,6 +837,7 @@ func _take_turn(a: int, b: int) -> void:
 	if phase != "idle":
 		return
 	phase = "resolving"
+	nova_origin = -1
 	selected = -1
 	press_index = -1
 	var outcome: Dictionary = session.begin_swap(a, b)
@@ -759,6 +850,8 @@ func _take_nova(target: int) -> void:
 	phase = "resolving"
 	selected = -1
 	press_index = -1
+	nova_origin = target
+	audio.cue("nova")
 	var outcome: Dictionary = session.begin_nova(target)
 	await _apply_outcome(outcome, false)
 
@@ -772,7 +865,9 @@ func _apply_outcome(outcome: Dictionary, _use_move: bool) -> void:
 	display_cells = board.cells.duplicate()
 	display_specials = board.specials.duplicate()
 	display_asteroids = board.asteroids.duplicate()
+	var previous_unlock: int = int(progress.data["highest_unlocked"])
 	if bool(outcome["valid"]):
+		metrics.turns += 1
 		session.commit_outcome(outcome)
 		if current_level_id > 0:
 			progress.mark_tutorial(current_level_id)
@@ -803,8 +898,79 @@ func _apply_outcome(outcome: Dictionary, _use_move: bool) -> void:
 		feedback = "That swap doesn't make a match"
 	flash_time = 0.45
 	phase = "finished" if finished else "idle"
+	if finished:
+		result_elapsed = 0
+		awarded_stars = 0
+		audio.cue("victory" if won else "defeat")
+		if int(progress.data["highest_unlocked"]) > previous_unlock: audio.cue("unlock")
+	_refresh_views()
 	if pause_after_turn:
 		pause_after_turn = false
 		if not finished:
 			open_overlay("pause")
 	queue_redraw()
+
+
+func ui_cue(confirm: bool = false) -> void:
+	if audio != null: audio.cue("confirm" if confirm else "menu")
+
+
+func open_settings() -> void:
+	if phase == "resolving" or settings_open: return
+	settings_open = true
+	_refresh_views()
+	settings_view.back.grab_focus()
+
+
+func close_settings() -> void:
+	settings_open = false
+	ui_cue(true)
+	_refresh_views()
+
+
+func set_preference(key: String, value) -> void:
+	progress.set_preference(key, value)
+	audio.configure(progress.data["settings"])
+	_refresh_views()
+	queue_redraw()
+
+
+func _draw_power_effects(rect: Rect2) -> void:
+	if reduced_motion() or active_event.get("type", "") != "clear": return
+	var t: float = clampf(event_elapsed / event_duration, 0, 1)
+	var alpha: float = sin(t * PI) * .7
+	var radius: float = rect.size.x / 8 * .42
+	var powers: Array = active_event.get("specials_before", [])
+	var count: int = 0
+	if nova_origin >= 0:
+		var origin: Vector2 = _center_of(nova_origin, rect)
+		draw_line(Vector2(rect.position.x, origin.y), Vector2(rect.end.x, origin.y), Color(.7, .5, 1, alpha), 5, true)
+		draw_line(Vector2(origin.x, rect.position.y), Vector2(origin.x, rect.end.y), Color(.7, .5, 1, alpha), 5, true)
+	for index in active_event.get("indices", []):
+		if count >= 8: break
+		var power: int = int(powers[index]) if index < powers.size() else 0
+		if power == 0: continue
+		count += 1
+		var center: Vector2 = _center_of(index, rect)
+		if power in [1, 2]:
+			var a: Vector2 = Vector2(rect.position.x, center.y) if power == 1 else Vector2(center.x, rect.position.y)
+			var b: Vector2 = Vector2(rect.end.x, center.y) if power == 1 else Vector2(center.x, rect.end.y)
+			draw_line(a, b, Color(.4, .95, 1, alpha), 4, true)
+		elif power == 3:
+			draw_arc(center, radius * (1 + t * 1.5), 0, TAU, 28, Color(1, .7, .3, alpha), 3, true)
+		else:
+			for ray in range(6):
+				var direction: Vector2 = Vector2.from_angle(TAU * ray / 6)
+				draw_line(center, center + direction * radius * (1 + t), Color(1, .9, .4, alpha), 3, true)
+
+
+func write_performance_report() -> Dictionary:
+	var report: Dictionary = metrics.report()
+	report["reduced_motion"] = reduced_motion()
+	report["audio_voices"] = audio.VOICES
+	report["audio_dropped"] = audio.dropped
+	report["screen"] = screen
+	report["level"] = current_level_id
+	var file: FileAccess = FileAccess.open("user://performance-last.json", FileAccess.WRITE)
+	if file != null: file.store_string(JSON.stringify(report, "  "))
+	return report

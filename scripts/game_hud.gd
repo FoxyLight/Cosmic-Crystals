@@ -98,6 +98,7 @@ func _ready() -> void:
 	_button("confirm_leave", "Return to map", func(): game.go_map(true))
 	_button("confirm_restart", "Restart level", func(): game._reset_game())
 	_button("resume", "Keep playing", func(): game.close_overlay())
+	_button("settings", "Sound & comfort", func(): game.open_settings())
 	_button("guide", "How to play", func(): game.open_overlay("help"))
 	_button("back", "Back to game", func(): game.close_overlay())
 	_button("stress", "Run effects check", func(): game._toggle_stress_test(); game.close_overlay())
@@ -162,7 +163,7 @@ func _button(key: String, text: String, action: Callable, quiet: bool = false) -
 	focus.set_border_width_all(2)
 	button.add_theme_stylebox_override("focus", focus)
 	button.action_mode = BaseButton.ACTION_MODE_BUTTON_RELEASE
-	button.pressed.connect(action)
+	button.pressed.connect(func(): game.ui_cue(key.begins_with("confirm")); action.call())
 	buttons[key] = button
 	add_child(button)
 
@@ -198,6 +199,7 @@ func _meter(key: String, rect: Rect2, fraction: float) -> void:
 func refresh(layout: Dictionary) -> void:
 	if game == null or game.board == null:
 		return
+	labels["caption"].add_theme_font_size_override("font_size", 14 if game.progress.data["settings"].get("large_text", false) else 11)
 	var modal: String = "result" if game.finished else game.overlay
 	var blocked: bool = not modal.is_empty()
 	var idle: bool = game.phase == "idle" or game.phase == "nova_targeting"
@@ -290,7 +292,7 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 		icons["rating%d" % i].visible = visible_modal and modal == "result" and campaign and game.won
 	for key in ["modal_eyebrow", "modal_title", "modal_body", "modal_score"]:
 		labels[key].visible = visible_modal
-	for key in ["replay", "resume", "guide", "back", "stress", "next", "map", "restart", "confirm_leave", "confirm_restart"]:
+	for key in ["replay", "resume", "guide", "back", "stress", "next", "map", "restart", "confirm_leave", "confirm_restart", "settings"]:
 		if modal != last_modal or not visible_modal:
 			buttons[key].visible = false
 	if not visible_modal:
@@ -382,9 +384,10 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 		labels["modal_body"].text = "Your crystals will be right here."
 		if campaign:
 			_place("modal_body", Rect2(x, dialog.position.y + 156, width, 24))
-			order = ["resume", "guide", "restart", "map"]
+			order = ["resume", "guide", "settings", "restart", "map"]
+			labels["modal_body"].visible = false
 			for i in range(order.size()):
-				_rect(buttons[order[i]], Rect2(x, dialog.end.y - 244 + i * 56, width, 48))
+				_rect(buttons[order[i]], Rect2(x, dialog.end.y - 272 + i * 50, width, 48))
 				buttons[order[i]].visible = true
 		else:
 			_rect(buttons["resume"], Rect2(x, dialog.end.y - 138, width, 48))
@@ -399,4 +402,7 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 			button.focus_previous = button.get_path_to(buttons[order[(i - 1 + order.size()) % order.size()]])
 		if not order.is_empty():
 			buttons[order[0]].grab_focus()
+	if game.progress.data["settings"].get("large_text", false):
+		labels["modal_body"].add_theme_font_size_override("font_size", 17)
+		labels["modal_score"].add_theme_font_size_override("font_size", 16 if modal == "help" else 26)
 	last_modal = modal
