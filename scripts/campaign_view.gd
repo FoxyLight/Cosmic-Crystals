@@ -123,6 +123,10 @@ func refresh(layout: Dictionary) -> void:
 	for node in groups:
 		node.visible = groups[node] == "both" or groups[node] == game.screen
 	var area: Rect2 = layout["safe"]
+	var large: bool = game.progress.data["settings"].get("large_text", false)
+	labels["home_body"].add_theme_font_size_override("font_size", 19 if large else 15)
+	labels["home_progress"].add_theme_font_size_override("font_size", 15 if large else 12)
+	labels["map_progress"].add_theme_font_size_override("font_size", 14 if large else 12)
 	var width: float = minf(480, area.size.x - 24)
 	var x: float = area.get_center().x - width * 0.5
 	var top: float = area.position.y + 8
@@ -149,7 +153,7 @@ func refresh(layout: Dictionary) -> void:
 		_rect(buttons["home"], Rect2(x + width - 76, top, 76, 48))
 		_rect(labels["map_title"], Rect2(x, top + 64, width, 36))
 		_rect(labels["map_progress"], Rect2(x, top + 103, width, 22))
-		labels["map_progress"].text = "Lyra restored · %d / 15 stars" % game.progress.total_stars() if game.progress.all_completed() else "%d / 15 stars · Choose a star to awaken" % game.progress.total_stars()
+		labels["map_progress"].text = "Lyra restored · %d / 15 stars" % game.progress.total_stars() if game.progress.all_completed() else ("%d / 15 stars · Choose a star" if large else "%d / 15 stars · Choose a star to awaken") % game.progress.total_stars()
 		var play: Rect2 = Rect2(x, area.end.y - 62, width, 50)
 		var enlarged: bool = game.progress.data["settings"].get("large_text", false)
 		var preview_rect: Rect2 = Rect2(x, play.position.y - (188 if enlarged else 156), width, 176 if enlarged else 144)
@@ -200,12 +204,8 @@ func refresh(layout: Dictionary) -> void:
 		_rect(labels["notice"], Rect2(x, play.position.y - 38, width, 36))
 	if last_screen != game.screen:
 		buttons["journey" if game.screen == "home" else "play"].grab_focus()
-	if game.progress.data["settings"].get("large_text", false):
-		labels["level_tip"].add_theme_font_size_override("font_size", 15)
-		labels["level_goals"].add_theme_font_size_override("font_size", 14)
-	else:
-		labels["level_tip"].add_theme_font_size_override("font_size", 12)
-		labels["level_goals"].add_theme_font_size_override("font_size", 12)
+	labels["level_tip"].add_theme_font_size_override("font_size", 16 if large else 12)
+	labels["level_goals"].add_theme_font_size_override("font_size", 15 if large else 12)
 	last_screen = game.screen
 	queue_redraw()
 
