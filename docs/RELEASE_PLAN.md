@@ -2,7 +2,7 @@
 
 Android is the sole supported product. Sequence: accepted five-level M3 → M4 audio/accessibility/performance and safe updates → Android M5 release candidate → separately authorized M6 production signing/AAB/Play work. No Web, desktop distribution or iOS work is planned. [Historical release plan](history/PRE_M4_RELEASE_PLAN.md) is superseded.
 
-0.5.0 is the M4 source base. Debug CI derives unique code/name/filename from run/attempt/commit; validates manifest, signature, pin, checksum and assets; includes build-info. Stable debug identity is private Actions-secret material, not a Play release/upload key. A differently signed old app requires an explicit save-safe migration; never erase progress for convenience.
+0.5.1 is the current M4 source base (four-match Beam movement-direction correction). Debug CI derives unique code/name/filename from run/attempt/commit; validates manifest, signature, pin, checksum and assets; includes build-info. Stable debug identity is private Actions-secret material, not a Play release/upload key. The phone's 10801 → 11001 update was verified with its save byte-identical; this **does not** prove compatibility with a different-certificate legacy installation. A differently signed old app requires an explicitly approved save-safe migration; never erase progress for convenience. [Run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426).
 
 ## M4 acceptance
 
