@@ -1,75 +1,44 @@
-> Scope update 2026-10-30: Android is the only supported target. Web/browser/iOS/desktop-distribution requirements below are historical and superseded by ADR-006 and the current Android QA/release plan. Preserve Android device/performance/release-signing risks.
+# Current AI Development Prompt: Cosmic Crystals (Android Only)
 
-# AI Development Prompt: Cosmic Crystals
+**Updated:** 2026-10-30. **Current source:** product `0.5.1`, Godot `4.7.2` GDScript, Compatibility renderer. This document replaces the original 2026-10-29 cross-platform/build-from-scratch prompt. Consult Git history for that historical prompt. Do **not** add Web/HTML5, browser tests, desktop distribution or iOS development.
 
-Use this prompt with an AI coding agent that has access to this repository.
+Use this brief with a coding agent that can inspect and modify the connected repository **[FoxyLight/Cosmic-Crystals](https://github.com/FoxyLight/Cosmic-Crystals)** and run its Android-relevant tests.
 
-## Your role
+## First, verify the live state
 
-Act as an experienced gameplay engineer, casual puzzle designer, technical artist and cross-platform architect. Develop **Cosmic Crystals: A Starweaver's Journey**, an original match-3 puzzle adventure for web, iOS and Android.
+1. Read [PROJECT_STATUS.md](PROJECT_STATUS.md), [MILESTONES.md](MILESTONES.md), [ROADMAP.md](ROADMAP.md), [GAME_DESIGN.md](GAME_DESIGN.md), [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md), [ANDROID_VERSIONING.md](ANDROID_VERSIONING.md), [QA_TEST_PLAN.md](QA_TEST_PLAN.md), [RELEASE_PLAN.md](RELEASE_PLAN.md), [DECISIONS.md](DECISIONS.md) and latest main CI/issue #8.
+2. Confirm the *current* `main` commit and `VERSION` instead of relying on examples in this prompt. Preserve the already implemented five-level Lyra journey, saved unlocks/best-star ratings, M1/M2 special interactions, asteroids and all regression tests.
+3. Confirm the **Android-only** scope in the workflow: `check` and `android-debug-export` only. Headless/desktop Godot is allowed **as a development/test host**. Do not generate or test Web/iOS deliverables.
+4. Distinguish implemented source, local/headless or emulator tests, and user-confirmed physical Android playtests. A green CI run and installed APK do not establish human M4 acceptance.
 
-**Read first:** [PROJECT_STATUS.md](PROJECT_STATUS.md), [MILESTONES.md](MILESTONES.md), [ROADMAP.md](ROADMAP.md), [GAME_DESIGN.md](GAME_DESIGN.md), [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md), [DECISIONS.md](DECISIONS.md), and the repository README. For QA/export or release changes also read [QA_TEST_PLAN.md](QA_TEST_PLAN.md) and [RELEASE_PLAN.md](RELEASE_PLAN.md). Preserve existing project work. Do not claim that a feature is implemented unless its code exists and has been tested.
+## Proven baseline (review actual main before editing)
 
-## Product promise
+- **M3 #7 is closed:** the player reported a passing five-level Android campaign/relaunch playtest. Five JSON-authored stages, game sessions, home/map/results, star thresholds and schema-1 local saves are implemented.
+- **M4 #8 is open:** original audio (17 effects, five music loops), cached players, volume/mute preferences, comfort/reduced-motion and larger-text settings, Android focus/background behavior, visual effects, UI caching and bounded performance diagnostics are implemented. Human audio/comfort/accessibility/performance validation remains pending.
+- **Version 0.5.1 / PR #34:** four-match Star Beam direction follows the initiating **swap axis**: left/right → row/horizontal, up/down → column/vertical. The 53-case Beam gesture/scene suite passes; established power formation precedence and stored powers are preserved.
+- **Main CI #110:** both Android-only jobs passed, including **15 Godot suites, nine Python tests**, real APK manifest/signature/pinned certificate, bundled assets, SHA-256, and an isolated Android-emulator same-key save-preserving upgrade.
+- **APK #110:** versionName `0.5.1-dev.110.1+g7864c820`, versionCode `11001`, [Actions artifact](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426/artifacts/12988237867). GitHub M4 #8 records an **actual Android phone update 10801 → 11001 with byte-identical save data**. This is save-integrity evidence, **not** a newly passed human M4 playtest.
+- **Debug signing:** main CI has a configured private stable debug keystore/password and public certificate pin. Pull requests use ephemeral signers. Never expose keys, recover private key from GitHub secrets or claim the stable signer is production signing.
+- **Legacy signatures:** old 9801 and other differently signed APKs cannot be updated by the new key. Never uninstall/clear a progress-bearing phone without fresh explicit permission, validated backup, and a safely tested migration plan.
+- **Release boundary:** no production signed AAB, Google Play track, browser distribution, cloud accounts, monetization or levels 6–20.
 
-The Great Eclipse has silenced the constellations. The player is a Starweaver who matches luminous crystals, charges the Nova Pulse, completes puzzles and restores the galaxy. The game should be approachable, smooth, replayable, and uniquely recognizable by its cosmic power effects and constellation progression.
+## Engineering approach
 
-## Core nonnegotiable game rules
+- Use a feature branch and focused pull request. Reuse `board.gd` / `cosmic_board.gd` (pure deterministic rules), `game_session.gd`, `level_catalog.gd`, `progress_store.gd`, `prototype.gd`, `game_hud.gd`, `campaign_view.gd`, `settings_view.gd`, `game_audio.gd` and `performance_monitor.gd` as appropriate.
+- Preserve immutable event snapshots, move/input-lock ordering, replay/last-move victory, blocker-safe falls, no-color inventory reshuffle and schema-1 progress compatibility. Do not invent new gameplay mechanics without an owner request.
+- Run all `tests/test_*.gd` under the strict Godot error-log guard, the headless `tests/benchmark_android.gd`, and `python3 -m unittest discover -s tests -p "test_android*.py" -v`. Confirm import and full playable scene.
+- Require successful `check` and `android-debug-export`, uniquely versioned Android APK, `build-info.json`, `SHA256SUMS.txt`, embedded manifest verification, matching pinned stable debug signer on **main**, and the isolated emulator update/save test. Main CI's signing mode must be inspected, not assumed.
+- Do not downgrade, uninstall or replace an installed Android app simply to test a new APK. Record exact build/commit/device/evidence and get permission before any potentially destructive phone operation.
+- Do not claim measured FPS/PSS/thermal, production release readiness, screen-reader accessibility or human listening quality without observed test evidence.
 
-1. A default 8 x 8 board contains six silhouette-distinct kinds: Nebula Amethyst, Solar Amber, Quantum Sapphire, Plasma Ruby, Aurora Emerald and Lunar Opal.
-2. Swap orthogonally adjacent crystals by mouse or touch (tap/tap and drag/swipe). Normal moves are valid only when they produce a line of three or more.
-3. Invalid swaps roll back and consume zero moves. Valid swaps consume exactly one move.
-4. Detect simultaneous matches, clear pieces without double-counting intersections, apply gravity, refill, and repeat cascades until stable.
-5. Starting boards have no automatic matches and always offer a legal move. Safely reshuffle deadlocks.
-6. A four-line makes Star Beam; a five-line makes Supernova; T/L shapes make Cosmic Bomb. Implement deterministic precedence and real activations, including defined special+special swaps.
-7. Nova energy charges through matches and combos. Once full, the player selects a cell; Nova Pulse clears its row and column, damages blockers, collects objectives, consumes zero moves, and resets the meter. Targeting is cancelable.
-8. Support collection objectives, asteroid blockers, move limits, scoring, three-star ratings, wins, losses, and five gradually harder levels.
-9. Supply home, galaxy map, gameplay, pause, win/lose, settings and concise tutorial experience. Persist unlocks, best stars and settings locally.
-10. Keep gameplay rules independent of Godot scene nodes, animation timing and device input. No accounts or backend for MVP.
+## Next development priorities
 
-## Visual direction
+1. **M4 human Android acceptance:** audio mix on speakers/headphones, music/SFX/mute, settings relaunch persistence, reduced motion/larger text and cutouts, Beam direction in real play, audio focus/background, rapid gestures, and a continuous heavy-effects session. Capture device/Android version, build, performance metrics where available. Close #8 only after warranted human evidence, keeping unverified sub-gates separate.
+2. **M5 Android release candidate:** multi-device tests, measured sustained FPS/p95/RAM/PSS, process death/restart, interruption handling, save compatibility, long-session stability and severity-tracked bugs. No browser/device matrix outside Android.
+3. **M6 (separately authorized):** private production/upload signing, signed release AAB, Play internal testing, store/data-safety policies and publication decision. Do not equate debug APK export with Play distribution.
 
-Premium cosmic fantasy, not a generic candy reskin. Palette: #0B102A, #7C4DFF, #39D5FF, #FFCB65, #FF66BF, #44E3B2. Create readable jewel-like silhouette crystals over a restrained deep-space background. Matches must feel crisp; cascades build musical/visual energy; Nova Pulse is the marquee spectacle. Respect reduced motion and audio mute settings.
+## Delivery requirements
 
-## Engineering direction
+Update the affected project design/technical architecture, QA, status, roadmap, milestones, release notes and issue tracking alongside source changes. Report exactly which behaviors were implemented and verified, the PR/merged commit, CI run, APK `versionName`/`versionCode`/filename/checksum/signing mode, outstanding human-device acceptance and safe installation guidance.
 
-Use Godot 4.7.2 standard edition with GDScript and the Compatibility renderer. Test pure rules headlessly with seeded RandomNumberGenerator. Validate the native Android APK/AAB pipeline first, then Godot web export and later iOS. Do not introduce Phaser, Vite, or Capacitor. Support mobile portrait and desktop responsive layouts with safe areas and accessible touch targets.
-
-Separate board state, turn resolution, objectives, blockers, specials, scoring and persistence from scenes, sprites and effects. Use an explicit state machine to prevent input while animations resolve. Save with versioned schemas.
-
-## GitHub milestones and current boundaries
-
-The foundation is already committed and headless CI-tested. Use [M0 #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4) for Android/web feasibility and [M1 #3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) for event-driven animated turns. Then work through [M2 #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6), [M3 #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7), [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8), [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9), and [M6 #10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10). [M7 #11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) is explicitly post-MVP.
-
-**Do not** treat a successful headless Godot run as Android APK/AAB export or on-device testing. Do not describe a five-level vertical slice or special powers as already present. Update the milestone issue with evidence for each completed task.
-
-## Implement incrementally
-
-1. Continue the existing Godot project and seeded match-3 engine; keep headless tests green and record the Android/web export results.
-2. Build the reliable 8 x 8 engine and one complete win/lose level.
-3. Add special crystals, asteroid blockers, Nova Pulse and tests.
-4. Build five curated levels with tutorial ramp, score, stars and local saves.
-5. Add galaxy progression, art direction, audio and interface polish.
-6. Measure performance on actual Android hardware, validate a signed AAB and exported web build before production approval.
-7. Expand to 20 levels and four constellations only after the five-level vertical slice is stable.
-
-## Acceptance criteria
-
-- Godot project parses successfully, unit tests pass, and native/web exports are independently verified.
-- No invalid swap consumes a move; no valid move consumes multiple moves.
-- Match intersections/cascades/special triggers never double-count crystal collection.
-- Game never accepts overlapping input during turn resolution.
-- A terminal board produces the correct win/loss state after all effects settle.
-- Special pieces and Nova Pulse work consistently with objective/blocker rules.
-- All five levels are playable and progress survives reload.
-- Game is usable at mobile phone widths and with a mouse on desktop.
-- No unlicensed assets are embedded; user-facing screens are coherent and polished.
-
-**Important:** A published concept page exists, but this repository started empty. Do not treat the published page's 20-level claim as evidence that those levels are implemented in this repo. If importing its source becomes possible, inspect and reconcile rather than overwriting it.
-
-For every change, link a milestone issue, summarize files modified, tests run, relevant Android/web devices tested, known limitations, and the next logical task. Update [PROJECT_STATUS.md](PROJECT_STATUS.md) and the milestone register when status or scope changes. The goal is a genuinely playable game, not a static interface.
-
-
-## Current implementation note (2026-10-29)
-
-The GitHub project contains a Godot `project.godot`, an M1 seeded board/event engine and an M2 [CosmicBoard](../scripts/cosmic_board.gd) prototype with power activation, special creation and Nova targeting. Read [M2 Gameplay Guide](M2_SPECIALS_NOVA.md) before modifying these mechanics. CI exports debug Android APK and Web preview artifacts (see [M0/M1 implementation](M0_M1_IMPLEMENTATION.md)). Do not rewrite these files from scratch or claim that asteroid blockers, complete M2 balancing, multi-level progression, saves, physical-device M2 testing, AAB release builds or Google Play submission are complete. Implement incrementally against [ROADMAP.md](ROADMAP.md), and use [ANDROID_EXPORT.md](ANDROID_EXPORT.md) to validate physical-device and web builds.
+**Do the work, not just a plan.** Merge only after required Android CI passes. Stop rather than risk erasing the player's earned progress.

@@ -20,12 +20,12 @@ assignees: []
 
 - Commit SHA / release version:
 - Godot version:
-- Device / Android version or browser:
-- APK / AAB / web / editor:
+- Android device/model, OS, display/font scale:
+- Exact APK versionName/versionCode/commit, signing mode and installation method (or Godot editor for dev-only reproduction):
 
 ## Evidence
 
-Screenshots, logs, recordings, or deterministic RNG seed / board layout (avoid personal information).
+Screenshots, redacted Android logcat, recordings, saved build-info/checksum, or deterministic RNG seed/board layout (avoid personal information and signing secrets). Note whether the bug was reproduced on a physical device, emulator or headless CI.
 
 ## Impact / severity
 

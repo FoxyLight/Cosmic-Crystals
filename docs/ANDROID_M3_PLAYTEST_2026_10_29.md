@@ -1,3 +1,5 @@
+> **Historical M3 acceptance evidence (0.4.0).** The report below remains the evidence for closed issue #7. Active product scope is **Android-only 0.5.1**; browser QA is excluded. The device's subsequent stable-key M4 **10801 → 11001 update** preserved saved data, but the new M4 audiovisual/Beam-direction human test is pending. See [M4](M4_ANDROID_POLISH.md), [status](PROJECT_STATUS.md).
+
 # M3 Lyra Android Playtest: Player-Reported PASS
 
 **Reported:** 2026-10-29

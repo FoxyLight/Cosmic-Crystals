@@ -20,4 +20,6 @@ Download the exact versioned artifact from [Actions](https://github.com/FoxyLigh
 
 Web/HTML5, desktop distribution, iOS, levels 6–20, extra constellations, monetization, accounts/cloud saves and Play publishing are outside M4. Earlier Web work remains in historical reports/Git history and has no active acceptance gate.
 
-Four-match Beams follow the gem movement: left/right creates a horizontal Beam; up/down creates a vertical Beam.
+Four-match Beams follow the gem movement: left/right creates a horizontal Beam; up/down creates a vertical Beam. [PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) and [Android-only main CI #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) verified this change. The stable-signer 10801 → 11001 phone update retained its save byte for byte, but the new M4 human audio/Beam-direction playtest is still pending.
+
+[Current Android-only repository and documentation audit](docs/ANDROID_DOCS_AUDIT_2026_10_30.md) records exactly which gates are complete and which device/release measurements are still missing.

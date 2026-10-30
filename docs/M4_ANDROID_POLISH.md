@@ -1,6 +1,6 @@
 # M4 Android Production Polish
 
-2026-10-30, product **0.5.0**. Android is the sole supported target. M3's
+2026-10-30, current product **0.5.1** (original M4 audio/polish slice 0.5.0; subsequent Beam-direction correction 0.5.1). Android is the sole supported target. M3's
 five-level campaign is human-accepted and #7 is closed. **M4 #8 remains open
 until the player accepts the new audio/accessibility build.** No Web artifact,
 browser test, desktop distribution, iOS work, new constellation, monetization,
@@ -171,6 +171,21 @@ Native development renders of the compact 320x568 and 376x746 settings sheet
 were inspected. This is Android UI development evidence, not desktop product
 support or a new human Android pass. The acceptance artifact/version/checksum
 and final CI evidence are recorded in [issue #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8).
+
+
+## Current 0.5.1 delivery and real-phone update (2026-10-30)
+
+[PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) fixes the newly forged Star Beam's direction: horizontal swap → row Beam; vertical swap → column Beam, including two-tap input and perpendicular completed match lines. Bomb/Supernova priority, existing stored Beam orientation, level restrictions and schema-1 progression are preserved. The new [Beam-direction suite](../tests/test_beam_direction.gd) passed **53 assertions**. The earlier M4 audio/comfort suite still passed **166 assertions**.
+
+[Main CI run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) for commit `7864c82007bf379de232156323328e887afdcf0c` passed both Android-only jobs, **15 Godot suites**, **nine Python tests**, actual APK manifest, signer pin, catalog/audio assets and checksum, plus an isolated-emulator same-key upgrade/save verification.
+
+- **VersionName:** `0.5.1-dev.110.1+g7864c820`; **versionCode:** `11001`.
+- **APK:** `cosmic-crystals-v0.5.1-dev.110.1-g7864c820-debug.apk` ([download through Actions](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426/artifacts/12988237867)).
+- **APK SHA-256:** `a2d15f5efe9f26958e8c1ab77ea43e1ff5ac899793bc946cfa62eef37e7a7249`.
+- **Signing:** `persistent-secret`, stable-signing verification passed against the pinned certificate.
+- **Device evidence:** GitHub [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) records a private, validated read-only save backup, a **real-phone compatible in-place 10801 → 11001 update** and **byte-for-byte identical save afterward**, with no uninstall or data clearing. Separately, CI confirmed identical save bytes across a disposable emulator update.
+
+This establishes compatible update mechanics and data retention **for the verified stable-key build**, not any differently signed legacy installation. The player has **not yet reported a new human M4 audio/visual/Beam-direction playtest**. Actual audio quality, Android focus interruptions, system scaling, screen-reader usability and sustained FPS/RAM/thermals remain pending. M4 #8 stays open; Google Play release AAB remains future M6 work.
 
 ## Android human playtest
 
