@@ -27,9 +27,7 @@ sessions (10,325 checks), saves (86) and touch-driven five-level scene/reload
 (966). Five version-policy tests pass. CI inspects catalog/licenses in actual
 exports and retains strict Godot log guards/embedded APK metadata checks.
 
-Asteroid build 9101 passed the player. Visual 9601 was installed/read back but
-has no separate human pass. **M3 needs a new Android test**, including all five
-levels and app close/reopen with the same earned records. [Checklist/evidence](M3_LYRA_CAMPAIGN.md).
+Asteroid build 9101 passed the player. The newer M3 APK 9801 was installed/read back, and the player subsequently reported **M3 Android playtest PASS** against the requested five-level journey/restart scope. [Evidence](ANDROID_M3_PLAYTEST_2026_10_29.md). Detailed device/OS metrics and exhaustive visual/accessibility validation are still open.
 This supersedes pre-M3 "not implemented" statuses in historical sections below.
 
 ## 1. Current automated coverage
@@ -73,9 +71,9 @@ The expanded seeded board test covers 125 seeds, no starting matches, adjacent l
 | Move budget | Illegal swap spends 0; legal spends 1; last-move win overrides loss | Real-scene regression including both crystal/rock goals passes |
 | Deadlocks | No legal move reshuffles without deleting blockers/specials | Exact movable inventory, fixed HP and isolated power recovery tested |
 | Special pieces | 4/5/T/L creation precedence; combined triggers; no double-count | First M2 rules coded and tested; phone balancing pending |
-| Blockers | Adjacent matches vs special and Nova damage; durability rules | Implemented and automated; physical Android acceptance pending |
+| Blockers | Adjacent matches vs special and Nova damage; durability rules | Automated; 0.3.0 asteroid build 9101 passed user Android gameplay smoke |
 | Nova Pulse | Charge, cancel, row/column, zero-move activation, reset | M2 rules + touch targeting implemented; manual cancellation/charge feel QA open |
-| Progression | Five-level unlocks, stars, replay and save load | Implemented/model + actual scene journey/reload tested; human gate pending |
+| Progression | Five-level unlocks, stars, replay and save load | Model/scene/disk tests pass; overall M3 Android playtest accepted by user on 2026-10-29 |
 | Persistence | Schema, malformed/truncated save, restart | Safe writes, backup/future recovery and automated disk reload tested |
 | Interruptions | Restart, pause, background while effects resolve | Transition guards/queued Back tested; full background/device matrix pending |
 
