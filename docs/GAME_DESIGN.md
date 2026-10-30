@@ -1,8 +1,8 @@
 # Game Design Document
 
 **Project:** Cosmic Crystals: A Starweaver's Journey
-**Status:** M3 implementation plus future design; new human Android acceptance pending
-**Last updated:** 2026-10-29
+**Status:** M3 human-accepted; M4 Android-only implementation, new polish acceptance pending
+**Last updated:** 2026-10-30
 
 ## 1. Vision
 
@@ -129,7 +129,7 @@ through replay/restart. Exactly five nodes; expansion stays M7.
 
 **Implemented presentation scope:** gameplay and result screens now follow the
 earlier navy/violet design, with both goals above a square board, score/moves
-cards and Nova below on phones, and an adjacent HUD on wide desktops. Help
+cards and Nova below on phones, and an adjacent HUD on wide Android tablets. Help
 explains powers/rocks/Nova; pause resumes without changing the board. Diagnostic
 controls are absent from the player HUD. Both victory and defeat keep a single
 intentional Play again control and show final score; defeat shows unmet goals.
@@ -159,11 +159,11 @@ Audio: optional background ambience; unobtrusive selection/match sounds; escalat
 ## 10. Target platforms and accessibility
 
 - Primary design: portrait mobile with thumb-friendly targets and safe-area support.
-- Desktop: centered puzzle area with adaptive HUD around it.
+- Android tablets: centered puzzle area with adaptive HUD. Desktop execution is development-only.
 - Input: drag/swipe and tap-two-to-swap plus mouse.
 - Independent readable silhouettes; scalable text and strong contrast.
 - Aim for smooth 60 FPS on capable devices, with performance degradation gracefully handled.
-- Android-first: Godot native debug APK builds and Web export are automated in CI; real Android/browser test coverage and a signed release AAB remain separate validation gates.
+- Android only: native debug APK builds are automated. Web/HTML5, browser compatibility and iOS are excluded. Real device acceptance and future production AAB remain separate gates.
 
 ## 11. Non-goals for first playable release
 
@@ -179,3 +179,10 @@ Accounts, backend, monetization, cloud saves, daily events, leaderboards, Gravit
 - Animation timing on low-end mobile devices.
 
 All of the above need empirical playtesting before being treated as finalized design.
+
+
+## M4 sound and comfort
+
+Original soft tuned effects distinguish selection/swap/invalid/match/cascade and each power, rocks, results/stars/unlocks and navigation. Ambient Home/map/game/victory/defeat loops crossfade without restarting on HUD updates. Six-voice cap, deduplicated power layers, conservative gain and short cue cooldowns restrain heavy chains. No gameplay action depends on sound.
+
+Master/music/SFX, mute, reduced motion and larger reading text persist with existing earned records. Focus loss/background stops new effects and pauses music; return keeps an intentional game pause. Reduced motion removes twinkle, screen flash, expanding power/rock effects, slow fades and delayed star reveals while preserving every rule, event and score. Colors AND existing silhouettes, power markers, cracked rocks/pips, named goals and numeric counters remain the gameplay language. Android human mix/contrast/scaling checks are required for acceptance.

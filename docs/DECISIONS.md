@@ -1,3 +1,7 @@
+# Current decision precedence
+
+**2026-10-30 ADR-006 supersedes earlier platform plans.** Android-only; Web/HTML5, browser QA, desktop distribution and iOS development/feasibility are out of scope. Prior ADR text below is historical rationale, not active platform scope.
+
 # Architecture and Product Decisions
 
 A compact decision log. New substantial decisions should be recorded here with date, status, alternatives, rationale and reversal conditions. **Accepted for a prototype** is not the same as production-tested.
@@ -60,3 +64,12 @@ A compact decision log. New substantial decisions should be recorded here with d
 | Numerical device performance budgets | 60 FPS aspirational, hardware floors TBD | Real test-device selection and measurements | [#9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
 | iOS native delivery date/scope | Deferred | Stable Android/web, verified build tooling | [#11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) |
 | Special crystal interactions | Initial behaviors in design; exact matrix needs testing | M2 implementation and balancing | [#6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) |
+
+
+## ADR-006: Android-only M4 and save-safe stable debug updates
+
+Date: 2026-10-30. Accepted by explicit owner assignment. Android is the sole supported product; keep shared rules/assets/tests, remove Web exports/checks, no iOS or desktop distribution. Desktop/headless Godot remains a development environment. Supersedes cross-platform scope in ADR-001 and older roadmap/release/QA documents. Revisit only on a new owner decision.
+
+Use a reusable private debug keystore and pinned certificate in main Actions secrets; PRs receive no key. Keep package ID and schema-1 earned records. Never uninstall/clear a player installation without explicit approval. Old ephemeral-key installations require a verified backup and separately approved migration; new-key compatibility cannot be manufactured. Debug identity is separate from future production/upload signing.
+
+M4 uses original deterministic synthesized audio with source/provenance, bounded mixing and independent music/SFX/master preferences. Reduced motion is presentation-only. No new gameplay systems/cloud/ads/store work. #8 remains open until new human Android acceptance.
