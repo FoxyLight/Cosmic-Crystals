@@ -51,10 +51,7 @@ cover unique CI versions, manifest verification and local-default drift.
 CI also checks that actual APK/Web packs contain the level catalog/licenses.
 Use the PR and merged-main Actions run for final artifact evidence.
 
-The player accepted **asteroid build 9101** on Android. Visual build **9601 was
-installed and verified**, but has no separate human visual pass. **The new M3
-campaign requires new human Android acceptance.** Automated reloads/exports
-do not prove physical restart behavior, FPS or full browser QA. [M3 issue #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) stays open.
+The player accepted **asteroid build 9101** on Android. Campaign build **9801** was installed/read back, and the player now reports the requested **M3 Android playtest PASSES**. The automated suites remain green. This is not measured FPS, full browser matrix, sound/accessibility acceptance or signed AAB validation. See [M3 report](docs/ANDROID_M3_PLAYTEST_2026_10_29.md) and [issue #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7).
 
 ## Run and build
 
