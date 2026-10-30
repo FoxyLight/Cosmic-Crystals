@@ -39,7 +39,10 @@ def main():
             t = i / RATE
             step = min(len(notes) - 1, int(t / duration * len(notes)))
             frequency = notes[step]
-            envelope = min(1, t / .008) * (1 - t / duration) ** 1.6
+            step_seconds = duration / len(notes)
+            local = t - step * step_seconds
+            edge = max(0, min(1, local / .004, (step_seconds - local) / .008))
+            envelope = edge * min(1, t / .008) * (1 - t / duration) ** 1.6
             tone = math.sin(math.tau * frequency * t) + .18 * math.sin(math.tau * frequency * 2 * t)
             samples.append(.25 * envelope * tone)
         write(name, samples)

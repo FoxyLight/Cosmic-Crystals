@@ -85,7 +85,7 @@ func refresh(area: Rect2) -> void:
 		slider.size = Vector2(w, 48)
 		captions[key].position = Vector2(x, y)
 		captions[key].size = Vector2(w, 20)
-		captions[key].text = "%s  %d%%" % [key.replace("_volume", "").capitalize(), roundi(slider.value)]
+		captions[key].text = "%s  %d%%" % [{"master_volume": "Master", "music_volume": "Music", "sfx_volume": "Sound effects"}[key], roundi(slider.value)]
 		y += 68
 	for key in toggles:
 		toggles[key].set_pressed_no_signal(settings[key])

@@ -117,6 +117,7 @@ func _ready() -> void:
 		screen = "home"
 		map_selection = int(progress.data["highest_unlocked"])
 	_refresh_views()
+	metrics.startup_ms = Time.get_ticks_msec()
 
 
 func _reset_game() -> void:

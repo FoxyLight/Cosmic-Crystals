@@ -57,8 +57,7 @@ Replay independently maximizes best score/stars.
 
 Writes validate, flush and verify `.tmp`, back up only a valid prior primary,
 and rename the temporary over the primary. Loading tries supported primary,
-backup, then defaults with a notice. Future schemas remain read-only. Browser
-storage unavailable -> a visible session-only warning. [Full policy](M3_LYRA_CAMPAIGN.md).
+backup, then defaults with a notice. Future schemas remain read-only. Android private user storage is the sole supported save backend. [Full policy](M3_LYRA_CAMPAIGN.md).
 
 ## Presentation and quality gates
 
