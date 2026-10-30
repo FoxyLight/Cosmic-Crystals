@@ -1,7 +1,7 @@
 # Game Design Document
 
 **Project:** Cosmic Crystals: A Starweaver's Journey
-**Status:** M3 human-accepted; M4 Android-only implementation, new polish acceptance pending
+**Status:** M3 and M4 implemented, with player-reported Android acceptance; M5 quantitative/device/accessibility QA pending.
 **Last updated:** 2026-10-30
 
 ## 1. Vision
@@ -78,7 +78,7 @@ Design decision for implementation: prioritize straight-five detection over T/L 
 
 **Combination behavior:** All 16 ordered two-power pairings across six positions/orientations have deterministic regression coverage; Nova and asteroid chain interactions are also tested. Detailed human feel, audio, charge rates and difficulty balancing remain in M2/M4. Never silently treat an unsupported special combination as a normal swap.
 
-**Implementation status (M2 prototype, 2026-10-29):** The first playable Star Beam, Cosmic Bomb, Supernova and Nova Pulse rules are now in [CosmicBoard](../scripts/cosmic_board.gd) and documented with first-pass combo behavior in [M2 Gameplay Guide](M2_SPECIALS_NOVA.md). This prototype supports swap activation without a 3-match, one initial special creation per move, and chain-triggered blast unions. The asteroid build 9101 and the M3 five-level campaign passed player Android smoke/acceptance; #7 is closed. Detailed M2 balance and new M4 0.5.1 audio/accessibility/Beam-direction acceptance remain open in #6/#8.
+**Implementation status (M2 prototype, 2026-10-29):** The first playable Star Beam, Cosmic Bomb, Supernova and Nova Pulse rules are now in [CosmicBoard](../scripts/cosmic_board.gd) and documented with first-pass combo behavior in [M2 Gameplay Guide](M2_SPECIALS_NOVA.md). This prototype supports swap activation without a 3-match, one initial special creation per move, and chain-triggered blast unions. The asteroid build 9101 and the M3 five-level campaign passed player Android smoke/acceptance; #7 is closed. Detailed M2 balance and M5 quantified Android/audio/accessibility QA remain open in #6/#9. The player reported M4 Android playtest PASS on 2026-10-30.
 
 ## 5. Signature power: Nova Pulse
 
@@ -102,7 +102,7 @@ adjacent cleared crystal, including special-cleared crystals. Simultaneous
 effects/chain powers are unioned; later cascades can damage again. Beams/Nova
 pass through rocks. Supernova color clears damage rocks by crystal adjacency;
 double Supernova hits all cells. At zero HP the rock disappears before gravity.
-Only crystals award score/collection/Nova energy. The legacy 30-crystal/six-rock/18-move round remains for regressions; the campaign now has five authored configurations. The asteroid baseline and subsequent five-level M3 campaign passed the player's Android acceptance; M4 audio/visual and 0.5.1 Beam-direction acceptance are pending. See [asteroid rules](M2_ASTEROIDS.md) and [campaign checklist](M3_LYRA_CAMPAIGN.md).
+Only crystals award score/collection/Nova energy. The legacy 30-crystal/six-rock/18-move round remains for regressions; the campaign now has five authored configurations. The asteroid baseline and subsequent five-level M3 campaign passed the player's Android acceptance; The player subsequently reported M4 audio/visual/0.5.1 Beam-direction **overall Android playtest PASS**. Full M5 device and accessibility measures remain open. See [asteroid rules](M2_ASTEROIDS.md) and [campaign checklist](M3_LYRA_CAMPAIGN.md).
 
 **MVP objectives**
 
@@ -190,4 +190,4 @@ Master/music/SFX, mute, reduced motion and larger reading text persist with exis
 
 ### Current Android-specific implementation checkpoint (0.5.1)
 
-Original PCM music/SFX, configurable master/music/effects/mute, additive saved settings, reduced motion and larger reading text, Android focus/pause gates and bounded performance diagnostics are implemented in [M4](M4_ANDROID_POLISH.md). Four-match Star Beam direction now follows **the initiating gem movement**, not the completed line. [PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) / [main run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) cover the rule and all Android build checks. A same-key **10801 → 11001** phone update retained the recorded save byte for byte. **No new human M4 audio/Beam-direction playtest, FPS/RAM/thermal study, screen-reader audit or signed Google Play AAB is claimed.** Android is the only supported product; older Web/iOS designs are historical.
+Original PCM music/SFX, configurable master/music/effects/mute, additive saved settings, reduced motion and larger reading text, Android focus/pause gates and bounded performance diagnostics are implemented in [M4](M4_ANDROID_POLISH.md). Four-match Star Beam direction now follows **the initiating gem movement**, not the completed line. [PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) / [main run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) cover the rule and all Android build checks. A same-key **10801 → 11001** phone update retained the recorded save byte for byte. **The player subsequently reported an overall M4 Android playtest PASS**; no FPS/RAM/thermal study, exhaustive screen-reader audit or signed Google Play AAB is claimed. Android is the only supported product; older Web/iOS designs are historical.
