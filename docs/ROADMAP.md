@@ -3,6 +3,14 @@
 **Snapshot:** 2026-10-29. Product base **0.4.0**. No committed dates, staffing
 or release promise. [Milestones](MILESTONES.md) are evidence-gated.
 
+## Current status: M3 accepted; next priority protect progress and polish
+
+The five-level Lyra campaign has passed source/scene/progression CI, an exported-browser persistence smoke test and the player's **2026-10-29 Android human playtest**. See the [M3 acceptance report](ANDROID_M3_PLAYTEST_2026_10_29.md) and [M3 #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7). The player provided an overall pass, not a per-case record or benchmark, so full Android device matrix and broader QA still apply.
+
+**Immediate infrastructure prerequisite:** Configure persistent private debug signing (or a carefully planned save-preservation migration) **before installing another APK over a device containing newly earned campaign progress**. Ephemeral signing changes can force uninstall and delete saves.
+
+**Next implementation focus:** M4 quality work, including audio, accessibility and mobile feedback. M5 performance/device/browser validation follows as a separate release-candidate phase. M0/M1/M2 balance and device acceptance requirements remain individually tracked.
+
 ## Current slice: M3 Lyra
 
 Implemented: five authored levels, sessions, stage mechanics, objectives/moves/
