@@ -29,7 +29,7 @@ Record exact versionName/code, source SHA, public certificate fingerprint, signi
 7. Exercise swipe/two taps, fast repeats, Nova cancel, confirmation/cancel, Back during effects, defeat/retry and final-level replay/map. Exactly five stages.
 8. Run normal/reduced-motion sessions, repeated navigation and heavy chains with audio for at least 10 minutes. Record actual FPS, p95 frame time, RAM/PSS, startup/load and thermals; compare phone classes. `performance-last.json` captures a rolling observed report on Android backgrounding, not a synthetic benchmark score.
 
-M3's player pass is recorded in [its report](ANDROID_M3_PLAYTEST_2026_10_29.md). M4 remains open until a new pass. Full device/performance and production accessibility acceptance cannot be inferred from CI.
+M3's player pass is recorded in [its report](ANDROID_M3_PLAYTEST_2026_10_29.md). The player subsequently reported **M4 Android playtest PASS**; see [M4 acceptance](ANDROID_M4_PLAYTEST_2026_10_30.md). Full measured device/performance and production accessibility acceptance cannot be inferred from CI or the general playtest pass; those remain in M5.
 
 
 ## 0.5.1 Beam direction regression
