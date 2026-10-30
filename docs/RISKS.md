@@ -1,31 +1,33 @@
-> Scope update 2026-10-30: Android is the only supported target. Web/browser/iOS/desktop-distribution requirements below are historical and superseded by ADR-006 and the current Android QA/release plan. Preserve Android device/performance/release-signing risks.
+# Current Android Risks and Dependencies
 
-# Project Risks and Dependencies
+**Reviewed:** 2026-10-30, source version **0.5.1**, Godot 4.7.2 Compatibility. **Android is the sole supported product.** The previous 2026-10-29 matrix described not-yet-implemented M2/M3 and planned browser/iOS work and has been superseded. Historical decisions/exports remain traceable in Git history and [ADR-006](DECISIONS.md).
 
-**Snapshot date:** 2026-10-29. Qualitative impact is an initial planning assessment, not a measured probability or financial forecast. Reassess risks at each milestone gate.
+Risk impact is qualitative; it is not an empirical probability or measured Android performance report.
 
-| ID | Risk | Impact | Evidence/state | Mitigation | Tracker |
+| ID | Active risk | Impact | Current evidence / boundary | Mitigation and remaining gate | Tracker |
 | --- | --- | --- | --- | --- | --- |
-| R01 | Android native export or device input behaves differently from headless prototype | High | No verified APK/device run | Test real APK on modest and recent Android phones before production sign-off | [M0 #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4) |
-| R02 | Godot web export compatibility, loading size or WebGL2 requirements limit browser reach | High | Export unverified | Host/export early; test desktop/mobile browsers; reconsider Cocos/Phaser if product's browser target changes | [M0 #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4) |
-| R03 | Synchronous turn resolver conflicts with animations or fast gestures | High | Current synchronous board resolution; limited flash feedback | Ordered event log and explicit state machine, deterministic tests | [M1 #3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) |
-| R04 | Specials/blockers cascade into incorrect counts or stuck boards | High | Not implemented | One-event-per-tile bookkeeping, seeded edge-case tests, iteration guards | [M2 #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6) |
-| R05 | Level difficulty fails playtesting or players are forced to reshuffle excessively | Medium | No authored levels/playtest dataset | Playtest 5 levels before expanding, seed capture, tune move budgets and star thresholds | [M3 #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) |
-| R06 | Save corruption or incompatible schema loses progress | High | Saves not implemented | Versioned `user://` format, validation and migration tests | [M3 #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) |
-| R07 | Particle effects and UI overload modest Android GPUs | High | No device stress measurements | 30-second effect stress, capped particles, pooling and reduced-motion fallback | [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8), [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
-| R08 | Play requirements, privacy declarations, signing or SDK conflicts delay release | High | Store submission not started | Verify current Play rules near submission; isolate secrets; test AAB in closed/internal track | [M6 #10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10) |
-| R09 | Scope expands before core gameplay is proven | High | 20-level vision exceeds 5-level MVP | Require M3/M5 exit gates before committing expanded content | [M7 #11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) |
-| R10 | External published concept and GitHub source drift apart | Medium | Published page is separate from repository | Treat GitHub as source of truth; mark published site as reference and avoid importing unknown code without review | [Milestones](MILESTONES.md) |
+| R01 | Android experience varies across screen sizes, device speed and OS versions | High | M3 five-level player pass; M4 11001 installed via same-key update and verified, **not** newly human-tested for audio/Beam-direction/comfort | Phone/tablet matrix with safe insets, system font/display scaling, touch, audio interruptions, p95 frame time, memory/PSS, startup and thermals | [M0 #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4), [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8), [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
+| R02 | A differently signed debug APK can destroy earned progress during a forced reinstall | High | Main debug keystore/pin verified in CI; phone **10801 → 11001** save was byte-for-byte identical; an old ephemeral-key app cannot update with the new certificate | Protect key/password outside Git, maintain encrypted offline backup, check installed certificate and version before update; require explicit approval and validated private save backup for *legacy* key migration | [Signing guide](ANDROID_VERSIONING.md), [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) |
+| R03 | Corrupt/unwritable saves or process interruption cause loss of stars/unlocks | High | Schema-1 validation/atomic temporary writes, backup/future-schema safeguards and tests exist; no unfinished board is saved | Android process-death/storage-failure tests, verify save path and notices; never claim autosave of an active round | [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
+| R04 | Special-power chains or asteroid topology produce incorrect counts, no moves or input deadlock | High | M2 deterministic combo/blocker matrix and M4 15-suite CI green, with 0.5.1 movement-direction regression; extended player balance evidence missing | Keep seeded replay, event continuity and blocked deadlock tests; collect real-device long-session and edge-case reports | [M2 #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6), [M1 #3](https://github.com/FoxyLight/Cosmic-Crystals/issues/3) |
+| R05 | Five authored levels are too easy/hard, Nova charge or star thresholds feel unfair | Medium | All five M3 levels automated/Android human smoke accepted; objective-aware simulated win rates do **not** measure human difficulty | Record player difficulty, failed attempts, moves left and feedback; adjust budgets with repeatable tests | [M2 #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6), [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
+| R06 | Audio mix, interruptions and accessibility are inadequate for actual Android players | High | Original SFX/music, saved sliders/mute/reduced motion/larger text and focus handling exist; headless audio tests are not listening tests | User M4 audio mix/playtest, focus/call/background checks, contrast/scaling and TalkBack limitations; keep M4 open | [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) |
+| R07 | Render/effects stress overloads modest Android devices | High | Bounded pools and diagnostic logger implemented; CPU/headless benchmarks are not Android FPS/RAM/PSS/thermal evidence | 10+ minute device load test; startup, p95 frame time, memory and throttling checks; record exact device/build | [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8), [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) |
+| R08 | Google Play API/policy, privacy disclosures, release signing or AAB path block distribution | High | Debug APK CI succeeds; **no production signed AAB/Play track** is verified | Separately authorize M6, establish production/upload signing, build signed Gradle AAB, internal test, review current policies and real data-handling declarations | [M0 #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4), [M6 #10](https://github.com/FoxyLight/Cosmic-Crystals/issues/10) |
+| R09 | Scope creep before Android quality gate | Medium | M3 complete; M4 pending player acceptance, M5/M6 future | Defer levels 6–20 and other constellations until quality/release gates; no active Web/iOS development | [M7 #11](https://github.com/FoxyLight/Cosmic-Crystals/issues/11) |
 
-## External dependencies
+## Verified checkpoint
 
-- Godot 4.7.2 editor and matching export templates for native/web builds.
-- Android SDK, Java environment and accessible Android test devices for M0/M5.
-- Secure, privately held release keystore and authorized Play Console access for M6.
-- Web hosting with the necessary WebAssembly/WebGL compatibility for browser distribution.
-- Licensed/original visual and audio assets for M4/M5.
-- iOS signing and macOS/Xcode tooling only if native iOS scope is approved.
+[PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) and [main run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) passed both Android CI jobs (15 Godot suites, nine Python tests, manifest/signature/pin/assets/checksum, isolated-emulator same-key save upgrade). The run's **0.5.1 build 11001** is `persistent-secret` signed. [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) separately documents a real-phone in-place update from 10801 to 11001 with the same saved data. This does not satisfy the upcoming human M4 audio/visual/Beam-direction QA or M5 device/performance/release gates.
 
-## Risk review cadence
+## Current external dependencies
 
-At each milestone PR or major design change, verify whether any high-impact risk has new evidence, an owner, a mitigation result or an accepted exception. If a risk blocks a gate, keep the milestone issue open and document the blocker. Assign named owners only when the team agrees.
+- Pinned Godot 4.7.2 editor and matching **Android** export templates; Android SDK/JDK and reproducible CI runners.
+- Secure, restorable private debug keystore/password and pinned public certificate. No signing secret in source, logs or public artifacts.
+- Representative physical Android phones/tablets, audio output devices, font scaling and interruption scenarios.
+- Original reproducible PCM audio assets and bundled SIL OFL font licenses; see [audio provenance](../assets/audio/PROVENANCE.txt).
+- Separately authorized Google Play Console and private production/upload credentials **only for M6**.
+
+## Review cadence
+
+Review risks after each gameplay/signing change and before M4/M5/M6 acceptance. Convert risks to closed items only with appropriate source tests or human/device evidence. Historical browser/iOS risks are retired from the active matrix, not treated as unfinished Android work.
