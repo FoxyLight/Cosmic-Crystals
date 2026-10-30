@@ -16,6 +16,10 @@ Use the **strict Godot parser/runtime-log guard** on every import/test/export. E
 
 The detailed checklist below is retained as a **M5 release-candidate testing matrix**. Its individual measurements and multi-device conditions are *not automatically checked off* by the general player pass. M4 #8 may close at the scoped implementation/player-acceptance gate while [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) remains open for these objective measurements.
 
+## Post-M4 0.5.2 Android settings regression
+
+The player reported that volume sliders could not be moved and that Larger reading text had no obvious effect. [PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) adds native `InputEventScreenTouch`/`InputEventScreenDrag` handling and a visible font-size preview; the extended M4 test suite verifies all three slider gestures, percentages, persistence, switch touches and font sizes. **Physical Android acceptance of this patch remains pending under [#37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37)**. [Retest checklist](ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md). Do not infer a new 0.5.2 playtest from the prior M4 overall PASS.
+
 ## New human Android M4 checklist
 
 Record exact versionName/code, source SHA, public certificate fingerprint, signing mode, device/Android version and display/font scaling. Preserve the old installation unless an explicit backup/migration approval has been given.
