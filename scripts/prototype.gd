@@ -923,6 +923,7 @@ func open_settings() -> void:
 
 
 func close_settings() -> void:
+	settings_view.cancel_touch_drag()
 	settings_open = false
 	ui_cue(true)
 	_refresh_views()

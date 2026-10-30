@@ -8,6 +8,10 @@ var captions: Dictionary = {}
 var toggles: Dictionary = {}
 var back: Button
 var status: Label
+var preview: Label
+var active_touch_index: int = -1
+var active_touch_key: String = ""
+var active_toggle_key: String = ""
 
 
 func _ready() -> void:
@@ -42,6 +46,7 @@ func _ready() -> void:
 		toggle.toggled.connect(func(value: bool): game.set_preference(key, value))
 		toggles[key] = toggle
 		add_child(toggle)
+	preview = _label("The stars shine brighter.", 14)
 	status = _label("", 12)
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	back = Button.new()
@@ -52,6 +57,61 @@ func _ready() -> void:
 	back.pressed.connect(func(): game.close_settings())
 	add_child(back)
 	visible = false
+
+
+## A Godot HSlider expects mouse motion, but Android touch-to-mouse emulation is
+## disabled so native puzzle gestures are not duplicated. Capture touch drags here
+## instead of changing the global input setting or intercepting other controls.
+func _input(event: InputEvent) -> void:
+	if not visible or game == null or not game.settings_open:
+		return
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			if active_touch_index >= 0:
+				return
+			for key in sliders:
+				var slider: HSlider = sliders[key]
+				if slider.get_global_rect().has_point(event.position):
+					active_touch_index = event.index
+					active_touch_key = key
+					_move_touch_slider(event.position)
+					get_viewport().set_input_as_handled()
+					return
+			for key in toggles:
+				if toggles[key].get_global_rect().has_point(event.position):
+					active_touch_index = event.index
+					active_toggle_key = key
+					get_viewport().set_input_as_handled()
+					return
+		elif event.index == active_touch_index:
+			if not active_touch_key.is_empty():
+				_move_touch_slider(event.position)
+			elif not active_toggle_key.is_empty():
+				var toggle: CheckButton = toggles[active_toggle_key]
+				if toggle.get_global_rect().has_point(event.position):
+					toggle.button_pressed = not toggle.button_pressed
+			cancel_touch_drag()
+			get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag and event.index == active_touch_index:
+		if not active_touch_key.is_empty():
+			_move_touch_slider(event.position)
+		get_viewport().set_input_as_handled()
+
+
+func _move_touch_slider(pointer: Vector2) -> void:
+	if active_touch_key.is_empty():
+		return
+	var slider: HSlider = sliders[active_touch_key]
+	var bounds: Rect2 = slider.get_global_rect()
+	var fraction: float = clampf((pointer.x - bounds.position.x) / maxf(1.0, bounds.size.x), 0.0, 1.0)
+	var raw_value: float = lerpf(slider.min_value, slider.max_value, fraction)
+	slider.value = clampf(snappedf(raw_value, slider.step), slider.min_value, slider.max_value)
+
+
+func cancel_touch_drag() -> void:
+	active_touch_index = -1
+	active_touch_key = ""
+	active_toggle_key = ""
 
 
 func _label(text: String, font_size: int) -> Label:
@@ -78,22 +138,31 @@ func refresh(area: Rect2) -> void:
 	title.size = Vector2(w, 34)
 	y += 38
 	var settings: Dictionary = game.progress.data["settings"]
+	var large: bool = settings.get("large_text", false)
+	title.add_theme_font_size_override("font_size", 27 if large else 25)
+	back.add_theme_font_size_override("font_size", 19 if large else 17)
+	preview.add_theme_font_size_override("font_size", 20 if large else 14)
+	status.add_theme_font_size_override("font_size", 14 if large else 12)
 	for key in sliders:
 		var slider: HSlider = sliders[key]
 		slider.set_value_no_signal(float(settings[key]) * 100)
 		slider.position = Vector2(x, y + 20)
 		slider.size = Vector2(w, 48)
+		captions[key].add_theme_font_size_override("font_size", 17 if large else 14)
 		captions[key].position = Vector2(x, y)
 		captions[key].size = Vector2(w, 20)
 		captions[key].text = "%s  %d%%" % [{"master_volume": "Master", "music_volume": "Music", "sfx_volume": "Sound effects"}[key], roundi(slider.value)]
 		y += 68
 	for key in toggles:
+		toggles[key].add_theme_font_size_override("font_size", 18 if large else 15)
 		toggles[key].set_pressed_no_signal(settings[key])
 		toggles[key].position = Vector2(x, y)
 		toggles[key].size = Vector2(w, 48)
 		y += 48
-	status.position = Vector2(x, y + 2)
-	status.size = Vector2(w, maxf(36, rect.end.y - 66 - y))
+	preview.position = Vector2(x, y)
+	preview.size = Vector2(w, 32)
+	status.position = Vector2(x, y + 34)
+	status.size = Vector2(w, maxf(28, rect.end.y - 66 - y - 34))
 	status.text = game.progress.notice if not game.progress.notice.is_empty() else "Preferences saved on this device.\nAudio pauses when the app loses focus."
 	back.position = Vector2(x, rect.end.y - 60)
 	back.size = Vector2(w, 48)
