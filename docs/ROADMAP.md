@@ -1,6 +1,6 @@
 # Android Development Roadmap
 
-Snapshot 2026-10-30, product **0.5.1**. Android is the sole supported product. Desktop/headless execution is development only. Web/HTML5/browser work and iOS development/feasibility are out of scope, superseding previous roadmap entries.
+Snapshot 2026-10-30, product **0.5.2**. Android is the sole supported product. Desktop/headless execution is development only. Web/HTML5/browser work and iOS development/feasibility are out of scope, superseding previous roadmap entries.
 
 M3's five-level Lyra campaign is accepted by the player and #7 is closed. Preserve all earned campaign records. [Acceptance](ANDROID_M3_PLAYTEST_2026_10_29.md).
 
