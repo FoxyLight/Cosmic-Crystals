@@ -11,6 +11,14 @@ The immediately preceding requested scope covered four/five-match special creati
 
 **Still outstanding:** device/Android version, FPS/RAM/thermals/touch latency, interruption/resume, safe areas, exhaustive manual combo coverage, web browser testing, signed AAB and final M0 engine sign-off. Do not conflate this limited smoke-test pass with release acceptance.
 
+## M3 human Android campaign acceptance: PASS (player-reported)
+
+**2026-10-29:** After the request to play all five Lyra levels and confirm that map unlocks, star ratings, new UI and saved progress survive an Android close/reopen, the player replied **“Human android play test passes.”** This records overall acceptance of the requested M3 test scope, backed by 13 passing Godot suites, five Android-version tests, campaign scene/reload tests and a previous Chromium persistence smoke test.
+
+See the [M3 Android Playtest Report](ANDROID_M3_PLAYTEST_2026_10_29.md). The last independently ADB-read-back installed campaign version was `0.4.0-dev.98.1+ge14ef9e9` / **9801**; the player did not supply a new app version or device model in the pass message. Do not manufacture per-level timing/score values, screenshots, FPS/RAM/thermals or full hardware evidence.
+
+This closes the **M3 human campaign acceptance gate**, not the M0/M1/M2/M4 platform, long-session, balancing, production audio/accessibility or Google Play gates. Protect player saves before another ephemeral-signed CI APK update.
+
 ## M3 current acceptance gate
 
 Product base 0.4.0 implements five Lyra stages, sessions/goals/ratings, map/next/
