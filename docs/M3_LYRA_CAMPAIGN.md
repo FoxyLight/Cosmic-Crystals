@@ -1,7 +1,7 @@
 # M3: The Five-Level Lyra Campaign
 
 **Product base:** 0.4.0. **Implementation/automated verification:** present.
-**New human Android acceptance:** pending. No 6-20 expansion, other
+**M3 human Android acceptance:** player-reported PASS on 2026-10-29. No 6-20 expansion, other
 constellations, accounts, cloud storage, monetization or store publishing.
 
 ## Levels and progression
@@ -145,8 +145,15 @@ Reload retained 3/15 stars, 1/5 restored and level 2 unlocked. No captured
 warning/error console logs. This is a bounded browser runtime/persistence smoke,
 not a full browser/device matrix. The main Web artifact is available in run 98.
 
-**Human Android campaign/visual acceptance remains pending.** Installation and
-automated tests do not satisfy it. See #7 for current delivery and player results.
+**Historical delivery status before user feedback:** the campaign had been installed and passed automated tests, but player acceptance was then pending. The 2026-10-29 human acceptance report below supersedes that pending state.
+
+## Player Android acceptance: PASS (2026-10-29)
+
+Following the M3 campaign delivery and the request to play all five levels, test results/level unlocks and close/reopen to verify progress, the player reported **“Human android play test passes.”** This is accepted as the user's overall M3 campaign sign-off. The report does **not** contain per-level screenshots, scores, device/OS specifications or measured hardware performance, and it is not a claim of separately instrumented checks.
+
+The known installed-and-ADB-read-back M3 gameplay build is `0.4.0-dev.98.1+ge14ef9e9` (versionCode **9801**, commit `e14ef9e9`). The newer [main run #100](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40974920062) differed only in documentation and was not confirmed as newly installed. Full evidence and remaining gates: [M3 Android Playtest Report](ANDROID_M3_PLAYTEST_2026_10_29.md).
+
+The five-level campaign implementation has passed both automated and player sign-off, allowing [M3 #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) to be completed. This does **not** close M0/M1/M2/M4/M5/M6 release, accessibility, audio, balance or device-performance requirements. **Before another routine build is installed**, protect the new on-device progression against ephemeral CI signing changes (see [Android Versioning](ANDROID_VERSIONING.md)).
 
 ## Android acceptance checklist
 
@@ -170,6 +177,4 @@ Record exact versionName/code, source SHA, signing mode, device/Android version.
    and reduced motion. Record performance/interruption issues. Browser reload/
    resize needs its own supported-browser acceptance matrix.
 
-Keep #7 open until the player confirms the new journey/restart test. Unfinished
-board resume, audio, full accessibility/performance QA, production AAB/store work
-and expansion remain outside this M3 delivery.
+The player has now confirmed the requested Android campaign test passes; close #7 with the [M3 playtest evidence](ANDROID_M3_PLAYTEST_2026_10_29.md). Unfinished board resume, audio, full accessibility/performance QA, production AAB/store work and expansion remain outside this M3 delivery.

@@ -11,6 +11,14 @@ The immediately preceding requested scope covered four/five-match special creati
 
 **Still outstanding:** device/Android version, FPS/RAM/thermals/touch latency, interruption/resume, safe areas, exhaustive manual combo coverage, web browser testing, signed AAB and final M0 engine sign-off. Do not conflate this limited smoke-test pass with release acceptance.
 
+## M3 human Android campaign acceptance: PASS (player-reported)
+
+**2026-10-29:** After the request to play all five Lyra levels and confirm that map unlocks, star ratings, new UI and saved progress survive an Android close/reopen, the player replied **“Human android play test passes.”** This records overall acceptance of the requested M3 test scope, backed by 13 passing Godot suites, five Android-version tests, campaign scene/reload tests and a previous Chromium persistence smoke test.
+
+See the [M3 Android Playtest Report](ANDROID_M3_PLAYTEST_2026_10_29.md). The last independently ADB-read-back installed campaign version was `0.4.0-dev.98.1+ge14ef9e9` / **9801**; the player did not supply a new app version or device model in the pass message. Do not manufacture per-level timing/score values, screenshots, FPS/RAM/thermals or full hardware evidence.
+
+This closes the **M3 human campaign acceptance gate**, not the M0/M1/M2/M4 platform, long-session, balancing, production audio/accessibility or Google Play gates. Protect player saves before another ephemeral-signed CI APK update.
+
 ## M3 current acceptance gate
 
 Product base 0.4.0 implements five Lyra stages, sessions/goals/ratings, map/next/
@@ -19,9 +27,7 @@ sessions (10,325 checks), saves (86) and touch-driven five-level scene/reload
 (966). Five version-policy tests pass. CI inspects catalog/licenses in actual
 exports and retains strict Godot log guards/embedded APK metadata checks.
 
-Asteroid build 9101 passed the player. Visual 9601 was installed/read back but
-has no separate human pass. **M3 needs a new Android test**, including all five
-levels and app close/reopen with the same earned records. [Checklist/evidence](M3_LYRA_CAMPAIGN.md).
+Asteroid build 9101 passed the player. The newer M3 APK 9801 was installed/read back, and the player subsequently reported **M3 Android playtest PASS** against the requested five-level journey/restart scope. [Evidence](ANDROID_M3_PLAYTEST_2026_10_29.md). Detailed device/OS metrics and exhaustive visual/accessibility validation are still open.
 This supersedes pre-M3 "not implemented" statuses in historical sections below.
 
 ## 1. Current automated coverage
@@ -65,9 +71,9 @@ The expanded seeded board test covers 125 seeds, no starting matches, adjacent l
 | Move budget | Illegal swap spends 0; legal spends 1; last-move win overrides loss | Real-scene regression including both crystal/rock goals passes |
 | Deadlocks | No legal move reshuffles without deleting blockers/specials | Exact movable inventory, fixed HP and isolated power recovery tested |
 | Special pieces | 4/5/T/L creation precedence; combined triggers; no double-count | First M2 rules coded and tested; phone balancing pending |
-| Blockers | Adjacent matches vs special and Nova damage; durability rules | Implemented and automated; physical Android acceptance pending |
+| Blockers | Adjacent matches vs special and Nova damage; durability rules | Automated; 0.3.0 asteroid build 9101 passed user Android gameplay smoke |
 | Nova Pulse | Charge, cancel, row/column, zero-move activation, reset | M2 rules + touch targeting implemented; manual cancellation/charge feel QA open |
-| Progression | Five-level unlocks, stars, replay and save load | Implemented/model + actual scene journey/reload tested; human gate pending |
+| Progression | Five-level unlocks, stars, replay and save load | Model/scene/disk tests pass; overall M3 Android playtest accepted by user on 2026-10-29 |
 | Persistence | Schema, malformed/truncated save, restart | Safe writes, backup/future recovery and automated disk reload tested |
 | Interruptions | Restart, pause, background while effects resolve | Transition guards/queued Back tested; full background/device matrix pending |
 

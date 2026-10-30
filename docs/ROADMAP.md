@@ -3,17 +3,19 @@
 **Snapshot:** 2026-10-29. Product base **0.4.0**. No committed dates, staffing
 or release promise. [Milestones](MILESTONES.md) are evidence-gated.
 
-## Current slice: M3 Lyra
+## Current status: M3 accepted; next priority protect progress and polish
 
-Implemented: five authored levels, sessions, stage mechanics, objectives/moves/
-ratings, Home/map/next/replay, local records/settings/recovery and nonblocking
-cues. All 13 Godot suites and five version tests pass locally. CI/Android/Web
-and new human acceptance gates remain. [Campaign](M3_LYRA_CAMPAIGN.md), [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7).
+The five-level Lyra campaign has passed source/scene/progression CI, an exported-browser persistence smoke test and the player's **2026-10-29 Android human playtest**. See the [M3 acceptance report](ANDROID_M3_PLAYTEST_2026_10_29.md) and [M3 #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7). The player provided an overall pass, not a per-case record or benchmark, so full Android device matrix and broader QA still apply.
 
-1. Pass feature PR checks and Android/Web exports; merge only green changes.
-2. Verify merged-main artifacts/catalog/manifest/version/checksum. Test the new
-   APK on Android, including closing/reopening with identical earned records.
-3. Tune from feedback. Keep M3 open until the human journey/restart gate passes.
+**Immediate infrastructure prerequisite:** Configure persistent private debug signing (or a carefully planned save-preservation migration) **before installing another APK over a device containing newly earned campaign progress**. Ephemeral signing changes can force uninstall and delete saves.
+
+**Next implementation focus:** M4 quality work, including audio, accessibility and mobile feedback. M5 performance/device/browser validation follows as a separate release-candidate phase. M0/M1/M2 balance and device acceptance requirements remain individually tracked.
+
+## Completed slice: M3 Lyra
+
+Implemented and accepted: five authored levels, sessions, stage mechanics, objectives/moves/ratings, Home/map/next/replay, local records/settings/recovery and nonblocking cues. All 13 Godot suites, five version tests and Android/Web exports passed; the player reports M3 Android campaign acceptance passed. [Campaign](M3_LYRA_CAMPAIGN.md), [#7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7).
+
+Completed M3: PR #29 implementation, PR #30 delivery documentation, verified merged-main CI and player-reported Android acceptance. Next: preserve debug saves with stable signing, then M4 audio/accessibility and M5 measured regression/device/browser QA.
 
 ## Remaining gates
 
