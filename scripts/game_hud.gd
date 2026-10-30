@@ -199,7 +199,8 @@ func _meter(key: String, rect: Rect2, fraction: float) -> void:
 func refresh(layout: Dictionary) -> void:
 	if game == null or game.board == null:
 		return
-	labels["caption"].add_theme_font_size_override("font_size", 14 if game.progress.data["settings"].get("large_text", false) else 11)
+	var large: bool = game.progress.data["settings"].get("large_text", false)
+	labels["aside"].add_theme_font_size_override("font_size", 18 if large else 15)
 	var modal: String = "result" if game.finished else game.overlay
 	var blocked: bool = not modal.is_empty()
 	var idle: bool = game.phase == "idle" or game.phase == "nova_targeting"
@@ -273,7 +274,7 @@ func refresh(layout: Dictionary) -> void:
 		buttons["nova"].text = "Nova rests"
 	_place("caption", layout["caption"])
 	labels["caption"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if not game.practice_mode else TextServer.AUTOWRAP_OFF
-	labels["caption"].add_theme_font_size_override("font_size", 12 if not game.practice_mode else 11)
+	labels["caption"].add_theme_font_size_override("font_size", (16 if large else 12) if not game.practice_mode else (14 if large else 11))
 	labels["caption"].text = "Choose a tile for your Nova Pulse" if game.phase == "nova_targeting" else game.feedback
 	labels["caption"].modulate = Color.WHITE if game.feedback_ok else Color("#FF9AB4")
 	_place("aside", layout["aside"])
@@ -402,7 +403,8 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 			button.focus_previous = button.get_path_to(buttons[order[(i - 1 + order.size()) % order.size()]])
 		if not order.is_empty():
 			buttons[order[0]].grab_focus()
-	if game.progress.data["settings"].get("large_text", false):
-		labels["modal_body"].add_theme_font_size_override("font_size", 17)
-		labels["modal_score"].add_theme_font_size_override("font_size", 16 if modal == "help" else 26)
+	# Restore the normal font size as well as enlarging it. Otherwise a prior
+	# toggle remains stuck at the larger size after the player turns it off.
+	labels["modal_body"].add_theme_font_size_override("font_size", (17 if large else 14) if campaign else (18 if large else 15))
+	labels["modal_score"].add_theme_font_size_override("font_size", (17 if large else 14) if modal == "help" else 26)
 	last_modal = modal
