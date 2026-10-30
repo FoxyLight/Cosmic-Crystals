@@ -135,6 +135,7 @@ func _run() -> void:
 	var regular_preview_size: int = game.settings_view.preview.get_theme_font_size("font_size")
 	tap(game.settings_view.toggles["large_text"].get_global_rect().get_center())
 	await process_frame
+	print("ANDROID_TOUCH_TRACE: large_text=", game.progress.data["settings"]["large_text"], " button=", game.settings_view.toggles["large_text"].button_pressed, " size=", game.settings_view.preview.get_theme_font_size("font_size"), " active=", game.settings_view.active_touch_index)
 	check(game.progress.data["settings"]["large_text"] and game.settings_view.preview.get_theme_font_size("font_size") >= regular_preview_size + 5, "Larger reading text toggle visibly enlarges its settings preview")
 	check(game.settings_view.toggles["large_text"].get_theme_font_size("font_size") >= 18, "Settings toggle text enlarges immediately")
 	tap(game.settings_view.toggles["large_text"].get_global_rect().get_center())
