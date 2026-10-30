@@ -34,7 +34,7 @@ M3's player pass is recorded in [its report](ANDROID_M3_PLAYTEST_2026_10_29.md).
 
 ## 0.5.1 Beam direction regression
 
-[PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) merged with 53 additional real-scene Beam-direction checks. At [main CI #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426), **all 15 Godot suites and nine Python tests passed**, as did Android APK manifest, signer-pin, packaged-assets and same-key emulator upgrade checks. The phone's 10801 → 11001 in-place update retained a validated save byte-for-byte; **M4 human audiovisual and Beam-direction acceptance is still pending**.
+[PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) merged with 53 additional real-scene Beam-direction checks. At [main CI #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426), **all 15 Godot suites and nine Python tests passed**, as did Android APK manifest, signer-pin, packaged-assets and same-key emulator upgrade checks. The phone's 10801 → 11001 in-place update retained a validated save byte-for-byte. **The player's overall M4 Android playtest subsequently passed**; individual quantitative device/audio/accessibility checks remain M5 work.
 
 A four-match Beam follows the initiating swap axis, not the completed line's
 orientation: left/right movement creates a horizontal row Beam; up/down creates
