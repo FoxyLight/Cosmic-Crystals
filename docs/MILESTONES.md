@@ -22,10 +22,7 @@ Exactly five data-driven Lyra levels, connected map, stage goals/moves, seeded
 sessions, tested powers/rocks, ratings, next/replay/map, best local records/
 unlocks/tutorials/settings and recovery. [M3 evidence](M3_LYRA_CAMPAIGN.md).
 
-Asteroid build 9101 was installed/read back and accepted by the player. Visual
-build 9601 was installed/read back but has no separate human acceptance. M3
-needs its **own** journey/restart test. Exports do not establish human acceptance,
-full hardware/browser QA or release signing. Keep incomplete trackers open.
+Asteroid build 9101 was installed/read back and accepted by the player. The M3 campaign APK 9801 was installed/read back, and the player has now reported the requested **five-level Android playtest passes**. The later visual build is covered by the M3 gameplay smoke at a broad level, not a complete accessibility/contrast assessment. [M3 report](ANDROID_M3_PLAYTEST_2026_10_29.md). Full hardware/browser QA, detailed balance, accessibility and production signing remain open.
 
 ## Exit gates
 
