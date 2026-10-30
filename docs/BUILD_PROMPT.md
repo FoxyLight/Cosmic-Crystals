@@ -1,6 +1,6 @@
 # Current AI Development Prompt: Cosmic Crystals (Android Only)
 
-**Updated:** 2026-10-30. **Current source:** product `0.5.1`, Godot `4.7.2` GDScript, Compatibility renderer. This document replaces the original 2026-10-29 cross-platform/build-from-scratch prompt. Consult Git history for that historical prompt. Do **not** add Web/HTML5, browser tests, desktop distribution or iOS development.
+**Updated:** 2026-10-30. **Current source:** product `0.5.2`, Godot `4.7.2` GDScript, Compatibility renderer. This document replaces the original 2026-10-29 cross-platform/build-from-scratch prompt. Consult Git history for that historical prompt. Do **not** add Web/HTML5, browser tests, desktop distribution or iOS development.
 
 Use this brief with a coding agent that can inspect and modify the connected repository **[FoxyLight/Cosmic-Crystals](https://github.com/FoxyLight/Cosmic-Crystals)** and run its Android-relevant tests.
 
