@@ -61,23 +61,23 @@ func _run() -> void:
 	if scene == null:
 		quit(1)
 		return
-	# Horizontal 4 (row Beam).
+	# Upward swap into a horizontal 4 (column Beam).
 	var four = _fixture(121)
 	for col in [1, 2, 4]:
 		four.cells[2 * 8 + col] = 1
 	four.cells[2 * 8 + 3] = 2
 	four.cells[3 * 8 + 3] = 1
 	_test_creation(scene, four, 3 * 8 + 3, 2 * 8 + 3,
-		Board.BEAM_ROW, "Horizontal four")
+		Board.BEAM_COLUMN, "Upward four-match swap")
 
-	# Vertical 4 (column Beam).
+	# Leftward swap into a vertical 4 (row Beam).
 	var vertical = _fixture(122)
 	for row in [1, 2, 4]:
 		vertical.cells[row * 8 + 3] = 4
 	vertical.cells[3 * 8 + 3] = 0
 	vertical.cells[3 * 8 + 4] = 4
 	_test_creation(scene, vertical, 3 * 8 + 4, 3 * 8 + 3,
-		Board.BEAM_COLUMN, "Vertical four")
+		Board.BEAM_ROW, "Leftward four-match swap")
 
 	# Horizontal 5 (Supernova).
 	var five = _fixture(123)

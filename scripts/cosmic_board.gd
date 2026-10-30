@@ -214,6 +214,8 @@ func _find_reward(matched: Array[int], a: int, b: int) -> Dictionary:
 	var best_score: int = 0
 	var best_kind: int = NONE
 	var best_index: int = -1
+	# Four-match Beams follow the player's swap axis, including two-tap swaps.
+	var beam_kind: int = BEAM_ROW if int(a / WIDTH) == int(b / WIDTH) else BEAM_COLUMN
 	# The swapped destination wins ties; then source, then row-major.
 	var ordered: Array[int] = []
 	for i in [b, a]:
@@ -233,9 +235,9 @@ func _find_reward(matched: Array[int], a: int, b: int) -> Dictionary:
 		elif h >= 3 and v >= 3 and enabled_powers.has(BOMB):
 			score = 2
 			kind = BOMB
-		elif (h >= 4 and enabled_powers.has(BEAM_ROW)) or (v >= 4 and enabled_powers.has(BEAM_COLUMN)):
+		elif (h >= 4 or v >= 4) and enabled_powers.has(beam_kind):
 			score = 1
-			kind = BEAM_ROW if h >= 4 and enabled_powers.has(BEAM_ROW) else BEAM_COLUMN
+			kind = beam_kind
 		if score > best_score:
 			best_score = score
 			best_kind = kind

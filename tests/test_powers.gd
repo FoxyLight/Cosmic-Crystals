@@ -76,12 +76,12 @@ func _run() -> void:
 	var old_power: Array[int] = beam.specials.duplicate()
 	var made: Dictionary = beam.play_swap(3 * 8 + 3, 2 * 8 + 3)
 	_ok(made["valid"], "Four-match swap is legal")
-	_ok(int(made["created"]) == Board.BEAM_ROW, "Horizontal four creates row beam")
-	_ok(beam.specials.has(Board.BEAM_ROW), "New beam survives gravity")
+	_ok(int(made["created"]) == Board.BEAM_COLUMN, "Upward swap creates column beam even in a horizontal four")
+	_ok(beam.specials.has(Board.BEAM_COLUMN), "New column beam survives gravity")
 	_ok(made["nova_gain"] > 0, "Matches charge Nova")
 	_events(old, old_power, made, beam, "beam formation")
 
-	# Vertical four should create a COLUMN beam, never a row beam.
+	# A leftward swap completes a vertical four but creates a ROW Beam.
 	var vertical = _fixture(80)
 	for row in [1, 2, 4]:
 		vertical.cells[row * 8 + 3] = 4
@@ -90,8 +90,8 @@ func _run() -> void:
 	_ok(vertical.find_matches().is_empty(), "Vertical-four fixture begins stable")
 	var column_outcome: Dictionary = vertical.play_swap(3 * 8 + 4, 3 * 8 + 3)
 	_ok(column_outcome["valid"], "Vertical four can be formed by a swap")
-	_ok(int(column_outcome["created"]) == Board.BEAM_COLUMN, "Vertical four creates column beam")
-	_ok(vertical.specials.has(Board.BEAM_COLUMN), "Column beam survives resolution")
+	_ok(int(column_outcome["created"]) == Board.BEAM_ROW, "Leftward swap creates row beam even in a vertical four")
+	_ok(vertical.specials.has(Board.BEAM_ROW), "Row beam survives resolution")
 
 	# Straight five made by a REAL swap creates one Supernova.
 	var five = _fixture(71)

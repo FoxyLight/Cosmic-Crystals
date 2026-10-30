@@ -69,7 +69,7 @@ Color **and** silhouette must identify each type. Highlight, selected, special, 
 
 | Trigger | Created piece | Behavior |
 | --- | --- | --- |
-| Straight four-match | **Star Beam** | Clear one full row or column on activation, orientation based on formation |
+| Straight four-match | **Star Beam** | Clear one full row or column on activation, orientation follows the gem’s movement: left/right swap → row, up/down swap → column |
 | Straight five-match | **Supernova** | Clear all crystals of the type it is swapped/activated against |
 | T or L match | **Cosmic Bomb** | Clear a 3 x 3 area centered on activation |
 | Swap of two specials | **Special combination** | Larger, explicitly defined combined effect |

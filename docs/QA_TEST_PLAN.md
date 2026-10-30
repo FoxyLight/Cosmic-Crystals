@@ -24,3 +24,13 @@ Record exact versionName/code, source SHA, public certificate fingerprint, signi
 8. Run normal/reduced-motion sessions, repeated navigation and heavy chains with audio for at least 10 minutes. Record actual FPS, p95 frame time, RAM/PSS, startup/load and thermals; compare phone classes. `performance-last.json` captures a rolling observed report on Android backgrounding, not a synthetic benchmark score.
 
 M3's player pass is recorded in [its report](ANDROID_M3_PLAYTEST_2026_10_29.md). M4 remains open until a new pass. Full device/performance and production accessibility acceptance cannot be inferred from CI.
+
+
+## 0.5.1 Beam direction regression
+
+A four-match Beam follows the initiating swap axis, not the completed line's
+orientation: left/right movement creates a horizontal row Beam; up/down creates
+a vertical column Beam. Test all four directions with swipes and two-tap swaps,
+including movement perpendicular to the matched line. The visible forged marker
+and its later full-line blast must agree. Existing saved Beams/records are not
+rewritten; Bomb/Supernova precedence and available mechanics remain unchanged.
