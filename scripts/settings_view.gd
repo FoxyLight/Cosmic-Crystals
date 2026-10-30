@@ -40,7 +40,7 @@ func _ready() -> void:
 		add_child(slider)
 	for key in ["muted", "reduced_motion", "large_text"]:
 		var toggle: CheckButton = CheckButton.new()
-		toggle.text = {"muted": "Mute all audio", "reduced_motion": "Reduced motion", "large_text": "Extra-large text"}[key]
+		toggle.text = {"muted": "Mute all audio", "reduced_motion": "Reduced motion", "large_text": "Larger Text"}[key]
 		toggle.add_theme_font_override("font", game.hud.body_face)
 		toggle.add_theme_font_size_override("font_size", 15)
 		toggle.toggled.connect(func(value: bool): game.set_preference(key, value))
