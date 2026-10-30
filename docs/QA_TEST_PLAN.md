@@ -1,6 +1,6 @@
 # Android QA and Acceptance Plan
 
-Current plan: 2026-10-30, Android-only **0.5.1**. This supersedes the [historical pre-M4 QA matrix](history/PRE_M4_QA_TEST_PLAN.md). No Web/browser/iOS acceptance applies. Desktop/headless execution is an Android development environment only.
+Current plan: 2026-10-30, Android-only **0.5.2**. This supersedes the [historical pre-M4 QA matrix](history/PRE_M4_QA_TEST_PLAN.md). No Web/browser/iOS acceptance applies. Desktop/headless execution is an Android development environment only.
 
 ## Automated gate
 
@@ -15,6 +15,10 @@ Use the **strict Godot parser/runtime-log guard** on every import/test/export. E
 **2026-10-30:** The player states **“M4 playtest passes”** after the version 0.5.1 audio/comfort/Beam-direction delivery. This records **overall M4 human usability acceptance** without inventing per-item scores, device specifications, system font-scale configurations, audio-mix measurements, hardware interruption tests, FPS/p95, RAM/PSS or thermals. [Evidence and exact known installed-build boundary](ANDROID_M4_PLAYTEST_2026_10_30.md).
 
 The detailed checklist below is retained as a **M5 release-candidate testing matrix**. Its individual measurements and multi-device conditions are *not automatically checked off* by the general player pass. M4 #8 may close at the scoped implementation/player-acceptance gate while [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) remains open for these objective measurements.
+
+## Post-M4 0.5.2 Android settings regression
+
+The player reported that volume sliders could not be moved and that Larger reading text had no obvious effect. [PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) adds native `InputEventScreenTouch`/`InputEventScreenDrag` handling and a visible font-size preview; the extended M4 test suite verifies all three slider gestures, percentages, persistence, switch touches and font sizes. **Physical Android acceptance of this patch remains pending under [#37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37)**. [Retest checklist](ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md). Do not infer a new 0.5.2 playtest from the prior M4 overall PASS.
 
 ## New human Android M4 checklist
 

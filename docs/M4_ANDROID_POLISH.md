@@ -194,6 +194,10 @@ The known device-installed/read-back gameplay build was `0.5.1-dev.110.1+g7864c8
 
 The following detailed test checklist remains useful for deeper **M5 Android release-candidate QA**; the reported overall M4 pass does not establish each listed measurement.
 
+## Post-acceptance Android 0.5.2 settings repair
+
+The player subsequently reported two settings defects: non-movable sound volume sliders and Larger reading text with little visible effect. [PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) fixes native touch drag and switch handling without global mouse emulation, expands/reverses reading-text sizes, and adds 190-test M4 UI regression coverage. This is a **later patch after the overall M4 human PASS**, not retroactive evidence that the patch was human-tested. [Issue #37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37) remains open for a new Android retest; [instructions](ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md).
+
 ## Android human playtest
 
 First resolve signing compatibility safely; never uninstall merely to start

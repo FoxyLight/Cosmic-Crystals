@@ -1,6 +1,6 @@
 # Cosmic Crystals: A Starweaver's Journey
 
-An **Android-only** five-level match-3 game. Godot 4.7.2, GDScript, Compatibility renderer. Product base **0.5.1** (M4 polish). Package stays `org.foxylight.cosmiccrystals.prototype`.
+An **Android-only** five-level match-3 game. Godot 4.7.2, GDScript, Compatibility renderer. Product base **0.5.2** (Android settings touch/readability patch after M4 polish). Package stays `org.foxylight.cosmiccrystals.prototype`.
 
 Home → Lyra constellation → five authored levels → earned stars → next/replay/map. Beams, Bombs, Supernovas, Nova and fixed 1/2-HP asteroids have deterministic rules and immutable animation events. M3 passed the player's Android campaign/relaunch test; [report](docs/ANDROID_M3_PLAYTEST_2026_10_29.md), closed #7.
 
@@ -9,6 +9,10 @@ M4 adds 17 original effects, five ambient loops, bounded sound layering, crossfa
 ## M4 Android player acceptance: PASS
 
 On **2026-10-30**, the player reported **“M4 playtest passes”** for the current Android-only audio, visual/comfort and Beam-direction build. This is an overall human acceptance result, not a measured performance/accessibility or exhaustive interruption matrix. The last physically installed/read-back gameplay APK was `0.5.1-dev.110.1+g7864c820` (code 11001); subsequent main build #113 changed documentation only. [M4 playtest report](docs/ANDROID_M4_PLAYTEST_2026_10_30.md). **M4 #8 is accepted at its implementation/human-smoke gate; M5 device/release-candidate QA remains open.**
+
+## Android settings follow-up (0.5.2)
+
+After the overall M4 playtest PASS, the player found that the volume sliders would not drag and the Larger reading text switch was not visually clear. [PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) fixes **native Android slider/switch touches**, makes larger text obvious in Settings, Home, map, gameplay guidance and dialogs, and adds real touch-drag/font-toggle regression tests. [Issue #37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37) is **open pending a new human Android retest**. [Fix details and safe install checklist](docs/ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md).
 
 ## Development and verification
 

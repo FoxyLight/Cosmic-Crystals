@@ -1,6 +1,6 @@
 # Current Project Status
 
-Snapshot 2026-10-30. **Android-only**, product base **0.5.1**, Godot 4.7.2 Compatibility. Same package and schema-1 earned progression; additive settings default safely for older saves.
+Snapshot 2026-10-30. **Android-only**, product base **0.5.2**, Godot 4.7.2 Compatibility. Same package and schema-1 earned progression; additive settings default safely for older saves.
 
 M3 #7 is closed following the player's human Android five-level/relaunch pass. **Historical M3 phone build 9801 used a temporary CI key.** The test Pixel 7a subsequently installed stable-key M4 build 10601 and later **updated in place from 10801 to 11001 with its validated save unchanged**. Do not assume a separate phone still carrying 9801 can update using the new stable key.
 
@@ -11,6 +11,8 @@ Private stable-debug key, generated private password and public-pin Actions secr
 The player has now reported **M4 Android playtest PASS on 2026-10-30** ([report](ANDROID_M4_PLAYTEST_2026_10_30.md)). M4 #8 may close for its implemented/human-accepted polish slice. No quantified phone FPS/RAM, perceived mix rating, thermal, full font/display scaling, screen reader or multi-device result is claimed. The initial read-only backup attempt found no installed package, so no old campaign save was captured. Progress earned in the new stable-key build must be preserved during updates. PR and main pipelines validate only Android; no Web artifact is produced.
 
 **M4 Android human feedback (2026-10-30): PASS.** The player reports **“M4 playtest passes.”** [Report](ANDROID_M4_PLAYTEST_2026_10_30.md). This accepts the implemented audio/comfort/visual and Beam-direction slice in a general player test. Do not confuse it with measured FPS/p95/RAM/PSS, full Android audio focus, font/display scaling, TalkBack accessibility, or multi-device coverage. The last known installed gameplay APK was code 11001; the later documentation-only code 11301 was not confirmed installed. M4 #8 is complete at the player-acceptance gate; the unmeasured release-candidate/device requirements remain in M5 #9.
+
+**Post-M4 settings defect fixed in source (2026-10-30):** Following the overall M4 pass, the player reported that sound sliders could not be dragged and Larger reading text was not visibly effective. [PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) added native Android slider/CheckButton touch input, readable live settings preview, and reversible larger fonts across screens; [issue #37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37) remains **open for physical-phone retest**. Product base is now 0.5.2. [Fix details and checklist](ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md). This is a fix after M4 overall acceptance, not a claim that the 0.5.2 APK has been played on a phone.
 
 M0/M1/M2 broader device/balance gates, M5 quality and M6 release signing/Play remain open. Web/HTML5, iOS and desktop distribution are out of scope. Historical Web evidence is retained without current deliverables.
 

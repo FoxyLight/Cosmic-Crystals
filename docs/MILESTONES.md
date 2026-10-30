@@ -1,6 +1,6 @@
 # Milestones and Delivery Gates
 
-Snapshot 2026-10-30. Android-only, Godot 4.7.2, source **0.5.1**. Milestones require evidence; Android debug export is not production release approval.
+Snapshot 2026-10-30. Android-only, Godot 4.7.2, source **0.5.2**. Milestones require evidence; Android debug export is not production release approval.
 
 | Milestone | State | Remaining gate |
 | --- | --- | --- |
@@ -10,6 +10,7 @@ Snapshot 2026-10-30. Android-only, Godot 4.7.2, source **0.5.1**. Milestones req
 | M2 #6 | Open | Detailed special/Nova balance; asteroid smoke accepted |
 | M3 #7 | Complete | Player accepted five-level campaign/relaunch scope on 2026-10-29 |
 | M4 #8 | **Complete: implemented and player-reported Android playtest PASS** | Audio/comfort/visual/Beam-direction M4 usability accepted; quantified device performance and full accessibility moved to M5 #9 |
+| Post-M4 #37 | Fixed in source; **human retest pending** | Native volume slider drag and visible Larger reading text in Android 0.5.2 |
 | M5 #9 | Future | Android release-candidate quality gate |
 | M6 #10 | Future | Production signing/AAB and Play publication decision |
 | M7 #11 | Deferred | Expanded Android content only; iOS excluded |
