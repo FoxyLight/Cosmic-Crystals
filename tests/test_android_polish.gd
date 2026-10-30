@@ -133,6 +133,7 @@ func _run() -> void:
 	for key in ["master_volume", "music_volume", "sfx_volume"]:
 		check(is_equal_approx(float(disk_after_touch.data["settings"][key]), float(game.progress.data["settings"][key])), "Touch volume survives disk reload: " + key)
 	var regular_preview_size: int = game.settings_view.preview.get_theme_font_size("font_size")
+	game.settings_view.toggles["large_text"].toggled.connect(func(value: bool): print("TRACE_TOGGLE_EVENT ", value))
 	print("ANDROID_TOUCH_TRACE: toggle_rect=", game.settings_view.toggles["large_text"].get_global_rect(), " settings_rect=", game.settings_view.get_global_rect(), " visible=", game.settings_view.visible, " native_settings=", game.settings_open, " other_toggle=", game.settings_view.toggles["muted"].get_global_rect())
 	tap(game.settings_view.toggles["large_text"].get_global_rect().get_center())
 	await process_frame
