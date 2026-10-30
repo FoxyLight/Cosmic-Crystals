@@ -6,7 +6,7 @@ Android is the sole supported product. Sequence: accepted five-level M3 → M4 a
 
 ## M4 acceptance
 
-Keep #8 open until the player confirms the new Android audio/visual/comfort build. Complete [QA checklist](QA_TEST_PLAN.md), record exact build and preserve saves. M3 has already passed its own scope. No store readiness is inferred.
+**The player reported M4 Android playtest PASS on 2026-10-30.** The implemented audio/visual/comfort and Beam-direction M4 slice meets its *overall human acceptance* gate; see [M4 report](ANDROID_M4_PLAYTEST_2026_10_30.md). Keep [M5's fuller Android QA](QA_TEST_PLAN.md) open for measured physical-device performance, scaling, audio interruptions and accessibility. M3 was already accepted. No Play Store/release AAB readiness is inferred.
 
 ## M5 Android quality gate
 
