@@ -2,7 +2,7 @@
 
 Snapshot 2026-10-30. **Android-only**, product base **0.5.1**, Godot 4.7.2 Compatibility. Same package and schema-1 earned progression; additive settings default safely for older saves.
 
-M3 #7 is closed following the player's human Android five-level/relaunch pass. Last independently verified player installation was build 9801, signed with a temporary CI key. Do not uninstall it or infer compatibility with the new stable key.
+M3 #7 is closed following the player's human Android five-level/relaunch pass. **Historical M3 phone build 9801 used a temporary CI key.** The test Pixel 7a subsequently installed stable-key M4 build 10601 and later **updated in place from 10801 to 11001 with its validated save unchanged**. Do not assume a separate phone still carrying 9801 can update using the new stable key.
 
 M4 implements original audio, smooth context music, bounded effects, saved volume/mute/comfort preferences, Android focus/background gating, restrained power effects and results, larger reading text, safe settings controls, cached view/layout updates and bounded frame/load/event diagnostics. CI has no Web job or artifact and validates Android packaging and same-key emulator upgrades. [M4 specification, evidence and limits](M4_ANDROID_POLISH.md).
 
