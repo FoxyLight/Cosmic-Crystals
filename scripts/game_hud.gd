@@ -283,6 +283,7 @@ func refresh(layout: Dictionary) -> void:
 
 
 func _refresh_modal(layout: Dictionary, modal: String) -> void:
+	var large: bool = game.progress.data["settings"].get("large_text", false)
 	var visible_modal: bool = not modal.is_empty()
 	var campaign: bool = game.current_level_id > 0 and not game.practice_mode
 	_rect(shade, Rect2(Vector2.ZERO, size))
