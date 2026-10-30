@@ -6,6 +6,10 @@ Home → Lyra constellation → five authored levels → earned stars → next/r
 
 M4 adds 17 original effects, five ambient loops, bounded sound layering, crossfades, master/music/SFX controls, mute, remembered comfort settings, focus/background suspension, larger reading text, reduced effects, power feedback and bounded performance diagnostics. [M4 specification and evidence](docs/M4_ANDROID_POLISH.md).
 
+## M4 Android player acceptance: PASS
+
+On **2026-10-30**, the player reported **“M4 playtest passes”** for the current Android-only audio, visual/comfort and Beam-direction build. This is an overall human acceptance result, not a measured performance/accessibility or exhaustive interruption matrix. The last physically installed/read-back gameplay APK was `0.5.1-dev.110.1+g7864c820` (code 11001); subsequent main build #113 changed documentation only. [M4 playtest report](docs/ANDROID_M4_PLAYTEST_2026_10_30.md). **M4 #8 is accepted at its implementation/human-smoke gate; M5 device/release-candidate QA remains open.**
+
 ## Development and verification
 
 Desktop/headless Godot is a development/testing environment only. Run Godot headless import, each `tests/test_*.gd`, `tests/benchmark_android.gd`, and `python -m unittest discover -s tests -p "test_android*.py" -v`. Check parser/runtime logs even when Godot exits zero. Android CI runs validation, 15 regression suites, CPU benchmark, version/signature/manifest checks, APK asset packaging and an isolated-emulator same-key upgrade/save test. No Web artifacts or browser QA.
