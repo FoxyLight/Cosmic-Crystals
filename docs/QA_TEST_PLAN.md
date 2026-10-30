@@ -10,6 +10,12 @@ Nine Python tests cover Android versions/preset selection, source drift, signatu
 
 Use the **strict Godot parser/runtime-log guard** on every import/test/export. Exit zero with SCRIPT ERROR/ERROR is still failure. CI also runs a CPU settlement benchmark and two separately exported same-key versions on an isolated Android emulator, verifying exact saved bytes after `adb install -r`. That is not proof of updating the player's differently signed build 9801.
 
+## Player-reported M4 Android playtest: PASS
+
+**2026-10-30:** The player states **“M4 playtest passes”** after the version 0.5.1 audio/comfort/Beam-direction delivery. This records **overall M4 human usability acceptance** without inventing per-item scores, device specifications, system font-scale configurations, audio-mix measurements, hardware interruption tests, FPS/p95, RAM/PSS or thermals. [Evidence and exact known installed-build boundary](ANDROID_M4_PLAYTEST_2026_10_30.md).
+
+The detailed checklist below is retained as a **M5 release-candidate testing matrix**. Its individual measurements and multi-device conditions are *not automatically checked off* by the general player pass. M4 #8 may close at the scoped implementation/player-acceptance gate while [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) remains open for these objective measurements.
+
 ## New human Android M4 checklist
 
 Record exact versionName/code, source SHA, public certificate fingerprint, signing mode, device/Android version and display/font scaling. Preserve the old installation unless an explicit backup/migration approval has been given.
