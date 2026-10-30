@@ -60,9 +60,9 @@ To verify the downloaded APK has not changed, run `sha256sum -c SHA256SUMS.txt` 
 
 ## M4 stable debug signing, maintenance and recovery
 
-Owner setup on 2026-10-30 created private Actions secrets `COSMIC_DEBUG_KEYSTORE_BASE64` and `COSMIC_DEBUG_CERT_SHA256`. This is configuration evidence only until a main APK passes the actual cryptographic verification/pin check. Main builds use `persistent-secret`; PRs use explicit `ephemeral-ci` and never access the key. Metadata includes `signing_certificate_sha256`, `stable_signing_verified` and emulator upgrade results. Read these fields rather than assuming a stable label means compatible with an old app.
+Owner setup on 2026-10-30 created private Actions secrets `COSMIC_DEBUG_KEYSTORE_BASE64`, `COSMIC_DEBUG_KEYSTORE_PASSWORD` and `COSMIC_DEBUG_CERT_SHA256`. This is configuration evidence only until a main APK passes the actual cryptographic verification/pin check. Main builds use `persistent-secret`; PRs use explicit `ephemeral-ci` and never access the key. Metadata includes `signing_certificate_sha256`, `stable_signing_verified` and emulator upgrade results. Read these fields rather than assuming a stable label means compatible with an old app.
 
-Public certificate pin: `bb524f7e0b31b29118043206b481505d940cf0ea635f0fc68b978e88fe1a62b2`. Private keystore and local public-pin file reside outside the checkout at `%USERPROFILE%\.codex\private\cosmic-crystals-debug`, with inheritance removed and access limited to the owner/SYSTEM. Keep an encrypted offline backup of this directory in an owner-controlled secure location. Do not put it in Git, APK artifacts, chat or public logs. Debug alias/password are the conventional `androiddebugkey` / `android`; the private file itself is the security boundary. This is NEVER a production/upload signing key.
+Public certificate pin: `bb524f7e0b31b29118043206b481505d940cf0ea635f0fc68b978e88fe1a62b2`. Private keystore and local public-pin file reside outside the checkout at `%USERPROFILE%\.codex\private\cosmic-crystals-debug`, with inheritance removed and access limited to the owner/SYSTEM. Keep an encrypted offline backup of this directory in an owner-controlled secure location. Do not put it in Git, APK artifacts, chat or public logs. Debug alias is `androiddebugkey`; the reusable keystore now uses a generated private password in Actions secrets and an ACL-protected local password file. No private password value is committed or printed. The password-protection conversion preserved the exact certificate/private-key identity. A private pre-conversion recovery copy remains in the same protected directory; prefer the current protected keystore/password pair for backups. This is NEVER a production/upload signing key.
 
 To recreate the two secret entries from the SAME existing private key:
 
@@ -85,3 +85,15 @@ python scripts/android_save_backup.py --adb "PATH_TO_ADB" --serial "EXACT_PHONE_
 The script uses debug `run-as`, validates schema/record array sizes, saves exact bytes/checksum and refuses overwrite; it never installs/restores/deletes. Inspect records, validate with `ProgressStore.normalize`, and keep two private backup copies. If run-as is unavailable or the file cannot be validated, keep the old installation and stop. Restore onto a disposable emulator first if needed. Any real-phone uninstall/one-time migration requires new explicit approval, then exact-byte restore verification and a manual launch/relaunch check. The old M2 disposable-app approval is not permission to erase earned M3 saves.
 
 CI's emulator upgrade test uses two separately exported APKs with the same loaded key and an incremented probe code. It installs the first on a disposable emulator, writes a schema-1 earned save, updates with `install -r`, and compares exact bytes. The second probe APK is never published. This validates compatible Android update mechanics, not old-key compatibility or human gameplay. Every distributed APK still uses unique run-based versioning.
+
+
+### Verified M4 delivery checkpoint
+
+[Main run 106](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41069911792)
+verified the stable certificate pin and same-key two-export upgrade/save test.
+Build 10601 was independently verified after download and installed fresh on the
+Pixel 7a; versionName/code were read back. The owner confirmed they had already
+uninstalled the prior copy; no prior app was removed or old save recovered by
+M4. The subsequent private-password hardening preserves that same certificate,
+so it is eligible for an in-place update, not another uninstall. Exact latest
+acceptance artifact and follow-up validation are recorded in #8.

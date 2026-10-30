@@ -105,7 +105,9 @@ FPS/p95, loading, PSS, long-session thermals and audio-under-load remain pending
 ## Signing and installation safety
 
 The authorized owner session configured `COSMIC_DEBUG_KEYSTORE_BASE64` and
-`COSMIC_DEBUG_CERT_SHA256` privately. Main exports must pass `apksigner` and
+`COSMIC_DEBUG_CERT_SHA256` privately, plus a generated private
+`COSMIC_DEBUG_KEYSTORE_PASSWORD` secret. Password protection retains the
+exact certificate and private-key identity. No private password is committed. Main exports must pass `apksigner` and
 the pin; actual `build-info.json` records the result. PRs use isolated temporary
 keys and never receive the private key. The private local backup is outside Git
 with owner/SYSTEM ACLs. No keystore/password is committed. Back it up encrypted
@@ -122,11 +124,35 @@ save, updates in place and checks exact bytes. The probe APK is never uploaded;
 the delivered APK has its unique run-based version. This proves same-key update
 mechanics only. It does not make old ephemeral-key build 9801 compatible.
 
-**No real-phone uninstall, data clearing, migration or new M4 installation has
-been performed.** At audit the phone was disconnected. Later the Pixel 7a reconnected but Android reported the expected package absent, so the read-only backup could not be captured. No backup is claimed. Keep the existing game.
-The read-only backup helper refuses overwrite and validates before saving exact
-bytes/checksum. After a validated backup, a one-time replacement/restore needs
-separate explicit approval. If backing up fails, stop. [Safe procedure](ANDROID_EXPORT.md).
+**No real-phone uninstall, data clearing or migration was performed by M4.**
+The phone was disconnected at audit, then the connected Pixel 7a reported the
+expected package absent; the read-only backup attempt failed before a save
+backup could be created. The owner confirmed **“I uninstalled the previous
+version.”** No old-save recovery is claimed. After main verification, M4 build
+10601 was installed fresh and its version read back. Future stable-key updates
+must use `install -r`, preserving any newly earned data. The read-only backup
+helper rejects unreadable data and never overwrites existing backups. A different
+old-key installation elsewhere still requires the separately approved safe
+procedure in [Android export](ANDROID_EXPORT.md).
+
+### Verified main-106 checkpoint
+
+[PR #32](https://github.com/FoxyLight/Cosmic-Crystals/pull/32) merged as
+`8a0aa6fe04efb776f73653756e5bf35526edb20f` after both checks passed.
+[Main run 106](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41069911792)
+passed both Android-only jobs, including all regression suites, actual APK
+signature/pin/manifest/asset checks and an emulator save retained byte for byte
+through two separately exported same-key versions.
+
+[Checkpoint artifact](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41069911792/artifacts/12984013523):
+`cosmic-crystals-v0.5.0-dev.106.1-g8a0aa6fe-debug.apk`, versionName
+`0.5.0-dev.106.1+g8a0aa6fe`, versionCode **10601**, signing mode
+`persistent-secret`, `stable_signing_verified: true`. APK SHA-256:
+`d9a46aede34676582822296f3717f74b0e46f0c54b7a15d06d622a24742ca2e1`.
+Downloaded manifest/hash and actual signer pin were independently checked.
+Installation and version read-back succeeded. This is not a new human pass or
+an Android FPS/audio-quality result. The password-hardening follow-up retains
+the exact signer; #8 records its final artifact and compatible update evidence.
 
 ## Automated gate and delivery record
 

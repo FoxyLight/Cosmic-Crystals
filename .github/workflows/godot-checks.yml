@@ -117,21 +117,24 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           COSMIC_DEBUG_KEYSTORE_BASE64: ${{ secrets.COSMIC_DEBUG_KEYSTORE_BASE64 }}
+          COSMIC_DEBUG_KEYSTORE_PASSWORD: ${{ secrets.COSMIC_DEBUG_KEYSTORE_PASSWORD }}
           COSMIC_DEBUG_CERT_SHA256: ${{ secrets.COSMIC_DEBUG_CERT_SHA256 }}
         run: |
           if [[ -n "$COSMIC_DEBUG_KEYSTORE_BASE64" ]]; then
+            test -n "$COSMIC_DEBUG_KEYSTORE_PASSWORD" || { echo "::error::Stable debug key needs its private password secret"; exit 1; }
             test -n "$COSMIC_DEBUG_CERT_SHA256" || { echo "::error::Stable debug key needs a certificate pin"; exit 1; }
             mkdir -p "$HOME/.android"
             printf '%s' "$COSMIC_DEBUG_KEYSTORE_BASE64" | base64 --decode > "$HOME/.android/debug.keystore"
             chmod 600 "$HOME/.android/debug.keystore"
             keytool -list -keystore "$HOME/.android/debug.keystore" \
-              -storepass android -alias androiddebugkey > /dev/null
+              -storepass:env COSMIC_DEBUG_KEYSTORE_PASSWORD -alias androiddebugkey > /dev/null
             echo "COSMIC_SIGNING_MODE=persistent-secret" >> "$GITHUB_ENV"
             echo "Stable debug signing certificate loaded from private Actions secret."
           fi
       - name: Sign, export and verify versioned Android debug APK
         env:
           APK_PATH: ${{ steps.version.outputs.apk_path }}
+          STABLE_DEBUG_PASSWORD: ${{ github.event_name == 'push' && secrets.COSMIC_DEBUG_KEYSTORE_PASSWORD || '' }}
           EXPECTED_DEBUG_CERT: ${{ github.event_name == 'push' && secrets.COSMIC_DEBUG_CERT_SHA256 || '' }}
         run: |
           mkdir -p "$HOME/.android" build/android
@@ -143,7 +146,7 @@ jobs:
           fi
           export GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$HOME/.android/debug.keystore"
           export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
-          export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="${STABLE_DEBUG_PASSWORD:-android}"
           bash scripts/ci/check_godot_log.sh ./godot --headless --path . --editor --quit
           bash scripts/ci/check_godot_log.sh ./godot --headless --path . --export-debug Android "$APK_PATH"
           test -s "$APK_PATH"
@@ -161,7 +164,7 @@ jobs:
         env:
           GODOT_ANDROID_KEYSTORE_DEBUG_PATH: /home/runner/.android/debug.keystore
           GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
-          GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
+          GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: ${{ github.event_name == 'push' && secrets.COSMIC_DEBUG_KEYSTORE_PASSWORD || 'android' }}
         run: |
           mkdir -p build/upgrade-probe
           python3 -c 'import json; from pathlib import Path; from scripts.ci.version_android import patch_android_preset; i=json.loads(Path("build/android/build-info.json").read_text()); p=Path("export_presets.cfg"); p.write_text(patch_android_preset(p.read_text(), i["version_code"]+1, i["version_name"]+".upgrade-probe")[0])'
