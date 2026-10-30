@@ -132,12 +132,12 @@ func _run() -> void:
 	disk_after_touch.load_progress()
 	for key in ["master_volume", "music_volume", "sfx_volume"]:
 		check(is_equal_approx(float(disk_after_touch.data["settings"][key]), float(game.progress.data["settings"][key])), "Touch volume survives disk reload: " + key)
+	# The earlier additive-save test deliberately enabled all comfort settings.
+	# Begin native-toggle gesture checks at the known normal font setting.
+	game.set_preference("large_text", false)
 	var regular_preview_size: int = game.settings_view.preview.get_theme_font_size("font_size")
-	game.settings_view.toggles["large_text"].toggled.connect(func(value: bool): print("TRACE_TOGGLE_EVENT ", value))
-	print("ANDROID_TOUCH_TRACE: toggle_rect=", game.settings_view.toggles["large_text"].get_global_rect(), " settings_rect=", game.settings_view.get_global_rect(), " visible=", game.settings_view.visible, " native_settings=", game.settings_open, " other_toggle=", game.settings_view.toggles["muted"].get_global_rect())
 	tap(game.settings_view.toggles["large_text"].get_global_rect().get_center())
 	await process_frame
-	print("ANDROID_TOUCH_TRACE: large_text=", game.progress.data["settings"]["large_text"], " button=", game.settings_view.toggles["large_text"].button_pressed, " size=", game.settings_view.preview.get_theme_font_size("font_size"), " active=", game.settings_view.active_touch_index)
 	check(game.progress.data["settings"]["large_text"] and game.settings_view.preview.get_theme_font_size("font_size") >= regular_preview_size + 5, "Larger reading text toggle visibly enlarges its settings preview")
 	check(game.settings_view.toggles["large_text"].get_theme_font_size("font_size") >= 18, "Settings toggle text enlarges immediately")
 	tap(game.settings_view.toggles["large_text"].get_global_rect().get_center())
