@@ -1,6 +1,6 @@
 # Android QA and Acceptance Plan
 
-Current plan: 2026-10-30, Android-only **0.5.1**. This supersedes the [historical pre-M4 QA matrix](history/PRE_M4_QA_TEST_PLAN.md). No Web/browser/iOS acceptance applies. Desktop/headless execution is an Android development environment only.
+Current plan: 2026-10-30, Android-only **0.5.2**. This supersedes the [historical pre-M4 QA matrix](history/PRE_M4_QA_TEST_PLAN.md). No Web/browser/iOS acceptance applies. Desktop/headless execution is an Android development environment only.
 
 ## Automated gate
 
