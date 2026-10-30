@@ -1,6 +1,6 @@
 # Cosmic Crystals: A Starweaver's Journey
 
-An **Android-only** five-level match-3 game. Godot 4.7.2, GDScript, Compatibility renderer. Product base **0.5.2** (Android settings touch/readability patch after M4 polish). Package stays `org.foxylight.cosmiccrystals.prototype`.
+An **Android-only** five-level match-3 game. Godot 4.7.2, GDScript, Compatibility renderer. Product base **0.5.3** (readable default and extra-large text). Package stays `org.foxylight.cosmiccrystals.prototype`.
 
 Home → Lyra constellation → five authored levels → earned stars → next/replay/map. Beams, Bombs, Supernovas, Nova and fixed 1/2-HP asteroids have deterministic rules and immutable animation events. M3 passed the player's Android campaign/relaunch test; [report](docs/ANDROID_M3_PLAYTEST_2026_10_29.md), closed #7.
 
@@ -12,7 +12,7 @@ On **2026-10-30**, the player reported **“M4 playtest passes”** for the curr
 
 ## Android settings follow-up (0.5.2)
 
-After the overall M4 playtest PASS, the player found that the volume sliders would not drag and the Larger reading text switch was not visually clear. [PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) fixes **native Android slider/switch touches**, makes larger text obvious in Settings, Home, map, gameplay guidance and dialogs, and adds real touch-drag/font-toggle regression tests. [Issue #37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37) is **open pending a new human Android retest**. [Fix details and safe install checklist](docs/ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md).
+After the overall M4 playtest PASS, the player found that the volume sliders would not drag and the Larger reading text switch was not visually clear. [PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) fixes **native Android slider/switch touches**, makes larger text obvious in Settings, Home, map, gameplay guidance and dialogs, and adds real touch-drag/font-toggle regression tests. The player confirmed **“That is working now”** after installing/read-back of 0.5.2 build 12501. [Issue #37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37) is accepted for those two defects; the new 0.5.3 size refinement has its own retest. [Fix details and safe install checklist](docs/ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md).
 
 ## Development and verification
 
@@ -31,3 +31,5 @@ Web/HTML5, desktop distribution, iOS, levels 6–20, extra constellations, monet
 Four-match Beams follow the gem movement: left/right creates a horizontal Beam; up/down creates a vertical Beam. [PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) and [Android-only main CI #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) verified this change. The stable-signer 10801 → 11001 phone update retained its save byte for byte; the player subsequently reported an **overall M4 Android playtest PASS**. No device performance/audio-focus measurements are inferred.
 
 [Current Android-only repository and documentation audit](docs/ANDROID_DOCS_AUDIT_2026_10_30.md) records exactly which gates are complete and which device/release measurements are still missing.
+
+Reading text now uses the previous larger size as the standard. **Extra-large text** increases it further, with reflowed captions and panels. [Sizes, layout checks and acceptance](docs/ANDROID_READING_TEXT_2026_10_30.md).

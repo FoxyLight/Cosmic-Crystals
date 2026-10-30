@@ -200,7 +200,7 @@ func refresh(layout: Dictionary) -> void:
 	if game == null or game.board == null:
 		return
 	var large: bool = game.progress.data["settings"].get("large_text", false)
-	labels["aside"].add_theme_font_size_override("font_size", 18 if large else 15)
+	labels["aside"].add_theme_font_size_override("font_size", 22 if large else 18)
 	var modal: String = "result" if game.finished else game.overlay
 	var blocked: bool = not modal.is_empty()
 	var idle: bool = game.phase == "idle" or game.phase == "nova_targeting"
@@ -274,7 +274,7 @@ func refresh(layout: Dictionary) -> void:
 		buttons["nova"].text = "Nova rests"
 	_place("caption", layout["caption"])
 	labels["caption"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if not game.practice_mode else TextServer.AUTOWRAP_OFF
-	labels["caption"].add_theme_font_size_override("font_size", (16 if large else 12) if not game.practice_mode else (14 if large else 11))
+	labels["caption"].add_theme_font_size_override("font_size", (20 if large else 16) if not game.practice_mode else (17 if large else 14))
 	labels["caption"].text = "Choose a tile for your Nova Pulse" if game.phase == "nova_targeting" else game.feedback
 	labels["caption"].modulate = Color.WHITE if game.feedback_ok else Color("#FF9AB4")
 	_place("aside", layout["aside"])
@@ -329,9 +329,9 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 					_rect(icon, Rect2(dialog.get_center().x - 67 + i * 48, dialog.position.y + 30, 38, 38))
 					icon.modulate = Color.WHITE if i < game.session.stars() else Color(0.25, 0.25, 0.32)
 				labels["modal_title"].text = "Lyra is alight." if game.current_level_id == 5 else "A star restored."
-				_place("modal_body", Rect2(x, dialog.position.y + 151, width, 44))
-				labels["modal_body"].text = "Match score %d + move bonus %d" % [game.score, game.moves_left * game.session.MOVE_BONUS]
-				_place("modal_score", Rect2(x, dialog.position.y + 198, width, 36))
+				_place("modal_body", Rect2(x, dialog.position.y + 156, width, 50))
+				labels["modal_body"].text = "Score %d + bonus %d" % [game.score, game.moves_left * game.session.MOVE_BONUS]
+				_place("modal_score", Rect2(x, dialog.position.y + 210, width, 32))
 				labels["modal_score"].text = "%d starlight" % game.session.rating_score()
 				if game.current_level_id < 5:
 					_rect(buttons["next"], Rect2(x, dialog.end.y - 184, width, 48))
@@ -356,11 +356,16 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 		icons["modal"].texture = STAR_ICON
 		labels["modal_eyebrow"].text = "YOUR LITTLE FIELD GUIDE"
 		labels["modal_title"].text = "Follow the stars."
-		labels["modal_body"].text = game.session.level["tutorial"] + "\n\nComplete every goal before your moves run out." if campaign else "Match 3 by swapping neighbors. Match 4, 5 or a T/L for powers.\n\nMatch beside rocks or blast them. Two hits break solid rocks."
+		labels["modal_body"].text = game.session.level["tutorial"] if campaign else "Swap neighbors to match 3; match 4, 5 or T/L for powers. Solid rocks take two hits."
 		labels["modal_score"].text = "Score +25 per unused move\n2 stars: %d / 3 stars: %d" % [game.session.level["star_scores"][1], game.session.level["star_scores"][2]] if campaign else "Fill Nova, then tap a tile. No move spent."
 		_rect(buttons["back"], layout["replay"])
 		buttons["back"].visible = true
 		order = ["back"]
+		_rect(icons["modal"], Rect2(dialog.get_center().x - 18, dialog.position.y + 16, 36, 36))
+		_place("modal_eyebrow", Rect2(x, dialog.position.y + 54, width, 20))
+		_place("modal_title", Rect2(x, dialog.position.y + 77, width, 42))
+		_place("modal_body", Rect2(x, dialog.position.y + 124, width, dialog.size.y - 272))
+		_place("modal_score", Rect2(x, dialog.end.y - 138, width, 54))
 	elif modal == "tools":
 		labels["modal_eyebrow"].text = "DEVELOPMENT TOOLS"
 		labels["modal_title"].text = "Effects check"
@@ -406,6 +411,6 @@ func _refresh_modal(layout: Dictionary, modal: String) -> void:
 			buttons[order[0]].grab_focus()
 	# Restore the normal font size as well as enlarging it. Otherwise a prior
 	# toggle remains stuck at the larger size after the player turns it off.
-	labels["modal_body"].add_theme_font_size_override("font_size", (17 if large else 14) if campaign else (18 if large else 15))
-	labels["modal_score"].add_theme_font_size_override("font_size", (17 if large else 14) if modal == "help" else 26)
+	labels["modal_body"].add_theme_font_size_override("font_size", (20 if large else 17) if campaign else (21 if large else 18))
+	labels["modal_score"].add_theme_font_size_override("font_size", (20 if large else 17) if modal == "help" else 26)
 	last_modal = modal

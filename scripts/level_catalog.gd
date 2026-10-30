@@ -38,6 +38,8 @@ static func normalize(raw) -> Dictionary:
 			return {}
 	if raw["moves"] > 100 or not raw.get("name") is String or raw["name"].is_empty() or not raw.get("tutorial") is String:
 		return {}
+	if raw.has("caption") and (not raw["caption"] is String or raw["caption"].is_empty()):
+		return {}
 	if not raw.get("kinds") is Array or raw["kinds"].size() < 3 or raw["kinds"].size() > 6:
 		return {}
 	var level: Dictionary = raw.duplicate(true)

@@ -29,7 +29,8 @@
         500,
         700
       ],
-      "tutorial": "Swap neighbors to match 3. Collect 24 crystals. Unused moves add score for stars."
+      "tutorial": "Swap neighbors to match 3. Collect 24 crystals. Unused moves add score for stars.",
+      "caption": "Swap neighbors to match 3."
     },
     {
       "kinds": [
@@ -72,7 +73,8 @@
       "hint": [
         27,
         19
-      ]
+      ],
+      "caption": "Match 4. Your swipe sets the Beam direction."
     },
     {
       "kinds": [
@@ -114,7 +116,8 @@
         1000,
         1400
       ],
-      "tutorial": "Match beside rocks or blast them. Two pips become one, then they break."
+      "tutorial": "Match beside rocks or blast them. Two pips become one, then they break.",
+      "caption": "Match beside rocks to crack them."
     },
     {
       "kinds": [
@@ -157,7 +160,8 @@
         1100,
         1600
       ],
-      "tutorial": "Swap the Bomb and Supernova together. Match a T/L or 5 to forge more powers."
+      "tutorial": "Swap the Bomb and Supernova together. Match a T/L or 5 to forge more powers.",
+      "caption": "Swap the Bomb and Supernova together."
     },
     {
       "kinds": [
@@ -208,7 +212,8 @@
         1500,
         2100
       ],
-      "tutorial": "Fill Nova by matching. Tap Nova, then a tile: a cross blast costs no move."
+      "tutorial": "Fill Nova by matching. Tap Nova, then a tile: a cross blast costs no move.",
+      "caption": "Fill Nova. Tap a tile for a cross blast."
     }
   ]
 }

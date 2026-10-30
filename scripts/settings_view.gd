@@ -40,13 +40,13 @@ func _ready() -> void:
 		add_child(slider)
 	for key in ["muted", "reduced_motion", "large_text"]:
 		var toggle: CheckButton = CheckButton.new()
-		toggle.text = {"muted": "Mute all audio", "reduced_motion": "Reduced motion", "large_text": "Larger reading text"}[key]
+		toggle.text = {"muted": "Mute all audio", "reduced_motion": "Reduced motion", "large_text": "Extra-large text"}[key]
 		toggle.add_theme_font_override("font", game.hud.body_face)
 		toggle.add_theme_font_size_override("font_size", 15)
 		toggle.toggled.connect(func(value: bool): game.set_preference(key, value))
 		toggles[key] = toggle
 		add_child(toggle)
-	preview = _label("The stars shine brighter.", 14)
+	preview = _label("The stars shine.", 14)
 	status = _label("", 12)
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	back = Button.new()
@@ -139,30 +139,31 @@ func refresh(area: Rect2) -> void:
 	y += 38
 	var settings: Dictionary = game.progress.data["settings"]
 	var large: bool = settings.get("large_text", false)
-	title.add_theme_font_size_override("font_size", 27 if large else 25)
-	back.add_theme_font_size_override("font_size", 19 if large else 17)
-	preview.add_theme_font_size_override("font_size", 20 if large else 14)
-	status.add_theme_font_size_override("font_size", 14 if large else 12)
+	title.add_theme_font_size_override("font_size", 30 if large else 27)
+	back.add_theme_font_size_override("font_size", 22 if large else 19)
+	preview.add_theme_font_size_override("font_size", 26 if large else 20)
+	status.add_theme_font_size_override("font_size", 16 if large else 14)
 	for key in sliders:
 		var slider: HSlider = sliders[key]
 		slider.set_value_no_signal(float(settings[key]) * 100)
 		slider.position = Vector2(x, y + 20)
 		slider.size = Vector2(w, 48)
-		captions[key].add_theme_font_size_override("font_size", 17 if large else 14)
+		captions[key].add_theme_font_size_override("font_size", 20 if large else 17)
 		captions[key].position = Vector2(x, y)
-		captions[key].size = Vector2(w, 20)
+		captions[key].size = Vector2(w, 26)
 		captions[key].text = "%s  %d%%" % [{"master_volume": "Master", "music_volume": "Music", "sfx_volume": "Sound effects"}[key], roundi(slider.value)]
 		y += 68
 	for key in toggles:
-		toggles[key].add_theme_font_size_override("font_size", 18 if large else 15)
+		toggles[key].add_theme_font_size_override("font_size", 21 if large else 18)
 		toggles[key].set_pressed_no_signal(settings[key])
 		toggles[key].position = Vector2(x, y)
 		toggles[key].size = Vector2(w, 48)
 		y += 48
 	preview.position = Vector2(x, y)
-	preview.size = Vector2(w, 32)
-	status.position = Vector2(x, y + 34)
-	status.size = Vector2(w, maxf(28, rect.end.y - 66 - y - 34))
-	status.text = game.progress.notice if not game.progress.notice.is_empty() else "Preferences saved on this device.\nAudio pauses when the app loses focus."
+	var preview_height: float = 40 if large else 32
+	preview.size = Vector2(w, preview_height)
+	status.position = Vector2(x, y + preview_height + 4)
+	status.size = Vector2(w, maxf(28, rect.end.y - 66 - y - preview_height - 4))
+	status.text = game.progress.notice if not game.progress.notice.is_empty() else "Saved on this device.\nAudio pauses in the background."
 	back.position = Vector2(x, rect.end.y - 60)
 	back.size = Vector2(w, 48)

@@ -46,3 +46,7 @@ a vertical column Beam. Test all four directions with swipes and two-tap swaps,
 including movement perpendicular to the matched line. The visible forged marker
 and its later full-line blast must agree. Existing saved Beams/records are not
 rewritten; Bomb/Supernova precedence and available mechanics remain unchanged.
+
+## 0.5.3 readable baseline and extra-large option
+
+The 0.5.2 larger font sizes are now standard without changing the stored boolean. Extra-large text raises these again. Verify both sizes at 320x568, 376x746, 800x1280 and 1280x720: settings preview/percent labels/toggles/status, Home text and button separation, every level preview/goal, gameplay caption, field guide and win summary. All text must fit without ellipsis, clipping, scroll or overlap. Check false → true → false restores the promoted default; native sliders remain draggable. Short gameplay captions supplement full map/help tutorials. The actual Android retest must confirm new readability; do not infer it from the prior 0.5.2 acceptance.

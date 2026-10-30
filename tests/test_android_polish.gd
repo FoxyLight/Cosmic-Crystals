@@ -168,7 +168,7 @@ func _run() -> void:
 	game._refresh_views()
 	check(game.hud.labels["modal_body"].get_theme_font_size("font_size") >= 17, "Game tutorial dialog text enlarges")
 	game.set_preference("large_text", false)
-	check(game.hud.labels["modal_body"].get_theme_font_size("font_size") == 14 and game.hud.labels["caption"].get_theme_font_size("font_size") == 12, "Turning larger text off restores normal modal and gameplay sizes")
+	check(game.hud.labels["modal_body"].get_theme_font_size("font_size") == 17 and game.hud.labels["caption"].get_theme_font_size("font_size") == 16, "Turning extra-large text off restores the promoted readable baseline")
 	game.close_overlay()
 
 	for repeat in range(25):
@@ -221,5 +221,76 @@ func _run() -> void:
 	await process_frame
 	for suffix in ["", ".bak", ".tmp"]:
 		if FileAccess.file_exists(path + suffix): DirAccess.remove_absolute(path + suffix)
+	await _reading_layouts()
 	print("Android polish: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
+
+
+func _reading_layouts() -> void:
+	var path: String = "user://tests/reading-layout-%d.json" % Time.get_ticks_usec()
+	var game = load("res://scenes/Prototype.tscn").instantiate()
+	game.save_path = path
+	root.add_child(game)
+	game.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	game.size = root.get_visible_rect().size
+	check(not game.progress.data["settings"]["large_text"], "Fresh settings use the promoted baseline without enabling extra-large")
+	game.open_settings()
+	check(game.settings_view.preview.get_theme_font_size("font_size") == 20, "Old larger preview is now the default")
+	check(game.settings_view.captions["master_volume"].get_theme_font_size("font_size") == 17, "Old larger volume-label size is now standard")
+	game.close_settings()
+	for extra in [false, true, false]:
+		game.set_preference("large_text", extra)
+		for dimension in [Vector2(320, 568), Vector2(376, 746), Vector2(800, 1280), Vector2(1280, 720)]:
+			game.size = dimension
+			game.show_home()
+			await process_frame
+			var safe: Rect2 = game._layout()["safe"]
+			var body: Label = game.campaign_view.labels["home_body"]
+			check(body.get_visible_line_count() == body.get_line_count(), "Home text fits %s %s: %d/%d" % [extra, dimension, body.get_visible_line_count(), body.get_line_count()])
+			check(not body.get_rect().intersects(game.campaign_view.buttons["journey"].get_rect()), "Home reading text stays clear of journey button")
+			game.open_settings()
+			await process_frame
+			check(game.settings_view.preview.get_theme_font_size("font_size") == (26 if extra else 20), "Extra-large preview is distinctly bigger and reversible")
+			for label in game.settings_view.captions.values() + [game.settings_view.title, game.settings_view.preview, game.settings_view.status]:
+				check(safe.encloses(label.get_rect()), "Settings text fits safe %s %s %s %s" % [extra, dimension, label.text, label.get_rect()])
+				check(label.get_visible_line_count() == label.get_line_count(), "Settings reading text fits vertically")
+				if label != game.settings_view.status:
+					check(label.get_theme_font("font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x <= label.size.x, "Single-line settings text fits without ellipsis")
+			for toggle in game.settings_view.toggles.values():
+				check(game.settings_view.panel.get_rect().encloses(toggle.get_rect()), "Extra-large switches stay inside their panel")
+			game.close_settings()
+			game.progress.data["highest_unlocked"] = 5
+			for id in range(1, 6):
+				game.go_map(true)
+				game.map_selection = id
+				game._refresh_views()
+				await process_frame
+				for key in ["level_goals", "level_tip"]:
+					var label: Label = game.campaign_view.labels[key]
+					check(label.get_visible_line_count() == label.get_line_count(), "Map text fits %s %s level %d %s: %d/%d" % [extra, dimension, id, key, label.get_visible_line_count(), label.get_line_count()])
+				game.start_level(id)
+				await process_frame
+				var caption: Label = game.hud.labels["caption"]
+				check(caption.get_visible_line_count() == caption.get_line_count(), "Caption fits %s %s level %d: %d/%d height %s" % [extra, dimension, id, caption.get_visible_line_count(), caption.get_line_count(), caption.size])
+				check(safe.encloses(caption.get_rect()) and not caption.get_rect().intersects(game._board_rect()), "Enlarged caption avoids board and viewport edges")
+				game.open_overlay("help")
+				await process_frame
+				var label: Label = game.hud.labels["modal_body"]
+				check(label.get_visible_line_count() == label.get_line_count(), "Every field guide fits at both font sizes")
+				check(not label.get_rect().intersects(game.hud.labels["modal_score"].get_rect()), "Help paragraphs and star thresholds do not overlap")
+				game.close_overlay()
+				game.finished = true
+				game.won = true
+				game.score = 12345
+				game._refresh_views()
+				await process_frame
+				var summary: Label = game.hud.labels["modal_body"]
+				check(summary.get_visible_line_count() == summary.get_line_count(), "Win summary fits larger text")
+				check(not summary.get_rect().intersects(game.hud.labels["modal_score"].get_rect()), "Win text does not overlap total")
+				game.finished = false
+				game.won = false
+				game.go_map(true)
+	game.queue_free()
+	await process_frame
+	for suffix in ["", ".bak", ".tmp"]:
+		if FileAccess.file_exists(path + suffix): DirAccess.remove_absolute(path + suffix)
