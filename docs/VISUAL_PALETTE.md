@@ -1,3 +1,5 @@
+> **Historical visual identity and contrast work (2026-10-29).** The initial Amber/Opal improvement received positive Android feedback. The current product is **Android-only 0.5.1**, including a five-level M3 player-accepted campaign and additional M4 settings/audio/visual work. A new *M4* brightness/font-scaling/accessibility test is still pending; this is not a claim that the original screenshot comparisons cover every device. See [M4](M4_ANDROID_POLISH.md).
+
 # Crystal Visual Identity and Mobile Contrast
 
 **Status:** Rendering implementation for M4 accessibility/visual clarity; **physical-device acceptance pending**.  
