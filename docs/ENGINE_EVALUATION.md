@@ -1,3 +1,5 @@
+**Current decision checkpoint (2026-10-30):** Godot **4.7.2 Compatibility** remains the chosen Android development engine. The five-level M3 campaign passed the owner's Android human playtest. M4 Android-only CI run #110 passed 15 Godot suites, nine Python tests, cryptographic APK manifest/signature/certificate-pin/asset checks and same-key emulator save-update verification; the phone's 10801 → 11001 compatible update preserved save data. **No signed production AAB, documented device FPS/RAM/thermal matrix or formal M0 production go/no-go exists yet.** Web/iOS/desktop shipping is not an acceptance requirement. See [M0 #4](https://github.com/FoxyLight/Cosmic-Crystals/issues/4), [ADR-006](DECISIONS.md), [Android QA](QA_TEST_PLAN.md).
+
 > Scope update 2026-10-30: Android is the only supported target. Web/browser/iOS/desktop-distribution requirements below are historical and superseded by ADR-006 and the current Android QA/release plan. Preserve Android device/performance/release-signing risks.
 
 # Engine Evaluation: Android-first Cosmic Crystals
