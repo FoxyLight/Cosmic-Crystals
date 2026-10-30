@@ -1,6 +1,6 @@
 # Current Project Status
 
-Snapshot 2026-10-30. **Android-only**, product base **0.5.0**, Godot 4.7.2 Compatibility. Same package and schema-1 earned progression; additive settings default safely for older saves.
+Snapshot 2026-10-30. **Android-only**, product base **0.5.1**, Godot 4.7.2 Compatibility. Same package and schema-1 earned progression; additive settings default safely for older saves.
 
 M3 #7 is closed following the player's human Android five-level/relaunch pass. Last independently verified player installation was build 9801, signed with a temporary CI key. Do not uninstall it or infer compatibility with the new stable key.
 
@@ -11,3 +11,5 @@ Private stable-debug key, generated private password and public-pin Actions secr
 M4 #8 remains open for new human Android acceptance. No new phone FPS/RAM, perceived mix quality, thermal, full font/display scaling, screen reader or multi-device result is claimed. The initial read-only backup attempt found no installed package, so no old campaign save was captured. Progress earned in the new stable-key build must be preserved during updates. PR and main pipelines validate only Android; no Web artifact is produced.
 
 M0/M1/M2 broader device/balance gates, M5 quality and M6 release signing/Play remain open. Web/HTML5, iOS and desktop distribution are out of scope. Historical Web evidence is retained without current deliverables.
+
+0.5.1 changes newly created four-match Beams to follow the initiating swap axis. Existing saved progress, audio/settings and previously stored power orientations are retained. Four-direction swipe/two-tap regressions and later blast footprints are covered.

@@ -68,7 +68,7 @@
         700,
         1000
       ],
-      "tutorial": "Swap the glowing pair to match 4. Your Beam clears a line when swapped.",
+      "tutorial": "Match 4. Move left/right for a row Beam, up/down for a column Beam. Swap a Beam to fire.",
       "hint": [
         27,
         19

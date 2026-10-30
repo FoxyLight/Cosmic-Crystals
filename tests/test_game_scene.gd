@@ -58,8 +58,8 @@ func _validate() -> void:
 	game.set("display_specials", example.specials.duplicate())
 	game.call("_take_turn", 3 * 8 + 3, 2 * 8 + 3)
 	_check(game.get("phase") == "resolving", "Swipe turn must lock UI during animations")
-	_check(example.specials.has(CosmicBoardScript.BEAM_ROW),
-		"Real gameplay turn must create a Star Beam from a horizontal four-match")
+	_check(example.specials.has(CosmicBoardScript.BEAM_COLUMN),
+		"Real gameplay upward swap must create a column Beam from a horizontal four-match")
 	var pending: Dictionary = game.get("active_event")
 	_check(not pending.is_empty() and pending.get("type", "") == "swap",
 		"Animated gameplay turn must begin playback of the swap")

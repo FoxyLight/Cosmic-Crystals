@@ -6,7 +6,7 @@
 
 ## Version numbering rules
 
-- `VERSION` is the product's source-controlled SemVer base, currently **`0.5.0`** (M4 Android polish). Bump it intentionally for a meaningful product iteration, not every CI run.
+- `VERSION` is the product's source-controlled SemVer base, currently **`0.5.1`** (Beam movement-direction fix). Bump it intentionally for a meaningful product iteration, not every CI run.
 - Each GitHub Actions workflow run receives a unique `GITHUB_RUN_NUMBER`. The run attempt increments when that same run is rerun.
 - Android `versionCode = run_number × 100 + run_attempt` (attempts 1–99). Codes increase across **new** workflow runs; rerunning an older workflow can produce an older code than a newer already-installed build. Do not install an older version expecting an upgrade. The generator rejects zero/invalid inputs and a code exceeding **2,100,000,000** (Play limit).
 - Android `versionName = <VERSION>-dev.<run_number>.<run_attempt>+g<first8GitSHA>`, for example `0.5.0-dev.74.1+gabc12345`.
@@ -14,7 +14,7 @@
 - GitHub Actions artifact name: `cosmic-crystals-android-v0.5.0-dev.74.1-gabc12345`.
 - The export uses the **same** `package/unique_name` as before: `org.foxylight.cosmiccrystals.prototype`.
 
-The CI generator edits Android `version/code` and `version/name` **in the ephemeral checkout**, not in the repository with each commit. The committed `export_presets.cfg` has `versionCode=2` and `versionName=0.5.0-local` for manual editor builds; those baseline values are **not** unique across local exports. To create a uniquely numbered local APK, deliberately set a code above the device's installed version and verify it.
+The CI generator edits Android `version/code` and `version/name` **in the ephemeral checkout**, not in the repository with each commit. The committed `export_presets.cfg` has `versionCode=2` and `versionName=0.5.1-local` for manual editor builds; those baseline values are **not** unique across local exports. To create a uniquely numbered local APK, deliberately set a code above the device's installed version and verify it.
 
 ## What GitHub Actions guarantees
 
