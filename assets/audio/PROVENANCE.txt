@@ -1,0 +1,8 @@
+Cosmic Crystals original synthesized audio, 2026-10-30.
+Created specifically for this project using scripts/ci/generate_audio.py.
+No sampled recordings, external music, or third-party melody is used.
+17 PCM sound effects and five 16-second original ambient compositions.
+Project owner FoxyLight may use, modify and distribute these generated assets
+with the game, including commercially, without third-party attribution fees.
+Generator and assets are maintained in this repository. Font licenses remain
+separate under assets/fonts/. Regenerate with Python 3 standard library.

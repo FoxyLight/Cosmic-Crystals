@@ -16,7 +16,7 @@ static func fresh() -> Dictionary:
 	return {"schema_version": SCHEMA, "highest_unlocked": 1,
 		"completed": [false, false, false, false, false],
 		"best_scores": [0, 0, 0, 0, 0], "best_stars": [0, 0, 0, 0, 0],
-		"tutorials_seen": [], "settings": {"reduced_motion": false}}
+		"tutorials_seen": [], "settings": {"reduced_motion": false, "large_text": false, "master_volume": 0.8, "music_volume": 0.45, "sfx_volume": 0.7, "muted": false}}
 
 
 static func normalize(raw) -> Dictionary:
@@ -48,8 +48,13 @@ static func normalize(raw) -> Dictionary:
 		for id in raw["tutorials_seen"]:
 			if (id is int or id is float) and id == floor(id) and id >= 1 and id <= COUNT and not clean["tutorials_seen"].has(int(id)):
 				clean["tutorials_seen"].append(int(id))
-	if raw.get("settings") is Dictionary and raw["settings"].get("reduced_motion") is bool:
-		clean["settings"]["reduced_motion"] = raw["settings"]["reduced_motion"]
+	if raw.get("settings") is Dictionary:
+		for key in ["reduced_motion", "large_text", "muted"]:
+			if raw["settings"].get(key) is bool: clean["settings"][key] = raw["settings"][key]
+		for key in ["master_volume", "music_volume", "sfx_volume"]:
+			var value = raw["settings"].get(key)
+			if (value is int or value is float) and is_finite(float(value)):
+				clean["settings"][key] = clampf(float(value), 0, 1)
 	return clean
 
 
@@ -89,9 +94,6 @@ func load_progress() -> Dictionary:
 
 func save_progress() -> bool:
 	if read_only:
-		return false
-	if OS.has_feature("web") and not OS.is_userfs_persistent():
-		notice = "Browser storage is unavailable. Progress lasts for this visit."
 		return false
 	var valid: Dictionary = normalize(data)
 	if valid.is_empty():
@@ -162,3 +164,10 @@ func total_stars() -> int:
 
 func all_completed() -> bool:
 	return not data["completed"].has(false)
+
+
+func set_preference(key: String, value) -> bool:
+	if not data["settings"].has(key): return false
+	data["settings"][key] = value
+	data = normalize(data)
+	return save_progress()
