@@ -1,7 +1,7 @@
 # M3: The Five-Level Lyra Campaign
 
 **Product base:** 0.4.0. **Implementation/automated verification:** present.
-**New human Android acceptance:** pending. No 6-20 expansion, other
+**M3 human Android acceptance:** player-reported PASS on 2026-10-29. No 6-20 expansion, other
 constellations, accounts, cloud storage, monetization or store publishing.
 
 ## Levels and progression
@@ -145,8 +145,7 @@ Reload retained 3/15 stars, 1/5 restored and level 2 unlocked. No captured
 warning/error console logs. This is a bounded browser runtime/persistence smoke,
 not a full browser/device matrix. The main Web artifact is available in run 98.
 
-**Human Android campaign/visual acceptance remains pending.** Installation and
-automated tests do not satisfy it. See #7 for current delivery and player results.
+**Historical delivery status before user feedback:** the campaign had been installed and passed automated tests, but player acceptance was then pending. The 2026-10-29 human acceptance report below supersedes that pending state.
 
 ## Player Android acceptance: PASS (2026-10-29)
 
@@ -178,6 +177,4 @@ Record exact versionName/code, source SHA, signing mode, device/Android version.
    and reduced motion. Record performance/interruption issues. Browser reload/
    resize needs its own supported-browser acceptance matrix.
 
-Keep #7 open until the player confirms the new journey/restart test. Unfinished
-board resume, audio, full accessibility/performance QA, production AAB/store work
-and expansion remain outside this M3 delivery.
+The player has now confirmed the requested Android campaign test passes; close #7 with the [M3 playtest evidence](ANDROID_M3_PLAYTEST_2026_10_29.md). Unfinished board resume, audio, full accessibility/performance QA, production AAB/store work and expansion remain outside this M3 delivery.
