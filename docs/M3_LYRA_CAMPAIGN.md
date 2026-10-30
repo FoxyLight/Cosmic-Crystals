@@ -148,6 +148,14 @@ not a full browser/device matrix. The main Web artifact is available in run 98.
 **Human Android campaign/visual acceptance remains pending.** Installation and
 automated tests do not satisfy it. See #7 for current delivery and player results.
 
+## Player Android acceptance: PASS (2026-10-29)
+
+Following the M3 campaign delivery and the request to play all five levels, test results/level unlocks and close/reopen to verify progress, the player reported **“Human android play test passes.”** This is accepted as the user's overall M3 campaign sign-off. The report does **not** contain per-level screenshots, scores, device/OS specifications or measured hardware performance, and it is not a claim of separately instrumented checks.
+
+The known installed-and-ADB-read-back M3 gameplay build is `0.4.0-dev.98.1+ge14ef9e9` (versionCode **9801**, commit `e14ef9e9`). The newer [main run #100](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/40974920062) differed only in documentation and was not confirmed as newly installed. Full evidence and remaining gates: [M3 Android Playtest Report](ANDROID_M3_PLAYTEST_2026_10_29.md).
+
+The five-level campaign implementation has passed both automated and player sign-off, allowing [M3 #7](https://github.com/FoxyLight/Cosmic-Crystals/issues/7) to be completed. This does **not** close M0/M1/M2/M4/M5/M6 release, accessibility, audio, balance or device-performance requirements. **Before another routine build is installed**, protect the new on-device progression against ephemeral CI signing changes (see [Android Versioning](ANDROID_VERSIONING.md)).
+
 ## Android acceptance checklist
 
 Record exact versionName/code, source SHA, signing mode, device/Android version.
