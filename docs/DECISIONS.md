@@ -71,7 +71,7 @@ Date: 2026-10-30. Accepted by explicit owner assignment. Android is the sole sup
 
 Use a reusable private debug keystore and pinned certificate in main Actions secrets; PRs receive no key. Keep package ID and schema-1 earned records. Never uninstall/clear a player installation without explicit approval. Old ephemeral-key installations require a verified backup and separately approved migration; new-key compatibility cannot be manufactured. Debug identity is separate from future production/upload signing.
 
-M4 uses original deterministic synthesized audio with source/provenance, bounded mixing and independent music/SFX/master preferences. Reduced motion is presentation-only. No new gameplay systems/cloud/ads/store work. #8 remains open until new human Android acceptance.
+M4 uses original deterministic synthesized audio with source/provenance, bounded mixing and independent music/SFX/master preferences. Reduced motion is presentation-only. No new gameplay systems/cloud/ads/store work. The player reported an overall M4 Android playtest PASS on 2026-10-30, satisfying the implemented/human acceptance gate for #8. M5 still owns detailed device measurements, focus-interruption and accessibility testing.
 
 
 ## ADR-007: Match-gem movement defines four-match Star Beam direction

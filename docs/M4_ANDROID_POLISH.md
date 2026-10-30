@@ -1,8 +1,7 @@
 # M4 Android Production Polish
 
 2026-10-30, current product **0.5.1** (original M4 audio/polish slice 0.5.0; subsequent Beam-direction correction 0.5.1). Android is the sole supported target. M3's
-five-level campaign is human-accepted and #7 is closed. **M4 #8 remains open
-until the player accepts the new audio/accessibility build.** No Web artifact,
+five-level campaign is human-accepted and #7 is closed. **M4 #8 subsequently received a player-reported Android playtest PASS on 2026-10-30.** No Web artifact,
 browser test, desktop distribution, iOS work, new constellation, monetization,
 cloud/account system or Play publication is included.
 
@@ -185,7 +184,15 @@ and final CI evidence are recorded in [issue #8](https://github.com/FoxyLight/Co
 - **Signing:** `persistent-secret`, stable-signing verification passed against the pinned certificate.
 - **Device evidence:** GitHub [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) records a private, validated read-only save backup, a **real-phone compatible in-place 10801 → 11001 update** and **byte-for-byte identical save afterward**, with no uninstall or data clearing. Separately, CI confirmed identical save bytes across a disposable emulator update.
 
-This establishes compatible update mechanics and data retention **for the verified stable-key build**, not any differently signed legacy installation. The player has **not yet reported a new human M4 audio/visual/Beam-direction playtest**. Actual audio quality, Android focus interruptions, system scaling, screen-reader usability and sustained FPS/RAM/thermals remain pending. M4 #8 stays open; Google Play release AAB remains future M6 work.
+This establishes compatible update mechanics and data retention **for the verified stable-key build**, not any differently signed legacy installation. **At the time of the build #110 checkpoint**, no M4 player acceptance was recorded. The player later reported **M4 playtest PASS on 2026-10-30**; see the report below. Detailed audio measurements, interruptions, system scaling, screen-reader usability and sustained FPS/RAM/thermals remain for M5. Google Play release AAB remains future M6 work.
+
+## Human Android acceptance: PASS (2026-10-30)
+
+The player reports **“M4 playtest passes”** following the M4 Android audio, settings/comfort, visuals and version 0.5.1 Beam-direction delivery. This is **overall human playtest acceptance** of the implemented M4 slice, not item-by-item evidence for every device/performance/accessibility/audio-focus scenario. See the [M4 Android playtest report](ANDROID_M4_PLAYTEST_2026_10_30.md) for exact version traceability and limitations.
+
+The known device-installed/read-back gameplay build was `0.5.1-dev.110.1+g7864c820`, code **11001**, with stable debug signing; later [main #113](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41090558472) introduced documentation only and has not been claimed installed for this test. A previously verified same-certificate 10801 → 11001 phone update retained saved progress byte-for-byte. **M4 can be completed at the defined implementation and human-playtest gate**, with unresolved quantitative hardware/audio-focus, system-scaling, full accessibility and multi-device requirements explicitly carried into M5 #9/M0/M1 rather than silently marked passed.
+
+The following detailed test checklist remains useful for deeper **M5 Android release-candidate QA**; the reported overall M4 pass does not establish each listed measurement.
 
 ## Android human playtest
 
@@ -204,6 +211,4 @@ this checklist. Record exact build, cert, device/OS and settings.
 6. Continuous normal/reduced sessions and repeated level changes with heavy
    effects/audio. Record actual FPS/p95, RAM/PSS, startup/load and thermals.
 
-Keep M4 open until the player confirms this new build. Production AAB/store
-signing, full screen-reader support, additional devices and extended balancing
-are not automatically completed by an APK export or emulator result.
+The player subsequently confirmed an overall **M4 Android playtest PASS**. Close M4 at the implemented/human-accepted polish scope, but keep **M5 multi-device/quantitative QA**, production AAB/store signing, full screen-reader coverage, and M2 extended balancing open; these are not proven by an APK export, emulator result or unitemized human response.

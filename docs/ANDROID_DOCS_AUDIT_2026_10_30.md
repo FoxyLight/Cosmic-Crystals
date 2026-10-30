@@ -40,6 +40,10 @@
 - **M6 #10:** separately authorized production/upload signing, signed AAB, Play internal track, declarations and publication decision.
 - **M7 #11:** optional post-MVP Android content only; iOS/Web are out of scope.
 
+## Post-audit M4 player acceptance update (2026-10-30)
+
+Following this documentation baseline audit, the player reported **“M4 playtest passes.”** [Report](ANDROID_M4_PLAYTEST_2026_10_30.md). The audit's earlier “M4 human acceptance pending” entries remain **historically accurate as of the original inspection** but have now been superseded for the *scoped M4 human playtest gate*. More extensive quantitative device/performance, audio interruption, font/display scaling and screen-reader testing remain open in M5/M0/M1. The 0.5.1 game code is unchanged; CI's later docs-only APK need not replace the installed build.
+
 ## Audit rule going forward
 
 When a feature, scope, version, signing identity, Android test or GitHub milestone changes, update **README**, [status](PROJECT_STATUS.md), [roadmap](ROADMAP.md), [milestones](MILESTONES.md), [QA](QA_TEST_PLAN.md), [M4](M4_ANDROID_POLISH.md), [Android signing](ANDROID_VERSIONING.md) and affected design/ADR documents together. Cite exact CI run, APK filename, embedded version, installed-device evidence, and separate **automated vs emulator vs human** outcomes. Never silently equate a passing APK export or byte-preserving device update with a user-approved gameplay release.
