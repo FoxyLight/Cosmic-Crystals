@@ -6,7 +6,7 @@ Current plan: 2026-10-30, Android-only 0.5.0. This supersedes the [historical pr
 
 Retain all 13 M3 Godot suites (rules, powers/combinations, asteroids, visuals, replay/shuffle, layout, sessions, saves and actual five-level touch progression). Add `test_android_polish.gd`: additive old-save preferences, volume/mute/reduced-motion, audio assets/crossfade/no restart/layering limits, focus+pause ordering, settings input interception and target/cutout geometry. Headless audio is deliberately silent: contract tests do not claim a speaker/audio-driver test.
 
-Eight Python tests cover Android versions/preset selection, source drift, signature parsing, Android-only workflow and all 22 PCM assets (headers, duration, headroom and loop seam). APK checks require all imported audio samples, provenance, font notices and authored catalog. Actual `aapt` and `apksigner` validate manifest and signing certificate; main stable-key APK must match the configured pin.
+Nine Python tests cover Android versions/preset selection, source drift, signature parsing, Android-only workflow and all 22 PCM assets (headers, duration, headroom and loop seam). APK checks require all imported audio samples, provenance, font notices and authored catalog. Actual `aapt` and `apksigner` validate manifest and signing certificate; main stable-key APK must match the configured pin.
 
 Use the **strict Godot parser/runtime-log guard** on every import/test/export. Exit zero with SCRIPT ERROR/ERROR is still failure. CI also runs a CPU settlement benchmark and two separately exported same-key versions on an isolated Android emulator, verifying exact saved bytes after `adb install -r`. That is not proof of updating the player's differently signed build 9801.
 

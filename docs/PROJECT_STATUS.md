@@ -8,6 +8,6 @@ M4 implements original audio, smooth context music, bounded effects, saved volum
 
 Private stable-debug setup was completed by the authorized owner session; actual main APK identity must pass the pin check before claiming enabled/verified. PR keys remain ephemeral. New-key compatibility with the old player app is not implied. See [versioning/signing](ANDROID_VERSIONING.md).
 
-M4 #8 remains open for new human Android acceptance. No new phone FPS/RAM, perceived mix quality, thermal, full font/display scaling, screen reader or multi-device result is claimed. The phone was disconnected at audit, so no M4 install or save migration was performed. Main/PR CI and exact artifact results are recorded in #8 and the final delivery report.
+M4 #8 remains open for new human Android acceptance. No new phone FPS/RAM, perceived mix quality, thermal, full font/display scaling, screen reader or multi-device result is claimed. The phone was disconnected at audit. A later Pixel 7a connection reported the expected game package absent; the read-only backup attempt failed before creating a save backup. No M4 install, uninstall or save migration was performed. Main/PR CI and exact artifact results are recorded in #8 and the final delivery report.
 
 M0/M1/M2 broader device/balance gates, M5 quality and M6 release signing/Play remain open. Web/HTML5, iOS and desktop distribution are out of scope. Historical Web evidence is retained without current deliverables.

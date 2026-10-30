@@ -123,7 +123,7 @@ the delivered APK has its unique run-based version. This proves same-key update
 mechanics only. It does not make old ephemeral-key build 9801 compatible.
 
 **No real-phone uninstall, data clearing, migration or new M4 installation has
-been performed.** At audit the phone was disconnected. Keep the existing game.
+been performed.** At audit the phone was disconnected. Later the Pixel 7a reconnected but Android reported the expected package absent, so the read-only backup could not be captured. No backup is claimed. Keep the existing game.
 The read-only backup helper refuses overwrite and validates before saving exact
 bytes/checksum. After a validated backup, a one-time replacement/restore needs
 separate explicit approval. If backing up fails, stop. [Safe procedure](ANDROID_EXPORT.md).
@@ -135,7 +135,7 @@ the new visible Home control. New M4 suite: 166 checks covering additive saves,
 all streams, settings persistence, mute/independent interruption ordering,
 crossfade/no restart, bounded concurrency, event dispatch, repeated navigation,
 real Beam audio dispatch, safe controls and unchanged reduced-motion rules.
-Eight Python tests cover versioning, actual preset selection, certificate
+Nine Python tests cover versioning, actual preset selection, certificate
 parsing, original PCM validation and Android-only configuration. All pass locally.
 Strict parser/runtime-log guards remain mandatory. CI additionally validates
 actual APK audio/catalog/font packaging, manifest, checksum, certificate and

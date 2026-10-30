@@ -3,11 +3,22 @@ import unittest
 import wave
 from pathlib import Path
 from scripts.ci.verify_signing import fingerprint
+from scripts.android_save_backup import validate_save
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class AndroidPolishTests(unittest.TestCase):
+    def test_backup_rejects_adb_error_text_and_bad_records(self):
+        import json
+        raw = {"schema_version": 1, "completed": [True, False, False, False, False],
+               "best_scores": [835, 0, 0, 0, 0], "best_stars": [3, 0, 0, 0, 0]}
+        self.assertEqual(validate_save(json.dumps(raw).encode()), raw)
+        for value in [b"run-as: unknown package", b"", b"{}"]:
+            with self.assertRaises(ValueError): validate_save(value)
+        raw["best_stars"][0] = 4
+        with self.assertRaises(ValueError): validate_save(json.dumps(raw).encode())
+
     def test_certificate_output_is_strict(self):
         digest = "a1" * 32
         self.assertEqual(fingerprint("Signer #1 certificate SHA-256 digest: " + digest), digest)
