@@ -3,6 +3,12 @@
 **Snapshot:** 2026-10-29. Product base **0.4.0**, Godot 4.7.2 / GDScript,
 Compatibility renderer. Canonical source: FoxyLight/Cosmic-Crystals.
 
+## M3 Android acceptance: player-reported PASS (2026-10-29)
+
+The player confirmed **“Human android play test passes”** in direct response to the M3 Android journey/close-and-reopen acceptance request. Five-level Lyra gameplay, progression and saved best records are therefore accepted at **human playtest level** following the already passing automated and Web smoke tests. See the [bounded M3 Android playtest report](ANDROID_M3_PLAYTEST_2026_10_29.md). The known installed-and-read-back M3 APK is `0.4.0-dev.98.1+ge14ef9e9` (code 9801); no additional device-install verification is inferred for documentation-only main builds.
+
+The M3 milestone may be recorded as **complete at its defined implementation and player-playtest gate**. Separate M0/M1/M2/M4 and release gates remain open, especially persistent debug signing to protect new saves, human balancing, audio/accessibility, performance and signed AAB.
+
 ## Current implementation
 
 M3's five-level Lyra campaign is implemented and verified in local and main CI, ready for
