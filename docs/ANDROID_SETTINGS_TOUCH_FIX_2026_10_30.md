@@ -22,7 +22,13 @@
 
 ## Automated verification
 
-[PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) passed the `check` and `android-debug-export` jobs including **190 Android polish checks** (native press/drag/release, visible percentages, three sliders, disk reload, CheckButton touch/toggle, reversible font sizing), other Godot suites, version tests, signed Android APK packaging and an emulator same-key save-preserving update. [Merged-main Android CI #123](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41109742730) is the final verification reference; inspect its live conclusion before claiming it passed.
+[PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) passed the `check` and `android-debug-export` jobs including **190 Android polish checks** (native press/drag/release, visible percentages, three sliders, disk reload, CheckButton touch/toggle, reversible font sizing), other Godot suites, version tests, signed Android APK packaging and an emulator same-key save-preserving update. [Merged-main Android CI #123](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41109742730) **passed both Android-only jobs**, including 15 Godot suites, nine Python version/polish checks, strict Godot log checks, manifest/signature/certificate-pin verification, checksum and the disposable-emulator same-key save update. The installed physical-phone playtest of this new patch is still pending.
+
+- **APK artifact:** [cosmic-crystals-android-v0.5.2-dev.123.1-g1dc1810b](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41109742730/artifacts/13002038436)
+- **APK filename:** `cosmic-crystals-v0.5.2-dev.123.1-g1dc1810b-debug.apk`
+- **Embedded versionName:** `0.5.2-dev.123.1+g1dc1810b`; **versionCode:** `12301`
+- **SHA-256:** `17162cdbba7dae3b21408bbd776fa56135f0ffb2c612dd730057ef176ce7a331`
+- **Signing:** `persistent-secret`, same verified pinned debug certificate identity as the pre-existing stable-key M4 builds.
 
 **No new human Android playtest of this 0.5.2 fix is yet reported.** The earlier overall M4 acceptance preceded discovery of these two settings defects. Keep #37 **open** for user retest even after CI is green; M5 #9 remains open for quantified multi-device accessibility/performance.
 
