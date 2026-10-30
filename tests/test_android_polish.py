@@ -54,6 +54,7 @@ class AndroidPolishTests(unittest.TestCase):
         self.assertIn("verify_signing.py", workflow)
         self.assertIn("check_upgrade.py", workflow)
         self.assertIn("COSMIC_DEBUG_CERT_SHA256", workflow)
+        self.assertIn("COSMIC_DEBUG_KEYSTORE_PASSWORD", workflow)
         self.assertIn("strict", (ROOT / "docs/QA_TEST_PLAN.md").read_text().lower())
 
 
