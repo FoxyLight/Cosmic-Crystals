@@ -1,3 +1,5 @@
+> **Historical v0.3.1 visual-pass report.** The active game is now **Android-only 0.5.1**, with the five-level M3 journey accepted and M4 audio/comfort features implemented. Earlier Web testing and pre-M3 scope statements below describe the historical delivery. New M4 human acceptance remains open. See [current status](PROJECT_STATUS.md) and [M4](M4_ANDROID_POLISH.md).
+
 # Gameplay visual pass · 0.3.1
 
 The player asked to align Godot with the earlier browser/Android design after
