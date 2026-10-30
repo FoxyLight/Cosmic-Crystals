@@ -187,6 +187,14 @@ and final CI evidence are recorded in [issue #8](https://github.com/FoxyLight/Co
 
 This establishes compatible update mechanics and data retention **for the verified stable-key build**, not any differently signed legacy installation. The player has **not yet reported a new human M4 audio/visual/Beam-direction playtest**. Actual audio quality, Android focus interruptions, system scaling, screen-reader usability and sustained FPS/RAM/thermals remain pending. M4 #8 stays open; Google Play release AAB remains future M6 work.
 
+## Human Android acceptance: PASS (2026-10-30)
+
+The player reports **“M4 playtest passes”** following the M4 Android audio, settings/comfort, visuals and version 0.5.1 Beam-direction delivery. This is **overall human playtest acceptance** of the implemented M4 slice, not item-by-item evidence for every device/performance/accessibility/audio-focus scenario. See the [M4 Android playtest report](ANDROID_M4_PLAYTEST_2026_10_30.md) for exact version traceability and limitations.
+
+The known device-installed/read-back gameplay build was `0.5.1-dev.110.1+g7864c820`, code **11001**, with stable debug signing; later [main #113](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41090558472) introduced documentation only and has not been claimed installed for this test. A previously verified same-certificate 10801 → 11001 phone update retained saved progress byte-for-byte. **M4 can be completed at the defined implementation and human-playtest gate**, with unresolved quantitative hardware/audio-focus, system-scaling, full accessibility and multi-device requirements explicitly carried into M5 #9/M0/M1 rather than silently marked passed.
+
+The following detailed test checklist remains useful for deeper **M5 Android release-candidate QA**; the reported overall M4 pass does not establish each listed measurement.
+
 ## Android human playtest
 
 First resolve signing compatibility safely; never uninstall merely to start
