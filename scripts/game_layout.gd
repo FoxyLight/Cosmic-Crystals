@@ -3,14 +3,14 @@ extends RefCounted
 ## Coordinates are viewport units; safe-area conversion is owned by the scene.
 
 
-static func calculate(view_size: Vector2, insets: Vector4 = Vector4.ZERO, campaign: bool = false) -> Dictionary:
-	var caption_height: float = 40.0 if campaign else 24.0
+static func calculate(view_size: Vector2, insets: Vector4 = Vector4.ZERO, campaign: bool = false, extra_large: bool = false) -> Dictionary:
+	var caption_height: float = (84.0 if extra_large else 64.0) if campaign else 24.0
 	var area: Rect2 = Rect2(Vector2(insets.x, insets.y),
 		view_size - Vector2(insets.x + insets.z, insets.y + insets.w))
 	var desktop: bool = area.size.x >= 760.0 and area.size.x > area.size.y * 1.15
 	var result: Dictionary = {"safe": area, "desktop": desktop}
 	if desktop:
-		var side: float = minf(area.size.y - 204.0, 560.0)
+		var side: float = minf(area.size.y - 204.0 - maxf(0, caption_height - 40.0), 560.0)
 		var width: float = minf(area.size.x - 64.0, side + 340.0)
 		var x: float = area.position.x + (area.size.x - width) * 0.5
 		var y: float = area.position.y + 20.0

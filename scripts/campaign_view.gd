@@ -40,6 +40,7 @@ func _ready() -> void:
 	_label("level_name", "", 21, true, "map")
 	_label("level_goals", "", 12, false, "map")
 	_label("level_tip", "", 12, false, "map")
+	labels["home_body"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	labels["level_goals"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	labels["level_tip"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_button("play", "Play level", func(): game.start_level(game.map_selection), "map")
@@ -124,9 +125,9 @@ func refresh(layout: Dictionary) -> void:
 		node.visible = groups[node] == "both" or groups[node] == game.screen
 	var area: Rect2 = layout["safe"]
 	var large: bool = game.progress.data["settings"].get("large_text", false)
-	labels["home_body"].add_theme_font_size_override("font_size", 19 if large else 15)
-	labels["home_progress"].add_theme_font_size_override("font_size", 15 if large else 12)
-	labels["map_progress"].add_theme_font_size_override("font_size", 14 if large else 12)
+	labels["home_body"].add_theme_font_size_override("font_size", 23 if large else 19)
+	labels["home_progress"].add_theme_font_size_override("font_size", 18 if large else 15)
+	labels["map_progress"].add_theme_font_size_override("font_size", 17 if large else 14)
 	var width: float = minf(480, area.size.x - 24)
 	var x: float = area.get_center().x - width * 0.5
 	var top: float = area.position.y + 8
@@ -135,15 +136,15 @@ func refresh(layout: Dictionary) -> void:
 	_rect(labels["subtitle"], Rect2(x + 42, top + 29, width - 120, 16))
 	labels["notice"].text = game.progress.notice
 	labels["notice"].visible = game.screen == "home" and not game.progress.notice.is_empty()
-	_rect(labels["notice"], Rect2(x, area.end.y - 92, width, 36))
+	_rect(labels["notice"], Rect2(x, top + 48, width, 32))
 	if game.screen == "home":
 		var middle: float = area.get_center().y
 		var side: float = 72.0 if area.size.y < 650 else 92.0
 		_rect(icons["hero"], Rect2(area.get_center().x - side * 0.5, middle - 196, side, side))
 		_rect(labels["home_title"], Rect2(x, middle - 102, width, 92))
-		_rect(labels["home_body"], Rect2(x, middle, width, 60))
-		_rect(buttons["journey"], Rect2(x + 16, middle + 82, width - 32, 52))
-		_rect(labels["home_progress"], Rect2(x, middle + 150, width, 24))
+		_rect(labels["home_body"], Rect2(x, middle, width, 112))
+		_rect(buttons["journey"], Rect2(x + 16, middle + 134, width - 32, 52))
+		_rect(labels["home_progress"], Rect2(x, middle + 198, width, 30))
 		labels["home_progress"].text = "%d / 15 stars · %d / 5 restored" % [game.progress.total_stars(), game.progress.data["completed"].count(true)]
 		buttons["journey"].text = "Revisit the stars" if game.progress.all_completed() else ("Continue your journey" if game.progress.data["highest_unlocked"] > 1 else "Begin your journey")
 		_rect(motion, Rect2(x, area.end.y - 56, width - 110, 48))
@@ -153,15 +154,15 @@ func refresh(layout: Dictionary) -> void:
 		_rect(buttons["home"], Rect2(x + width - 76, top, 76, 48))
 		_rect(labels["map_title"], Rect2(x, top + 64, width, 36))
 		_rect(labels["map_progress"], Rect2(x, top + 103, width, 22))
-		labels["map_progress"].text = "Lyra restored · %d / 15 stars" % game.progress.total_stars() if game.progress.all_completed() else ("%d / 15 stars · Choose a star" if large else "%d / 15 stars · Choose a star to awaken") % game.progress.total_stars()
+		labels["map_progress"].text = "Lyra restored · %d / 15 stars" % game.progress.total_stars() if game.progress.all_completed() else "%d / 15 stars · Choose a star" % game.progress.total_stars()
 		var play: Rect2 = Rect2(x, area.end.y - 62, width, 50)
 		var enlarged: bool = game.progress.data["settings"].get("large_text", false)
-		var preview_rect: Rect2 = Rect2(x, play.position.y - (188 if enlarged else 156), width, 176 if enlarged else 144)
+		var preview_rect: Rect2 = Rect2(x, play.position.y - (260 if enlarged else 208), width, 248 if enlarged else 196)
 		_rect(preview, preview_rect)
 		_rect(buttons["play"], play)
 		_rect(labels["level_name"], Rect2(preview_rect.position + Vector2(14, 8), Vector2(width - 28, 30)))
-		_rect(labels["level_goals"], Rect2(preview_rect.position + Vector2(14, 42), Vector2(width - 28, 38 if enlarged else 26)))
-		_rect(labels["level_tip"], Rect2(preview_rect.position + Vector2(14, 86 if enlarged else 75), Vector2(width - 28, 82 if enlarged else 62)))
+		_rect(labels["level_goals"], Rect2(preview_rect.position + Vector2(14, 42), Vector2(width - 28, 64 if enlarged else 52)))
+		_rect(labels["level_tip"], Rect2(preview_rect.position + Vector2(14, 116 if enlarged else 100), Vector2(width - 28, 124 if enlarged else 88)))
 		var level: Dictionary = Levels.get_level(game.map_selection)
 		labels["level_name"].text = "%d · %s" % [level["id"], level["name"]]
 		var targets: PackedStringArray = []
@@ -204,8 +205,8 @@ func refresh(layout: Dictionary) -> void:
 		_rect(labels["notice"], Rect2(x, play.position.y - 38, width, 36))
 	if last_screen != game.screen:
 		buttons["journey" if game.screen == "home" else "play"].grab_focus()
-	labels["level_tip"].add_theme_font_size_override("font_size", 16 if large else 12)
-	labels["level_goals"].add_theme_font_size_override("font_size", 15 if large else 12)
+	labels["level_tip"].add_theme_font_size_override("font_size", 19 if large else 16)
+	labels["level_goals"].add_theme_font_size_override("font_size", 18 if large else 15)
 	last_screen = game.screen
 	queue_redraw()
 

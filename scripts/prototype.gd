@@ -148,7 +148,7 @@ func _prepare_view() -> void:
 	phase = "idle"
 	overlay = ""
 	active_event = {}
-	feedback = str(session.level["tutorial"]) if not progress.data["tutorials_seen"].has(current_level_id) else "Complete every goal. Each little match adds starlight."
+	feedback = str(session.level.get("caption", session.level["tutorial"])) if not progress.data["tutorials_seen"].has(current_level_id) else "Complete every goal. Each little match adds starlight."
 	feedback_ok = true
 	flash_time = 0.0
 	_refresh_views()
@@ -319,10 +319,10 @@ func _safe_insets() -> Vector4:
 
 
 func _layout() -> Dictionary:
-	var key: Array = [size, _safe_insets(), not practice_mode]
+	var key: Array = [size, _safe_insets(), not practice_mode, progress.data["settings"].get("large_text", false)]
 	if key != layout_key:
 		layout_key = key
-		layout_cache = Layout.calculate(size, key[1], not practice_mode)
+		layout_cache = Layout.calculate(size, key[1], not practice_mode, key[3])
 	return layout_cache
 
 
