@@ -1,10 +1,10 @@
 # Android QA and Acceptance Plan
 
-Current plan: 2026-10-30, Android-only 0.5.0. This supersedes the [historical pre-M4 QA matrix](history/PRE_M4_QA_TEST_PLAN.md). No Web/browser/iOS acceptance applies. Desktop/headless execution is an Android development environment only.
+Current plan: 2026-10-30, Android-only **0.5.1**. This supersedes the [historical pre-M4 QA matrix](history/PRE_M4_QA_TEST_PLAN.md). No Web/browser/iOS acceptance applies. Desktop/headless execution is an Android development environment only.
 
 ## Automated gate
 
-Retain all 13 M3 Godot suites (rules, powers/combinations, asteroids, visuals, replay/shuffle, layout, sessions, saves and actual five-level touch progression). Add `test_android_polish.gd`: additive old-save preferences, volume/mute/reduced-motion, audio assets/crossfade/no restart/layering limits, focus+pause ordering, settings input interception and target/cutout geometry. Headless audio is deliberately silent: contract tests do not claim a speaker/audio-driver test.
+Retain the 13 M3 Godot suites (rules, powers/combinations, asteroids, visuals, replay/shuffle, layout, sessions, saves and actual five-level touch progression). Add `test_android_polish.gd`: additive old-save preferences, volume/mute/reduced-motion, audio assets/crossfade/no restart/layering limits, focus+pause ordering, settings input interception and target/cutout geometry. Headless audio is deliberately silent: contract tests do not claim a speaker/audio-driver test.
 
 Nine Python tests cover Android versions/preset selection, source drift, signature parsing, Android-only workflow and all 22 PCM assets (headers, duration, headroom and loop seam). APK checks require all imported audio samples, provenance, font notices and authored catalog. Actual `aapt` and `apksigner` validate manifest and signing certificate; main stable-key APK must match the configured pin.
 
@@ -27,6 +27,8 @@ M3's player pass is recorded in [its report](ANDROID_M3_PLAYTEST_2026_10_29.md).
 
 
 ## 0.5.1 Beam direction regression
+
+[PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) merged with 53 additional real-scene Beam-direction checks. At [main CI #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426), **all 15 Godot suites and nine Python tests passed**, as did Android APK manifest, signer-pin, packaged-assets and same-key emulator upgrade checks. The phone's 10801 → 11001 in-place update retained a validated save byte-for-byte; **M4 human audiovisual and Beam-direction acceptance is still pending**.
 
 A four-match Beam follows the initiating swap axis, not the completed line's
 orientation: left/right movement creates a horizontal row Beam; up/down creates
