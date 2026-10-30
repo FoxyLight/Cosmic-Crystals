@@ -11,8 +11,7 @@ The M3 milestone may be recorded as **complete at its defined implementation and
 
 ## Current implementation
 
-M3's five-level Lyra campaign is implemented and verified in local and main CI, ready for
-a new Android human acceptance test. Home/map/selection/play/
+M3's five-level Lyra campaign is implemented, verified in local/main CI and now accepted in the player's Android playtest. Home/map/selection/play/
 results/next/replay are connected; authored goals, budgets, scores, stars,
 unlocks, local progression and nonblocking tutorials are in place. The map
 has exactly five nodes and keeps prior best records on replay. Reduced motion
@@ -35,8 +34,7 @@ persistence/recovery and a complete touch-driven scene campaign with reload.
   passed tests and Android/Web exports. M3 uses the same guarded pipeline plus
   new tests and exported-catalog checks. PR run 97 and main run 98 passed all
   three jobs; delivery APK 9801 was installed and read back on the phone.
-- Local M3 disk reload/scene checks are automated evidence, not a physical
-  Android close/reopen test or a human campaign pass.
+- The user has since reported the requested M3 Android playtest **passes**, accepting the five-level campaign and reopen/persistence test at human feedback level. See [report](ANDROID_M3_PLAYTEST_2026_10_29.md). Exact per-case measurements were not supplied.
 - Desktop renders/prior Chromium smoke do not establish a full device/browser,
   hardware/accessibility matrix or release readiness.
 
@@ -48,11 +46,9 @@ persistence/recovery and a complete touch-driven scene campaign with reload.
 | M0 | Debug exports/basic smoke; AAB/metrics/device matrix open |
 | M1 | Automated correctness/scene checks; extended hardware/interruption QA open |
 | M2 | Powers/rocks implemented, automated, asteroid smoke accepted; tuning open |
-| M3 | Implementation and main CI verified; APK 9801 installed; human gate pending |
+| M3 | **Complete:** implementation/CI verified, Android user-reported acceptance passed |
 | M4 | Visual slice/basic reduced motion; broader acceptance/audio open |
 | M5-M6 | Not started |
 | M7 | Expansion/iOS deferred |
 
-Next: run the installed M3 APK's
-[M3 Android checklist](M3_LYRA_CAMPAIGN.md), record the player's result in #7,
-and fix findings. Do not close M3 merely because an APK exports.
+Next: preserve earned saves across debug updates with a stable private signing key, then advance M4 audio/accessibility/visual polish and M5 measured device/browser QA. Do not mistake the M3 human pass for full release sign-off.
