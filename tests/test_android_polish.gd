@@ -26,6 +26,27 @@ func tap(point: Vector2) -> void:
 		root.push_input(event, true)
 
 
+func touch_drag(slider: HSlider, from_fraction: float, to_fraction: float) -> void:
+	var rect: Rect2 = slider.get_global_rect()
+	var start: Vector2 = Vector2(rect.position.x + rect.size.x * from_fraction, rect.get_center().y)
+	var finish: Vector2 = Vector2(rect.position.x + rect.size.x * to_fraction, rect.get_center().y)
+	var down: InputEventScreenTouch = InputEventScreenTouch.new()
+	down.index = 0
+	down.position = start
+	down.pressed = true
+	root.push_input(down, true)
+	var motion: InputEventScreenDrag = InputEventScreenDrag.new()
+	motion.index = 0
+	motion.position = finish
+	motion.relative = finish - start
+	root.push_input(motion, true)
+	var up: InputEventScreenTouch = InputEventScreenTouch.new()
+	up.index = 0
+	up.position = finish
+	up.pressed = false
+	root.push_input(up, true)
+
+
 func _run() -> void:
 	var path: String = "user://tests/android-polish-%d.json" % Time.get_ticks_usec()
 	var store = Store.new(path)
@@ -94,6 +115,33 @@ func _run() -> void:
 	check(game.settings_open and game.settings_view.visible, "Home settings opens through real Android touch")
 	game.set_preference("muted", false)
 	game.set_preference("music_volume", .25)
+	# A native Android screen drag must work with mouse emulation disabled.
+	# The earlier suite only checked sliders' dimensions, not any player input.
+	var score_before_settings_drag: int = game.score
+	for volume_key in ["master_volume", "music_volume", "sfx_volume"]:
+		var control: HSlider = game.settings_view.sliders[volume_key]
+		touch_drag(control, .12, .88)
+		check(absf(float(game.progress.data["settings"][volume_key]) - .9) < .051, "Native Android drag increases " + volume_key)
+		check(int(control.value) == 90 and game.settings_view.captions[volume_key].text.contains("90%"), "Slider thumb and numeric label update during touch drag")
+		touch_drag(control, .85, -.15)
+		check(float(game.progress.data["settings"][volume_key]) == 0 and control.value == 0, "Drag beyond track clamps " + volume_key)
+		touch_drag(control, .1, .65)
+		check(absf(float(game.progress.data["settings"][volume_key]) - .65) < .051, "Native drag can move " + volume_key + " again")
+	check(game.score == score_before_settings_drag and game.settings_open, "Volume gesture never swaps board crystals or closes settings")
+	var disk_after_touch = Store.new(path)
+	disk_after_touch.load_progress()
+	for key in ["master_volume", "music_volume", "sfx_volume"]:
+		check(is_equal_approx(float(disk_after_touch.data["settings"][key]), float(game.progress.data["settings"][key])), "Touch volume survives disk reload: " + key)
+	var regular_preview_size: int = game.settings_view.preview.get_theme_font_size("font_size")
+	tap(game.settings_view.toggles["large_text"].get_global_rect().get_center())
+	await process_frame
+	check(game.progress.data["settings"]["large_text"] and game.settings_view.preview.get_theme_font_size("font_size") >= regular_preview_size + 5, "Larger reading text toggle visibly enlarges its settings preview")
+	check(game.settings_view.toggles["large_text"].get_theme_font_size("font_size") >= 18, "Settings toggle text enlarges immediately")
+	tap(game.settings_view.toggles["large_text"].get_global_rect().get_center())
+	await process_frame
+	check(not game.progress.data["settings"]["large_text"] and game.settings_view.preview.get_theme_font_size("font_size") == regular_preview_size, "Turning larger text off restores the normal preview")
+	tap(game.settings_view.toggles["large_text"].get_global_rect().get_center())
+	await process_frame
 	for dimension in [Vector2(320, 568), Vector2(376, 746), Vector2(600, 960), Vector2(800, 1280)]:
 		game.size = dimension
 		game._refresh_views()
@@ -106,7 +154,20 @@ func _run() -> void:
 			check(cutout["safe"].grow(.5).encloses(cutout[key]), "Android cutout/navigation-safe " + key)
 	game.size = root.get_visible_rect().size
 	game.close_settings()
+	game._refresh_views()
+	check(game.campaign_view.labels["home_body"].get_theme_font_size("font_size") >= 19, "Home reading text stays larger outside settings")
+	game.go_map(true)
+	check(game.campaign_view.labels["level_tip"].get_theme_font_size("font_size") >= 16, "Map tutorial text becomes noticeably larger")
 	check(game.start_level(2), "Earned unlock survives settings changes")
+	game._refresh_views()
+	check(game.hud.labels["caption"].get_theme_font_size("font_size") >= 16, "Gameplay feedback caption actually enlarges")
+	game.open_overlay("help")
+	game._refresh_views()
+	check(game.hud.labels["modal_body"].get_theme_font_size("font_size") >= 17, "Game tutorial dialog text enlarges")
+	game.set_preference("large_text", false)
+	check(game.hud.labels["modal_body"].get_theme_font_size("font_size") == 14 and game.hud.labels["caption"].get_theme_font_size("font_size") == 12, "Turning larger text off restores normal modal and gameplay sizes")
+	game.close_overlay()
+
 	for repeat in range(25):
 		game.go_map(true)
 		game.show_home()
