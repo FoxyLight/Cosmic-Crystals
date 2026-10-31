@@ -42,8 +42,8 @@
 6. Try rapid swipes/multiple fingers while Settings is open and while closing it. Confirm puzzle crystals do not move. Retest saved stars/unlocks after reopening.
 7. Record exact Android versionName/versionCode, phone/OS and qualitative result. Leave FPS/PSS, font scaling, TalkBack and multi-device accessibility audits to M5 rather than inventing them.
 
-**Sign-off required:** The user must confirm this specific patch's slider drag and visible text-size behavior on Android before issue #37 closes.
+**Sign-off received:** The user confirmed this patch on build 12501; #37 is closed. The original checklist above remains as historical test guidance.
 
 ## Player retest confirmation, 2026-10-30
 
-After the latest successful main APK `0.5.2-dev.125.1+gbe6733f0` (12501) was installed in place and its real save verified unchanged, the user was asked to test all three sliders and the visible Larger reading text toggle. The user replied **“That is working now.”** This accepts those reported defects at an overall player-test level; it does not invent itemized measurements or a device/accessibility matrix. #37 can close for this fix. The user then requested a larger default and a still larger option, implemented separately in [0.5.3](ANDROID_READING_TEXT_2026_10_30.md); the new sizes require their own retest.
+After the latest successful main APK `0.5.2-dev.125.1+gbe6733f0` (12501) was installed in place and its real save verified unchanged, the user was asked to test all three sliders and the visible Larger reading text toggle. The user replied **“That is working now.”** This accepts those reported defects at an overall player-test level; it does not invent itemized measurements or a device/accessibility matrix. #37 is closed for this fix. The user then requested a larger default and a still larger option, implemented separately in [0.5.3](ANDROID_READING_TEXT_2026_10_30.md); the new sizes and final Larger Text label were then separately **“Tested and approved”** on installed/read-back build 12901.
