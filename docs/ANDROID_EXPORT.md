@@ -23,3 +23,8 @@ Compare the installed and downloaded certificate, package and versionCode **befo
 **Current stable-key evidence:** [main run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) passed signature/pin, manifest, checksum, packaging and same-key emulator update tests. GitHub [M4 issue #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8) records the Pixel 7a's **10801 → 11001** compatible update and byte-identical save after a private validated backup, without uninstall or clear-data. [Artifact 0.5.1 build 11001](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426/artifacts/12988237867). The player subsequently reported **M4 Android playtest PASS** on 2026-10-30; this does not replace detailed M5 device performance, accessibility or audio-interruption testing. [M4 report](ANDROID_M4_PLAYTEST_2026_10_30.md).
 
 See [debug signing maintenance/recovery](ANDROID_VERSIONING.md) and [M4 phone checklist](M4_ANDROID_POLISH.md).
+
+
+## M5 stabilization, 2026-10-31
+
+Source base **0.5.4**; accepted prior Android build **0.5.3 / 12901**. [M5 audit/checklist](M5_ANDROID_RC_QA.md) and [current status](PROJECT_STATUS.md) supersede older current-build statements. Cancelled native touches cannot commit swaps/Nova or preference releases; backgrounding clears setting capture and extra fingers cannot bypass it. No gameplay rule, text size, package, schema or signing-key change. Candidate still requires physical Android QA; production signing/AAB/Play remains M6.

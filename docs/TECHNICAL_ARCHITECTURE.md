@@ -2,7 +2,7 @@
 
 Godot 4.7.2 standard, GDScript, Compatibility renderer. Android-only product and export. Desktop/headless execution is development only; Web/HTML5 and iOS are out of scope. Production AAB/store work remains separate.
 
-**Current checkpoint:** Product 0.5.1, [PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) implements move-axis Beam creation (horizontal swap → row Beam, vertical swap → column Beam), with all four gesture directions and retained stored-power blast direction tested. [Main run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) passed both Android-only jobs, 15 Godot suites, nine Python tests, manifest/signature/pin/asset checks and emulator same-key save preservation. The test phone also updated 10801 → 11001 without altering its saved file, per [M4 #8](https://github.com/FoxyLight/Cosmic-Crystals/issues/8). The player subsequently reported **M4 Android playtest PASS**, separate from these automated/update checks. Quantitative device performance, formal audio-interruption/accessibility matrices and a production AAB remain outstanding.
+**Current checkpoint:** Source **0.5.4**, M5 stabilization. Accepted baseline: main `77eb492c`, 0.5.3 build 12901; M3 #7, M4 #8 and settings #37 closed. The player approved the promoted baseline and **Larger Text** sizing/label. Android-only main #129 passed 15 Godot suites, nine Python tests, APK and emulator same-key update checks. M5 adds a sixteenth Godot suite, four Python probe tests and cancellation fixes; final merged build receipt is tracked in #9. [Current status](PROJECT_STATUS.md), [M5 implementation/evidence](M5_ANDROID_RC_QA.md). Quantitative physical-device/audio/scaling QA and M6 production AAB remain outstanding.
 
 ## Implemented layers
 
@@ -86,3 +86,8 @@ execution/exports from new human acceptance and platform measurements.
 `performance_monitor.gd`: at most 600 observed frame samples, mean/p95, engine FPS/static memory, session loads, turns/event counts. Android writes `user://performance-last.json` on backgrounding. This is observed runtime data, not a claim of physical-device testing. UI refresh is state-keyed, layout is cached by size/insets, clear membership cached per event; decorative board redraw is capped at 15 Hz while active animations retain frame updates. Reduced-motion idle redraw stops. No board scoring/RNG changes.
 
 CI is Android-only: strict Godot logs, all old tests plus M4, unique versioning/actual signature+pin checks, audio/catalog/license packing and isolated-emulator same-key update proof. Private main debug key is excluded from PRs and deleted from runner after use. See ANDROID_VERSIONING.md. No installation or migration of the user's old different-certificate game is automatic.
+
+
+## M5 stabilization checkpoint, 2026-10-31
+
+Source base **0.5.4** follows accepted 0.5.3 build 12901. [M5 audit and human checklist](M5_ANDROID_RC_QA.md) records verified cancellation fixes, 16 Godot suites and 13 Python tests, coverage boundaries and outstanding device measurements. M3 #7, M4 #8 and settings #37 are closed; M5 #9 remains open. Earlier numbered builds in this document are historical evidence, not the current APK. Read final candidate commit/version/signing in its main CI artifact and #9 delivery receipt.

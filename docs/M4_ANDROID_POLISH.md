@@ -1,6 +1,8 @@
+> **Historical milestone/build evidence.** For current source, accepted 0.5.3 build 12901, closed M3/M4/settings gates and active M5, see [PROJECT_STATUS](PROJECT_STATUS.md) and [M5 audit](M5_ANDROID_RC_QA.md). Status/next-step statements inside this earlier report apply to its recorded checkpoint.
+
 # M4 Android Production Polish
 
-2026-10-30, current product **0.5.1** (original M4 audio/polish slice 0.5.0; subsequent Beam-direction correction 0.5.1). Android is the sole supported target. M3's
+2026-10-30, recorded product **0.5.1** (original M4 audio/polish slice 0.5.0; subsequent Beam-direction correction 0.5.1). Android is the sole supported target. M3's
 five-level campaign is human-accepted and #7 is closed. **M4 #8 subsequently received a player-reported Android playtest PASS on 2026-10-30.** No Web artifact,
 browser test, desktop distribution, iOS work, new constellation, monetization,
 cloud/account system or Play publication is included.

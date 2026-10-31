@@ -191,3 +191,8 @@ Master/music/SFX, mute, reduced motion and larger reading text persist with exis
 ### Current Android-specific implementation checkpoint (0.5.1)
 
 Original PCM music/SFX, configurable master/music/effects/mute, additive saved settings, reduced motion and larger reading text, Android focus/pause gates and bounded performance diagnostics are implemented in [M4](M4_ANDROID_POLISH.md). Four-match Star Beam direction now follows **the initiating gem movement**, not the completed line. [PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34) / [main run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) cover the rule and all Android build checks. A same-key **10801 → 11001** phone update retained the recorded save byte for byte. **The player subsequently reported an overall M4 Android playtest PASS**; no FPS/RAM/thermal study, exhaustive screen-reader audit or signed Google Play AAB is claimed. Android is the only supported product; older Web/iOS designs are historical.
+
+
+## M5 stabilization, 2026-10-31
+
+Source base **0.5.4**; accepted prior Android build **0.5.3 / 12901**. [M5 audit/checklist](M5_ANDROID_RC_QA.md) and [current status](PROJECT_STATUS.md) supersede older current-build statements. Cancelled native touches cannot commit swaps/Nova or preference releases; backgrounding clears setting capture and extra fingers cannot bypass it. No gameplay rule, text size, package, schema or signing-key change. Candidate still requires physical Android QA; production signing/AAB/Play remains M6.

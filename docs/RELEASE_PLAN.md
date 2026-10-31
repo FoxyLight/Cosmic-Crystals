@@ -2,7 +2,7 @@
 
 Android is the sole supported product. Sequence: accepted five-level M3 → M4 audio/accessibility/performance and safe updates → Android M5 release candidate → separately authorized M6 production signing/AAB/Play work. No Web, desktop distribution or iOS work is planned. [Historical release plan](history/PRE_M4_RELEASE_PLAN.md) is superseded.
 
-0.5.2 is the current Android source patch. It fixes native volume touch dragging and visible larger reading text after the already-accepted M4 and 0.5.1 Beam-direction changes. Issue #37 awaits a new phone retest. Debug CI derives unique code/name/filename from run/attempt/commit; validates manifest, signature, pin, checksum and assets; includes build-info. Stable debug identity is private Actions-secret material, not a Play release/upload key. The phone's 10801 → 11001 update was verified with its save byte-identical; this **does not** prove compatibility with a different-certificate legacy installation. A differently signed old app requires an explicitly approved save-safe migration; never erase progress for convenience. [Run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426).
+Source **0.5.4** is the M5 stabilization candidate following accepted 0.5.3 build 12901. Settings #37 is fixed and accepted; PRs #40/#41 text sizing and Larger Text label are approved. Debug CI preserves unique run/attempt/commit versioning, manifest/certificate/pin/checksum/assets and emulator exact-save upgrade checks. The phone's 12501 → 12701 → 12901 updates retained its save byte-for-byte. No newer candidate installation or physical acceptance is assumed. Stable debug signing remains separate from M6 production/upload signing. [Current status](PROJECT_STATUS.md), [M5 audit/checklist](M5_ANDROID_RC_QA.md).
 
 ## M4 acceptance
 
@@ -19,3 +19,8 @@ Android is the sole supported product. Sequence: accepted five-level M3 → M4 a
 ## Future M6, not this assignment
 
 Privately provision distinct production/upload credentials; validate Gradle release AAB and Play testing. Recheck current Play policies/target API and declarations at submission time. Prepare listing/privacy/data-safety disclosures matching actual features, then test updates on the chosen track. No ad/account/cloud SDKs are introduced by M4. Publication requires a separate authorized decision and evidence of availability.
+
+
+## M5 stabilization checkpoint, 2026-10-31
+
+Source base **0.5.4** follows accepted 0.5.3 build 12901. [M5 audit and human checklist](M5_ANDROID_RC_QA.md) records verified cancellation fixes, 16 Godot suites and 13 Python tests, coverage boundaries and outstanding device measurements. M3 #7, M4 #8 and settings #37 are closed; M5 #9 remains open. Earlier numbered builds in this document are historical evidence, not the current APK. Read final candidate commit/version/signing in its main CI artifact and #9 delivery receipt.

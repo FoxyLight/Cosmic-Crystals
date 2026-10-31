@@ -1,4 +1,4 @@
-> **Historical player QA record (baseline 0.2.0)**, not current acceptance guidance. The repository is now **Android-only 0.5.1**; M3 and asteroid smoke tests have subsequently passed. Web/browser test references below describe superseded historical plans, not active tasks. M4 audio/Beam-direction acceptance remains pending; see [current QA](QA_TEST_PLAN.md).
+> **Historical milestone/build evidence.** For current source, accepted 0.5.3 build 12901, closed M3/M4/settings gates and active M5, see [PROJECT_STATUS](PROJECT_STATUS.md) and [M5 audit](M5_ANDROID_RC_QA.md). Status/next-step statements inside this earlier report apply to its recorded checkpoint.
 
 # Android Player Playtest: Passed
 

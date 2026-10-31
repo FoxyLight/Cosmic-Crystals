@@ -15,7 +15,7 @@
 | Gameplay feedback | 12 | 16 | 20 |
 | Campaign help/confirmation text | 14 | 17 | 20 |
 
-Sizes are logical Godot units, not a claim about Android system font scaling. Existing score/move numerals, brand headings and crystal silhouettes retain their roles. Settings labels the option **Extra-large text** so the player can distinguish it from the already enlarged baseline. Turning it off restores the new readable standard, not the former small text.
+Sizes are logical Godot units, not a claim about Android system font scaling. Existing score/move numerals, brand headings and crystal silhouettes retain their roles. Settings labels the option **Larger Text** (PR #41) so the player can distinguish it from the already enlarged baseline. Turning it off restores the new readable standard, not the former small text.
 
 ## One-screen layout
 
@@ -31,4 +31,9 @@ Schema 1 and `large_text` remain unchanged: false selects the newly readable sta
 
 The Android polish suite now includes 949 checks, including both sizes and a return to standard at 320x568, 376x746, 800x1280 and 1280x720; actual Label line metrics, no-ellipsis single-line widths, safe control bounds, Home button separation, all five map/game/help/result layouts and native volume drags. Existing gameplay, campaign, save, direction, version/signing and APK export suites remain active with strict Godot log guards. Compact native development renders of the settings sheet were inspected at both sizes. These are development checks, not a new physical phone pass.
 
-Retest on Android: with Extra-large text off, confirm the former larger sizing is now default. Turn it on and observe a clear increase, then turn it off to check reversal. Drag all volumes, inspect Home/map/all five levels/help/results, and close/reopen to retain your choice and earned records. Keep the new size's human acceptance separate from the player's confirmed 0.5.2 settings fix. Final CI/build/install evidence is recorded in the linked PR/issue tracking and delivery reply.
+Retest on Android: with Larger Text off, confirm the former larger sizing is now default. Turn it on and observe a clear increase, then turn it off to check reversal. Drag all volumes, inspect Home/map/all five levels/help/results, and close/reopen to retain your choice and earned records. Keep the new size's human acceptance separate from the player's confirmed 0.5.2 settings fix. Final CI/build/install evidence is recorded in the linked PR/issue tracking and delivery reply.
+
+
+## Subsequent physical acceptance
+
+The player confirmed **“Tested and approved”** after delivery/read-back of `0.5.3-dev.129.1+g77eb492c` / **12901**. This separately accepts the promoted default, increased optional size and final **Larger Text** label (PRs #40/#41). The prior instructions above are retained as the original checklist; no itemized scaling or quantitative device results are inferred.

@@ -82,3 +82,8 @@ M4 uses original deterministic synthesized audio with source/provenance, bounded
 - **Rationale:** The player explicitly requested the Beam to follow the gem's movement rather than the matched line's axis.
 - **Evidence:** [Main run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) passed 53 directional gesture/scene assertions and all other tests; later blast direction and saved-power identities remain unchanged.
 - **Pending:** Human Android confirmation of the new 0.5.1 gameplay/visual behavior, tracked in M4 #8. This is not a reason to reset or migrate saves.
+
+
+## M5 stabilization, 2026-10-31
+
+Source base **0.5.4**; accepted prior Android build **0.5.3 / 12901**. [M5 audit/checklist](M5_ANDROID_RC_QA.md) and [current status](PROJECT_STATUS.md) supersede older current-build statements. Cancelled native touches cannot commit swaps/Nova or preference releases; backgrounding clears setting capture and extra fingers cannot bypass it. No gameplay rule, text size, package, schema or signing-key change. Candidate still requires physical Android QA; production signing/AAB/Play remains M6.

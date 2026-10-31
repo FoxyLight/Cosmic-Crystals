@@ -1,4 +1,4 @@
-> **Historical M0/M1 implementation report for PR #13 (2026-10-29).** The project is now **Android-only 0.5.1** with M3 player acceptance, M4 audio/settings and stable debug signing. A real Android phone update from 10801 to 11001 preserved the save; the original “unverified APK install” and Web requirements below describe the *earlier snapshot*, not the current state. Current status: [PROJECT_STATUS.md](PROJECT_STATUS.md); current Android gates: [QA](QA_TEST_PLAN.md), [M4](M4_ANDROID_POLISH.md).
+> **Historical milestone/build evidence.** For current source, accepted 0.5.3 build 12901, closed M3/M4/settings gates and active M5, see [PROJECT_STATUS](PROJECT_STATUS.md) and [M5 audit](M5_ANDROID_RC_QA.md). Status/next-step statements inside this earlier report apply to its recorded checkpoint.
 
 # M0/M1 Implementation Notes: First Native/Web Build Artifacts
 

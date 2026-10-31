@@ -1,4 +1,4 @@
-> **Historical M3 delivery baseline:** The level and save-schema details below document product **0.4.0** at M3 acceptance. The current Android-only source is **0.5.1** with original audio/comfort settings, a verified persistent debug signer and new four-match Beam direction (left/right row; up/down column). M3 human Android acceptance is already recorded; the later M4 human test remains open. Earlier Web CI/browser references and ephemeral-signing caveats are historical, not active build instructions. See [M4](M4_ANDROID_POLISH.md), [versioning](ANDROID_VERSIONING.md), [status](PROJECT_STATUS.md).
+> **Historical milestone/build evidence.** For current source, accepted 0.5.3 build 12901, closed M3/M4/settings gates and active M5, see [PROJECT_STATUS](PROJECT_STATUS.md) and [M5 audit](M5_ANDROID_RC_QA.md). Status/next-step statements inside this earlier report apply to its recorded checkpoint.
 
 # M3: The Five-Level Lyra Campaign
 
