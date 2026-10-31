@@ -216,6 +216,7 @@ func _notification(what: int) -> void:
 	if audio == null: return
 	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
 		app_backgrounded = true
+		if settings_view != null: settings_view.cancel_touch_drag()
 		audio.suspend("paused" if what == NOTIFICATION_APPLICATION_PAUSED else "focus", true)
 		press_index = -1
 		selected = -1
@@ -677,6 +678,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event is InputEventScreenTouch:
 		if event.index == 0:
+			if event.canceled:
+				press_index = -1
+				selected = -1
+				return
 			_handle_touch(event.position, event.pressed)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_handle_touch(event.position, event.pressed)
