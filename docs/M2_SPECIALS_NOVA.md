@@ -1,4 +1,4 @@
-> **Historical M2 implementation record (2026-10-29).** The active product is Android-only **0.5.1**. The five-level M3 campaign has player acceptance and #7 is closed. Four-match Beams now follow the **initiating gem movement** (left/right → row; up/down → column), verified by [PR #34](https://github.com/FoxyLight/Cosmic-Crystals/pull/34), not the older reward-orientation assumptions below. The Web CI job was retired in M4. Historical APK/Web reports remain evidence of their original runs. Current M4 human acceptance is pending. See [M4](M4_ANDROID_POLISH.md), [QA](QA_TEST_PLAN.md).
+> **Historical milestone/build evidence.** For current source, accepted 0.5.3 build 12901, closed M3/M4/settings gates and active M5, see [PROJECT_STATUS](PROJECT_STATUS.md) and [M5 audit](M5_ANDROID_RC_QA.md). Status/next-step statements inside this earlier report apply to its recorded checkpoint.
 
 # M2 First Playable Slice: Special Crystals and Nova Pulse
 

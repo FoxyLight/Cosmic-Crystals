@@ -1,6 +1,6 @@
 # Current Android Risks and Dependencies
 
-**Reviewed:** 2026-10-30, source version **0.5.1**, Godot 4.7.2 Compatibility. **Android is the sole supported product.** The previous 2026-10-29 matrix described not-yet-implemented M2/M3 and planned browser/iOS work and has been superseded. Historical decisions/exports remain traceable in Git history and [ADR-006](DECISIONS.md).
+**Reviewed:** 2026-10-31, source version **0.5.4**, Godot 4.7.2 Compatibility. **Android is the sole supported product.** The previous 2026-10-29 matrix described not-yet-implemented M2/M3 and planned browser/iOS work and has been superseded. Historical decisions/exports remain traceable in Git history and [ADR-006](DECISIONS.md).
 
 Risk impact is qualitative; it is not an empirical probability or measured Android performance report.
 
@@ -31,3 +31,8 @@ Risk impact is qualitative; it is not an empirical probability or measured Andro
 ## Review cadence
 
 Review risks after each gameplay/signing change and before M4/M5/M6 acceptance. Convert risks to closed items only with appropriate source tests or human/device evidence. Historical browser/iOS risks are retired from the active matrix, not treated as unfinished Android work.
+
+
+## M5 stabilization checkpoint, 2026-10-31
+
+Source base **0.5.4** follows accepted 0.5.3 build 12901. [M5 audit and human checklist](M5_ANDROID_RC_QA.md) records verified cancellation fixes, 16 Godot suites and 13 Python tests, coverage boundaries and outstanding device measurements. M3 #7, M4 #8 and settings #37 are closed; M5 #9 remains open. Earlier numbered builds in this document are historical evidence, not the current APK. Read final candidate commit/version/signing in its main CI artifact and #9 delivery receipt.

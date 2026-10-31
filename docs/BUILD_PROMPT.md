@@ -1,17 +1,19 @@
 # Current AI Development Prompt: Cosmic Crystals (Android Only)
 
-**Updated:** 2026-10-30. **Current source:** product `0.5.2`, Godot `4.7.2` GDScript, Compatibility renderer. This document replaces the original 2026-10-29 cross-platform/build-from-scratch prompt. Consult Git history for that historical prompt. Do **not** add Web/HTML5, browser tests, desktop distribution or iOS development.
+**Updated:** 2026-10-31. **Current source:** product `0.5.4`, Godot `4.7.2` GDScript, Compatibility renderer. This document replaces the original 2026-10-29 cross-platform/build-from-scratch prompt. Consult Git history for that historical prompt. Do **not** add Web/HTML5, browser tests, desktop distribution or iOS development.
 
 Use this brief with a coding agent that can inspect and modify the connected repository **[FoxyLight/Cosmic-Crystals](https://github.com/FoxyLight/Cosmic-Crystals)** and run its Android-relevant tests.
 
 ## First, verify the live state
 
-1. Read [PROJECT_STATUS.md](PROJECT_STATUS.md), [MILESTONES.md](MILESTONES.md), [ROADMAP.md](ROADMAP.md), [GAME_DESIGN.md](GAME_DESIGN.md), [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md), [ANDROID_VERSIONING.md](ANDROID_VERSIONING.md), [QA_TEST_PLAN.md](QA_TEST_PLAN.md), [RELEASE_PLAN.md](RELEASE_PLAN.md), [DECISIONS.md](DECISIONS.md) and latest main CI/issue #8.
+1. Read [PROJECT_STATUS.md](PROJECT_STATUS.md), [MILESTONES.md](MILESTONES.md), [ROADMAP.md](ROADMAP.md), [GAME_DESIGN.md](GAME_DESIGN.md), [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md), [ANDROID_VERSIONING.md](ANDROID_VERSIONING.md), [QA_TEST_PLAN.md](QA_TEST_PLAN.md), [RELEASE_PLAN.md](RELEASE_PLAN.md), [DECISIONS.md](DECISIONS.md) and latest main CI/issue #9.
 2. Confirm the *current* `main` commit and `VERSION` instead of relying on examples in this prompt. Preserve the already implemented five-level Lyra journey, saved unlocks/best-star ratings, M1/M2 special interactions, asteroids and all regression tests.
 3. Confirm the **Android-only** scope in the workflow: `check` and `android-debug-export` only. Headless/desktop Godot is allowed **as a development/test host**. Do not generate or test Web/iOS deliverables.
 4. Distinguish implemented source, local/headless or emulator tests, and user-confirmed physical Android playtests. A green CI run and installed APK do not establish human M4 acceptance.
 
 ## Proven baseline (review actual main before editing)
+
+The M5 starting commit is `77eb492c` / source 0.5.3, successful main #129 and installed/read-back 12901. Settings #37 is closed after player confirmation on 12501; the size/label refinement was separately “Tested and approved” on 12901. Source 0.5.4 adds only demonstrated input-cancellation repairs and regression coverage. Older #110 bullets below are historical M4 evidence; use [current status](PROJECT_STATUS.md) and #9 for the final M5 artifact.
 
 - **M3 #7 is closed:** the player reported a passing five-level Android campaign/relaunch playtest. Five JSON-authored stages, game sessions, home/map/results, star thresholds and schema-1 local saves are implemented.
 - **M4 #8 implementation is complete and the player's Android playtest has PASSED:** original audio (17 effects, five music loops), cached players, volume/mute preferences, comfort/reduced-motion and larger-text settings, Android focus/background behavior, visual effects, UI caching and bounded performance diagnostics are implemented. Full measured Android audio-focus, accessibility and performance validation belongs to M5; an overall M4 human playtest PASS was reported on 2026-10-30.
@@ -42,3 +44,8 @@ Use this brief with a coding agent that can inspect and modify the connected rep
 Update the affected project design/technical architecture, QA, status, roadmap, milestones, release notes and issue tracking alongside source changes. Report exactly which behaviors were implemented and verified, the PR/merged commit, CI run, APK `versionName`/`versionCode`/filename/checksum/signing mode, outstanding human-device acceptance and safe installation guidance.
 
 **Do the work, not just a plan.** Merge only after required Android CI passes. Stop rather than risk erasing the player's earned progress.
+
+
+## M5 stabilization checkpoint, 2026-10-31
+
+Source base **0.5.4** follows accepted 0.5.3 build 12901. [M5 audit and human checklist](M5_ANDROID_RC_QA.md) records verified cancellation fixes, 16 Godot suites and 13 Python tests, coverage boundaries and outstanding device measurements. M3 #7, M4 #8 and settings #37 are closed; M5 #9 remains open. Earlier numbered builds in this document are historical evidence, not the current APK. Read final candidate commit/version/signing in its main CI artifact and #9 delivery receipt.

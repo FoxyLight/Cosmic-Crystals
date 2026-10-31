@@ -6,7 +6,7 @@
 
 ## Version numbering rules
 
-- `VERSION` is the product's source-controlled SemVer base, currently **`0.5.3`** (readable baseline and extra-large text). Bump it intentionally for a meaningful product iteration, not every CI run.
+- `VERSION` is the product's source-controlled SemVer base, currently **`0.5.4`** (M5 input/cancellation stabilization). Bump it intentionally for a meaningful product iteration, not every CI run.
 - Each GitHub Actions workflow run receives a unique `GITHUB_RUN_NUMBER`. The run attempt increments when that same run is rerun.
 - Android `versionCode = run_number × 100 + run_attempt` (attempts 1–99). Codes increase across **new** workflow runs; rerunning an older workflow can produce an older code than a newer already-installed build. Do not install an older version expecting an upgrade. The generator rejects zero/invalid inputs and a code exceeding **2,100,000,000** (Play limit).
 - Android `versionName = <VERSION>-dev.<run_number>.<run_attempt>+g<first8GitSHA>`, for example `0.5.2-dev.123.1+g1dc1810b`.
@@ -14,7 +14,7 @@
 - GitHub Actions artifact name: `cosmic-crystals-android-v0.5.2-dev.123.1-g1dc1810b`.
 - The export uses the **same** `package/unique_name` as before: `org.foxylight.cosmiccrystals.prototype`.
 
-The CI generator edits Android `version/code` and `version/name` **in the ephemeral checkout**, not in the repository with each commit. The committed `export_presets.cfg` has `versionCode=2` and `versionName=0.5.3-local` for manual editor builds; those baseline values are **not** unique across local exports. To create a uniquely numbered local APK, deliberately set a code above the device's installed version and verify it.
+The CI generator edits Android `version/code` and `version/name` **in the ephemeral checkout**, not in the repository with each commit. The committed `export_presets.cfg` has `versionCode=2` and `versionName=0.5.4-local` for manual editor builds; those baseline values are **not** unique across local exports. To create a uniquely numbered local APK, deliberately set a code above the device's installed version and verify it.
 
 ## What GitHub Actions guarantees
 
@@ -96,3 +96,8 @@ Pixel 7a; versionName/code were read back. The owner confirmed they had already
 uninstalled the prior copy; no prior app was removed or old save recovered by
 M4. The subsequent private-password hardening preserves that same certificate,
 so it is eligible for an in-place update, not another uninstall. Subsequently the phone was updated **10801 → 11001** with the same signer after a private verified read-only save backup; GitHub issue #8 reports the resulting save was **byte-for-byte unchanged** and the installed version was read back. [Main run #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426) passed both Android-only jobs and verified `0.5.1-dev.110.1+g7864c820` (code 11001, checksum `a2d15f5efe9f26958e8c1ab77ea43e1ff5ac899793bc946cfa62eef37e7a7249`, signing `persistent-secret`, signer pin matched). [APK artifact](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426/artifacts/12988237867). **This paragraph documents installation/save retention separately from human QA.** The player subsequently reported an **overall M4 Android playtest PASS** on 2026-10-30 ([report](ANDROID_M4_PLAYTEST_2026_10_30.md)); it does not establish quantified audio quality or device performance.
+
+
+## M5 stabilization, 2026-10-31
+
+Source base **0.5.4**; accepted prior Android build **0.5.3 / 12901**. [M5 audit/checklist](M5_ANDROID_RC_QA.md) and [current status](PROJECT_STATUS.md) supersede older current-build statements. Cancelled native touches cannot commit swaps/Nova or preference releases; backgrounding clears setting capture and extra fingers cannot bypass it. No gameplay rule, text size, package, schema or signing-key change. Candidate still requires physical Android QA; production signing/AAB/Play remains M6.

@@ -1,12 +1,12 @@
 # Android QA and Acceptance Plan
 
-Current plan: 2026-10-30, Android-only **0.5.2**. This supersedes the [historical pre-M4 QA matrix](history/PRE_M4_QA_TEST_PLAN.md). No Web/browser/iOS acceptance applies. Desktop/headless execution is an Android development environment only.
+Current plan: 2026-10-31, Android-only **0.5.4**. This supersedes the [historical pre-M4 QA matrix](history/PRE_M4_QA_TEST_PLAN.md). No Web/browser/iOS acceptance applies. Desktop/headless execution is an Android development environment only.
 
 ## Automated gate
 
 Retain the 13 M3 Godot suites (rules, powers/combinations, asteroids, visuals, replay/shuffle, layout, sessions, saves and actual five-level touch progression). Add `test_android_polish.gd`: additive old-save preferences, volume/mute/reduced-motion, audio assets/crossfade/no restart/layering limits, focus+pause ordering, settings input interception and target/cutout geometry. Headless audio is deliberately silent: contract tests do not claim a speaker/audio-driver test.
 
-Nine Python tests cover Android versions/preset selection, source drift, signature parsing, Android-only workflow and all 22 PCM assets (headers, duration, headroom and loop seam). APK checks require all imported audio samples, provenance, font notices and authored catalog. Actual `aapt` and `apksigner` validate manifest and signing certificate; main stable-key APK must match the configured pin.
+Thirteen Python tests cover Android versions/preset selection, source drift, signature parsing, Android-only workflow and all 22 PCM assets (headers, duration, headroom and loop seam). APK checks require all imported audio samples, provenance, font notices and authored catalog. Actual `aapt` and `apksigner` validate manifest and signing certificate; main stable-key APK must match the configured pin.
 
 Use the **strict Godot parser/runtime-log guard** on every import/test/export. Exit zero with SCRIPT ERROR/ERROR is still failure. CI also runs a CPU settlement benchmark and two separately exported same-key versions on an isolated Android emulator, verifying exact saved bytes after `adb install -r`. That is not proof of updating the player's differently signed build 9801.
 
@@ -14,13 +14,13 @@ Use the **strict Godot parser/runtime-log guard** on every import/test/export. E
 
 **2026-10-30:** The player states **“M4 playtest passes”** after the version 0.5.1 audio/comfort/Beam-direction delivery. This records **overall M4 human usability acceptance** without inventing per-item scores, device specifications, system font-scale configurations, audio-mix measurements, hardware interruption tests, FPS/p95, RAM/PSS or thermals. [Evidence and exact known installed-build boundary](ANDROID_M4_PLAYTEST_2026_10_30.md).
 
-The detailed checklist below is retained as a **M5 release-candidate testing matrix**. Its individual measurements and multi-device conditions are *not automatically checked off* by the general player pass. M4 #8 may close at the scoped implementation/player-acceptance gate while [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) remains open for these objective measurements.
+The detailed checklist below is retained as a **M5 release-candidate testing matrix**. Its individual measurements and multi-device conditions are *not automatically checked off* by the general player pass. M4 #8 is closed at the scoped implementation/player-acceptance gate while [M5 #9](https://github.com/FoxyLight/Cosmic-Crystals/issues/9) remains open for these objective measurements.
 
 ## Post-M4 0.5.2 Android settings regression
 
-The player reported that volume sliders could not be moved and that Larger reading text had no obvious effect. [PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) adds native `InputEventScreenTouch`/`InputEventScreenDrag` handling and a visible font-size preview; the extended M4 test suite verifies all three slider gestures, percentages, persistence, switch touches and font sizes. **Physical Android acceptance of this patch remains pending under [#37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37)**. [Retest checklist](ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md). Do not infer a new 0.5.2 playtest from the prior M4 overall PASS.
+The player reported that volume sliders could not be moved and that Larger reading text had no obvious effect. [PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38) adds native `InputEventScreenTouch`/`InputEventScreenDrag` handling and a visible font-size preview; the extended M4 test suite verifies all three slider gestures, percentages, persistence, switch touches and font sizes. **The player accepted the fix on installed/read-back build 12501; [#37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37) is closed**. [Retest checklist](ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md). Do not infer a new 0.5.2 playtest from the prior M4 overall PASS.
 
-## New human Android M4 checklist
+## M5 physical Android checklist
 
 Record exact versionName/code, source SHA, public certificate fingerprint, signing mode, device/Android version and display/font scaling. Preserve the old installation unless an explicit backup/migration approval has been given.
 
@@ -49,4 +49,9 @@ rewritten; Bomb/Supernova precedence and available mechanics remain unchanged.
 
 ## 0.5.3 readable baseline and extra-large option
 
-The 0.5.2 larger font sizes are now standard without changing the stored boolean. Extra-large text raises these again. Verify both sizes at 320x568, 376x746, 800x1280 and 1280x720: settings preview/percent labels/toggles/status, Home text and button separation, every level preview/goal, gameplay caption, field guide and win summary. All text must fit without ellipsis, clipping, scroll or overlap. Check false → true → false restores the promoted default; native sliders remain draggable. Short gameplay captions supplement full map/help tutorials. The actual Android retest must confirm new readability; do not infer it from the prior 0.5.2 acceptance.
+The 0.5.2 larger font sizes are now standard without changing the stored boolean. The **Larger Text** switch raises these again. Verify both sizes at 320x568, 376x746, 800x1280 and 1280x720: settings preview/percent labels/toggles/status, Home text and button separation, every level preview/goal, gameplay caption, field guide and win summary. All text must fit without ellipsis, clipping, scroll or overlap. Check false → true → false restores the promoted default; native sliders remain draggable. Short gameplay captions supplement full map/help tutorials. The player separately approved this refinement and the final **Larger Text** label on installed/read-back 0.5.3 build 12901. System scaling and multi-device measurements remain pending in M5.
+
+
+## M5 stabilization checkpoint, 2026-10-31
+
+Source base **0.5.4** follows accepted 0.5.3 build 12901. [M5 audit and human checklist](M5_ANDROID_RC_QA.md) records verified cancellation fixes, 16 Godot suites and 13 Python tests, coverage boundaries and outstanding device measurements. M3 #7, M4 #8 and settings #37 are closed; M5 #9 remains open. Earlier numbered builds in this document are historical evidence, not the current APK. Read final candidate commit/version/signing in its main CI artifact and #9 delivery receipt.

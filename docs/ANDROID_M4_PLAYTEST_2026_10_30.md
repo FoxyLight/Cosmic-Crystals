@@ -1,3 +1,5 @@
+> **Historical milestone/build evidence.** For current source, accepted 0.5.3 build 12901, closed M3/M4/settings gates and active M5, see [PROJECT_STATUS](PROJECT_STATUS.md) and [M5 audit](M5_ANDROID_RC_QA.md). Status/next-step statements inside this earlier report apply to its recorded checkpoint.
+
 # M4 Android Production Polish: Human Playtest Accepted
 
 **Player report date:** 2026-10-30  

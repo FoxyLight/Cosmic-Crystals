@@ -1,4 +1,4 @@
-> **Historical M2 implementation record for 0.3.0 (2026-10-29).** The “Android acceptance pending” wording below reflects the state at PR #26. The **0.3.0 asteroid build 9101 subsequently passed the player's physical Android smoke test**, documented in [issue #6](https://github.com/FoxyLight/Cosmic-Crystals/issues/6). Current source **0.5.1** is Android-only; CI no longer exports Web builds. M2 **detailed power/Nova balance** remains open, as does the newer M4 audio/Beam-direction human test. See [current status](PROJECT_STATUS.md), [QA](QA_TEST_PLAN.md).
+> **Historical milestone/build evidence.** For current source, accepted 0.5.3 build 12901, closed M3/M4/settings gates and active M5, see [PROJECT_STATUS](PROJECT_STATUS.md) and [M5 audit](M5_ANDROID_RC_QA.md). Status/next-step statements inside this earlier report apply to its recorded checkpoint.
 
 # M2 Asteroid Blockers
 

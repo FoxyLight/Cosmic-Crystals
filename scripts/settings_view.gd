@@ -65,9 +65,19 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if not visible or game == null or not game.settings_open:
 		return
+	if game.app_backgrounded:
+		if event is InputEventScreenTouch or event is InputEventScreenDrag:
+			get_viewport().set_input_as_handled()
+		return
 	if event is InputEventScreenTouch:
+		if event.canceled:
+			if event.index == active_touch_index:
+				cancel_touch_drag()
+				get_viewport().set_input_as_handled()
+			return
 		if event.pressed:
 			if active_touch_index >= 0:
+				get_viewport().set_input_as_handled()
 				return
 			for key in sliders:
 				var slider: HSlider = sliders[key]
@@ -91,6 +101,8 @@ func _input(event: InputEvent) -> void:
 				if toggle.get_global_rect().has_point(event.position):
 					toggle.button_pressed = not toggle.button_pressed
 			cancel_touch_drag()
+			get_viewport().set_input_as_handled()
+		elif active_touch_index >= 0:
 			get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag and event.index == active_touch_index:
 		if not active_touch_key.is_empty():

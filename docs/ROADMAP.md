@@ -1,12 +1,12 @@
 # Android Development Roadmap
 
-Snapshot 2026-10-30, product **0.5.2**. Android is the sole supported product. Desktop/headless execution is development only. Web/HTML5/browser work and iOS development/feasibility are out of scope, superseding previous roadmap entries.
+Snapshot 2026-10-31, product **0.5.4**. Android is the sole supported product. Desktop/headless execution is development only. Web/HTML5/browser work and iOS development/feasibility are out of scope, superseding previous roadmap entries.
 
 M3's five-level Lyra campaign is accepted by the player and #7 is closed. Preserve all earned campaign records. [Acceptance](ANDROID_M3_PLAYTEST_2026_10_29.md).
 
 M4 implements audio, comfort/accessibility, clear restrained effects, render/UI work reduction, performance instrumentation, Android-only CI and pinned private debug signing. **PR #34 / version 0.5.1** also corrects new four-match Beams to follow the swap axis. The player phone's 10801 → 11001 same-key update retained the validated save byte for byte. **The player subsequently reported M4 Android playtest PASS on 2026-10-30**; M4's implementation/human acceptance gate is complete. [Human report](ANDROID_M4_PLAYTEST_2026_10_30.md). Full quantified device/performance/accessibility QA remains in M5 #9. [M4](M4_ANDROID_POLISH.md), [main CI #110](https://github.com/FoxyLight/Cosmic-Crystals/actions/runs/41078423426).
 
-**Post-M4 usability repair:** Android 0.5.2 source ([PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38)) adds native drag/touch control for Master, Music and Effects sliders, a visible Larger reading text preview, and readable guidance across screens. The player's reported defects are tracked under [#37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37), **open pending a new physical Android retest**. [Exact checklist](ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md). M4's earlier broad acceptance still stands as historical feedback, not acceptance of this later patch.
+**Post-M4 usability repair:** Android 0.5.2 source ([PR #38](https://github.com/FoxyLight/Cosmic-Crystals/pull/38)) adds native drag/touch control for Master, Music and Effects sliders, a visible Larger reading text preview, and readable guidance across screens. The player's reported defects are tracked under [#37](https://github.com/FoxyLight/Cosmic-Crystals/issues/37), **closed after player confirmation on 0.5.2 build 12501**. [Exact checklist](ANDROID_SETTINGS_TOUCH_FIX_2026_10_30.md). The separate 0.5.3 text-size and Larger Text label refinement was then approved on build 12901 (PRs #40/#41).
 
 Remaining gates:
 - M0 #4: actual Android device matrix, FPS/frame-time/RAM/startup/thermal/interruption evidence, future AAB and engine decision.
@@ -18,3 +18,8 @@ Remaining gates:
 - M7 #11: levels 6–20 and additional constellations deferred. iOS is out of scope, not a promised later target.
 
 No committed dates, staffing or release promises. Historic Web exports and the separate concept site are records only.
+
+
+## M5 stabilization checkpoint, 2026-10-31
+
+Source base **0.5.4** follows accepted 0.5.3 build 12901. [M5 audit and human checklist](M5_ANDROID_RC_QA.md) records verified cancellation fixes, 16 Godot suites and 13 Python tests, coverage boundaries and outstanding device measurements. M3 #7, M4 #8 and settings #37 are closed; M5 #9 remains open. Earlier numbered builds in this document are historical evidence, not the current APK. Read final candidate commit/version/signing in its main CI artifact and #9 delivery receipt.

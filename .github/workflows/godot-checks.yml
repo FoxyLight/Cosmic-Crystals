@@ -63,6 +63,8 @@ jobs:
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_android_polish.gd
       - name: Verify Beam orientation follows all four swipe and two-tap directions
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_beam_direction.gd
+      - name: Verify Android cancellation, native Done, repeated gestures and interrupted turns
+        run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/test_android_rc.gd
       - name: Record reproducible headless navigation and effects benchmark
         run: bash scripts/ci/check_godot_log.sh ./godot --headless --path . --script res://tests/benchmark_android.gd
       - name: Run the prototype scene headlessly for 120 frames

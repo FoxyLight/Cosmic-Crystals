@@ -14,8 +14,10 @@ def main():
     p.add_argument("--second", required=True)
     p.add_argument("--metadata", required=True)
     a = p.parse_args()
+    serial = None
     def adb(*args, data=None):
-        return subprocess.run(["adb", *args], input=data, check=True, capture_output=True).stdout
+        target = ["-s", serial] if serial else []
+        return subprocess.run(["adb", *target, *args], input=data, check=True, capture_output=True).stdout
     # Safeguard: this helper must NEVER target the player's real device.
     serial = adb("get-serialno").decode().strip()
     if not serial.startswith("emulator-"):
@@ -25,7 +27,7 @@ def main():
                       "completed": [True, True, False, False, False],
                       "best_scores": [835, 1100, 0, 0, 0], "best_stars": [3, 3, 0, 0, 0],
                       "tutorials_seen": [1, 2], "settings": {"reduced_motion": True, "muted": True,
-                      "master_volume": .65, "music_volume": .3, "sfx_volume": .6}}).encode()
+                      "large_text": True, "master_volume": .65, "music_volume": .3, "sfx_volume": .6}}).encode()
     adb("shell", "run-as", PACKAGE, "mkdir", "-p", "files")
     adb("shell", "run-as", PACKAGE, "sh", "-c", "'cat > files/lyra-progress.json'", data=save)
     before = adb("exec-out", "run-as", PACKAGE, "cat", "files/lyra-progress.json")
